@@ -3,8 +3,10 @@ import Head from 'next/head'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { Layout, Menu } from 'antd'
-import { UserOutlined, ScheduleOutlined, ShoppingCartOutlined, FormOutlined, ShopOutlined, SettingOutlined, BarChartOutlined, RightCircleFilled } from '@ant-design/icons'
+import { UserOutlined, ScheduleOutlined, ShoppingCartOutlined, FormOutlined, ShopOutlined, SettingOutlined, BarChartOutlined, RightCircleFilled, ClearOutlined } from '@ant-design/icons'
 import Header from '../components/organism/Header'
+import 'moment/locale/ko'
+
 
 const GlobalStyle = createGlobalStyle`
     html, body {
@@ -69,6 +71,7 @@ const MyApp = ({ Component, pageProps }) => {
         router.push(key).then(() => window.scrollTo(0,0));
     }
 
+
     return (
         <>
             <Head>
@@ -79,45 +82,46 @@ const MyApp = ({ Component, pageProps }) => {
             </Head>
             <GlobalStyle />
             <ThemeProvider theme={theme}>
-                {router.pathname == '/' ?
+                {router.pathname == '/' || router.pathname == '/join' ?
                     <Component {...pageProps} />
                     :
                     (
-                        <Layout style={{height: '100vh'}}>
+                        <Layout style={{minheight: '100vh'}}>
                             <Sider theme={'light'} collapsible collapsed={collapsed} onCollapse={e => setCollapsed(e)}>
                                 <LogoArea>
                                     <HeaderLogo src={'/image/logo.png'} />
                                 </LogoArea>
-                                <Menu defaultOpenKeys={['/reserved', '/product', '/review', '/user', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={[router.pathname]} mode="inline">
+                                <Menu defaultOpenKeys={['/reserved', '/goods', '/review', '/user', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={[router.pathname]} mode="inline">
+                                    {isAdmin &&
+                                    <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
+                                        <Menu.Item key="/user/customer/list" group="회원 관리" title="파트너 목록">파트너 목록</Menu.Item>
+                                        <Menu.Item key="/user/partner/list" group="회원 관리" title="고객 목록">고객 목록</Menu.Item>
+                                    </SubMenu>
+                                    }
+                                    <SubMenu key="/goods" icon={<ShoppingCartOutlined />} title="상품 관리">
+                                        <Menu.Item key="/goods/list" group="상품 관리" title="상품 목록">상품 목록</Menu.Item>
+                                    </SubMenu>
+                                    <SubMenu key="/hotel" icon={<ShopOutlined />} title="숙소 관리">
+                                        <Menu.Item key="/hotel/list" group="숙소 관리" title="숙소 목록">숙소 목록</Menu.Item>
+                                    </SubMenu>
+                                    <SubMenu key="/rooms" icon={<ClearOutlined />} title="객실 관리">
+                                        <Menu.Item key="/rooms/list" group="객실 관리" title="객실 목록">객실 목록</Menu.Item>
+                                    </SubMenu>
                                     <SubMenu key="/reserved" icon={<ScheduleOutlined />} title="예약 관리">
                                         <Menu.Item key="/reserved/list" group="예약 관리" title="예약 목록">예약 목록</Menu.Item>
                                     </SubMenu>
-                                    <SubMenu key="/product" icon={<ShoppingCartOutlined />} title="상품 관리">
-                                        <Menu.Item key="/product/list" group="상품 관리">상품 목록</Menu.Item>
-                                    </SubMenu>
                                     <SubMenu key="/review" icon={<FormOutlined />} title="리뷰 관리">
-                                        <Menu.Item key="/review/list" group="리뷰 관리">리뷰 목록</Menu.Item>
+                                        <Menu.Item key="/review/list" group="리뷰 관리" title="리뷰 목록">리뷰 목록</Menu.Item>
                                     </SubMenu>
-                                    {isAdmin &&
-                                    <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
-                                        <Menu.Item key="/user/partner" group="회원 관리">파트너 목록</Menu.Item>
-                                        <Menu.Item key="/user/customer" group="회원 관리">고객 목록</Menu.Item>
-                                    </SubMenu>
-                                    }
-                                    {isAdmin &&
-                                    <SubMenu key="/rooms" icon={<ShopOutlined />} title="숙소 관리">
-                                        <Menu.Item key="/rooms/list" group="숙소 관리">숙소 목록</Menu.Item>
-                                    </SubMenu>
-                                    }
                                     {isAdmin &&
                                     <SubMenu key="/board" icon={<SettingOutlined />} title="게시판 관리">
-                                        <Menu.Item key="/board/notice" group="게시판 관리">공지사항 목록</Menu.Item>
-                                        <Menu.Item key="/board/faq" group="게시판 관리">FAQ 목록</Menu.Item>
-                                        <Menu.Item key="/board/policy" group="게시판 관리">약관 및 정책 목록</Menu.Item>
+                                        <Menu.Item key="/board/notice" group="게시판 관리" title="공지사항 목록">공지사항 목록</Menu.Item>
+                                        <Menu.Item key="/board/faq" group="게시판 관리" title="FAQ 목록">FAQ 목록</Menu.Item>
+                                        <Menu.Item key="/board/policy" group="게시판 관리" title="약관 및 정책 목록">약관 및 정책 목록</Menu.Item>
                                     </SubMenu>
                                     }
                                     <SubMenu key="/stats" icon={<BarChartOutlined />} title="통계 관리">
-                                        <Menu.Item key="/stats/list" group="통계 관리">통계 목록</Menu.Item>
+                                        <Menu.Item key="/stats/list" group="통계 관리" title="통계 목록">통계 목록</Menu.Item>
                                     </SubMenu>
                                 </Menu>
                             </Sider>
