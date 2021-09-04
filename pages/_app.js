@@ -50,6 +50,12 @@ const GlobalStyle = createGlobalStyle`
     .ant-layout-header {
         padding: 0 24px;
     }
+    .ant-layout {
+        background: #f1f0f0
+    }
+    .ant-descriptions-header {
+        margin-bottom: 10px;
+    }
 `
 
 const theme = {}
@@ -59,8 +65,8 @@ const MyApp = ({ Component, pageProps }) => {
 
     const [isAdmin, setIsAdmin] = useState(true);
     const [collapsed, setCollapsed] = useState(false);
-    const [group, setGroup] = useState('예약 관리');
-    const [title, setTitle] = useState('예약 목록')
+    const [group, setGroup] = useState('회원 관리');
+    const [title, setTitle] = useState('파트너 목록')
 
     const { Sider, Content } = Layout
     const { SubMenu } = Menu
@@ -91,11 +97,11 @@ const MyApp = ({ Component, pageProps }) => {
                                 <LogoArea>
                                     <HeaderLogo src={'/image/logo.png'} />
                                 </LogoArea>
-                                <Menu defaultOpenKeys={['/reserved', '/goods', '/review', '/user', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={[router.pathname]} mode="inline">
+                                <Menu defaultOpenKeys={['/user', '/reserved', '/goods', '/hotel', '/review', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
                                     {isAdmin &&
                                     <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
-                                        <Menu.Item key="/user/customer/list" group="회원 관리" title="파트너 목록">파트너 목록</Menu.Item>
-                                        <Menu.Item key="/user/partner/list" group="회원 관리" title="고객 목록">고객 목록</Menu.Item>
+                                        <Menu.Item key="/user/partner/list" group="회원 관리" title="파트너 목록">파트너 목록</Menu.Item>
+                                        <Menu.Item key="/user/customer/list" group="회원 관리" title="고객 목록">고객 목록</Menu.Item>
                                     </SubMenu>
                                     }
                                     <SubMenu key="/goods" icon={<ShoppingCartOutlined />} title="상품 관리">

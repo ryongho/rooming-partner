@@ -1,5 +1,5 @@
 import { Layout, Dropdown, Menu, Button } from 'antd'
-import { UserOutlined, DownOutlined } from '@ant-design/icons'
+import { CaretDownOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import { useRouter } from 'next/router'
 
@@ -12,14 +12,24 @@ const Header = ({ title }) => {
         router.push('/');
     }
 
+    const menu = (
+        <Menu>
+            <Menu.Item>
+                <List onClick={()=>{router.push('/')}}>내 정보</List>
+            </Menu.Item>
+        </Menu>
+    )
+
     return (
         <Wrapper>
             <Title>{title}</Title>
             <RightSide>
-                <User>
-                    <Name>{'루밍'} 님</Name>
-                    <Email>(test@rooming.com)</Email>
-                </User>
+                <Dropdown overlay={menu}>
+                    <User>
+                        <Name>{'루밍'} 님</Name>
+                        <Email>(test@rooming.com) <CaretDownOutlined /></Email>
+                    </User>
+                </Dropdown>
                 <Logout type={'default'} size={'small'} onClick={onLogout}>
                     로그아웃
                 </Logout>
@@ -51,6 +61,9 @@ const User = styled.div`
     align-items: center;
     line-height: 1.4;
     margin-right: 10px;
+    cursor: pointer;
+`
+const List = styled.div`
 `
 const Name = styled.div`
     font-size: 12px;

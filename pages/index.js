@@ -23,7 +23,7 @@ const Login = () => {
             return message.warning('이메일 또는 비밀번호를 입력해 주세요.')
         }
 
-        router.push('/reserved/list')
+        router.push('/user/partner/list')
     }
 
     const onFindId = () => {
