@@ -145,7 +145,7 @@ const ReservedList = () => {
                 <TotalNum>총 {data.length}건</TotalNum>
                 <Space>
                     <Search placeholder="검색어를 입력해주세요" onSearch={onSearch} style={{ width: 400 }} />
-                    <ExcelDownBtn type="primary" onClick={onExcelDown}>엑셀 다운로드</ExcelDownBtn>
+                    <Button type="primary" onClick={onExcelDown}>엑셀 다운로드</Button>
                 </Space>
             </TableTop>
             <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
@@ -197,10 +197,6 @@ const TotalNum = styled.div`
     padding-left: 8px;
     color: #333;
     font-weight: bold;
-`
-
-const ExcelDownBtn = styled(Button)`
-    margin-left: 20px;
 `
 
 

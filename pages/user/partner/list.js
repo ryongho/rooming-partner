@@ -1,9 +1,11 @@
 import styled from 'styled-components'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input } from 'antd'
 import Link from 'next/link'
+import moment from 'moment'
+import xlsx from 'xlsx'
 
-const ReservedList = () => {
+const PartnerList = () => {
     const data = [{
         key: '1',
         partner: '가나다라',
@@ -69,9 +71,8 @@ const ReservedList = () => {
         sorter: ()=>{  }
     }];
     
-    const { Search } = Input;
     const [isAdmin, setIsAdmin] = useState(true);
-    
+
     const onCategory = (e) => {
         console.log(e)
     }
@@ -89,9 +90,10 @@ const ReservedList = () => {
 
     return (
         <Wrapper>
+        {isAdmin &&
+        <>
             <TopBox>
                 <FilterWrap>
-                    {isAdmin &&
                     <Filter>
                         <FilterLabel>카테고리</FilterLabel>
                         <SelectBar defaultValue={"total"} onChange={onCategory}>
@@ -100,26 +102,26 @@ const ReservedList = () => {
                             <Select.Option value={"resort"}>리조트</Select.Option>
                         </SelectBar>
                     </Filter>
-                    }
                     
                     <Filter>
                         <FilterLabel>가입일</FilterLabel>
                         <DatePicker />
                     </Filter>
-                    
                 </FilterWrap>
+                <SearchWrap>
+                    <FilterLabel>검색</FilterLabel>
+                    <SearchBar placeholder="숙소명 또는 파트너명을 입력해주세요" onSearch={onSearch} />
+                </SearchWrap>
             </TopBox>
 
             <TableTop>
                 <TotalNum>총 {data.length}명</TotalNum>
                 <Space>
-                    <Search 
-                    placeholder="파트너명을 입력해주세요" 
-                    onSearch={onSearch} 
-                    style={{ width: 400 }} />
-                    <ExcelDownBtn type="primary" onClick={onExcelDown}>엑셀 다운로드</ExcelDownBtn>
+                    <Button onClick={onExcelDown}>엑셀 다운로드</Button>
                 </Space>
             </TableTop>
+        </>
+        }
             <Table 
             columns={columns} 
             dataSource={data} 
@@ -157,6 +159,14 @@ const FilterLabel = styled.div`
     color: #666;
 `
 
+const SearchWrap = styled(Filter)`
+    margin-top: 15px;
+`
+
+const SearchBar = styled(Input.Search)`
+    width: 45%;
+`
+
 const SelectBar = styled(Select)`
     width: 150px;
 `
@@ -175,9 +185,5 @@ const TotalNum = styled.div`
     font-weight: bold;
 `
 
-const ExcelDownBtn = styled(Button)`
-    margin-left: 10px;
-`
 
-
-export default ReservedList
+export default PartnerList

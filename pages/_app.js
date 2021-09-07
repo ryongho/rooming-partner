@@ -77,6 +77,19 @@ const MyApp = ({ Component, pageProps }) => {
         router.push(key).then(() => window.scrollTo(0,0));
     }
 
+    useEffect(() => {
+        console.log(router.pathname)
+        if (router.pathname == '/user/partner/[pid]') setTitle('파트너 상세')
+        if (router.pathname == '/user/partner/list') setTitle('파트너 목록')
+        
+        if (router.pathname == '/hotel/write') setTitle('숙소 등록')
+        if (router.pathname == '/hotel/list') setTitle('숙소 목록')
+        if (router.pathname == '/hotel/[pid]') setTitle('숙소 상세')
+
+        if (router.pathname == '/goods/write') setTitle('상품 등록')
+        if (router.pathname == '/goods/list') setTitle('상품 목록')
+        if (router.pathname == '/goods/[pid]') setTitle('상품 상세')
+    }, [router])
 
     return (
         <>
@@ -92,12 +105,13 @@ const MyApp = ({ Component, pageProps }) => {
                     <Component {...pageProps} />
                     :
                     (
-                        <Layout style={{minheight: '100vh'}}>
+                        <Layout style={{minHeight: '100vh'}}>
                             <Sider theme={'light'} collapsible collapsed={collapsed} onCollapse={e => setCollapsed(e)}>
                                 <LogoArea>
                                     <HeaderLogo src={'/image/logo.png'} />
                                 </LogoArea>
-                                <Menu defaultOpenKeys={['/user', '/reserved', '/goods', '/hotel', '/review', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
+                                {/* <Menu defaultOpenKeys={['/user', '/reserved', '/goods', '/hotel', '/review', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline"> */}
+                                <Menu defaultOpenKeys={['/user', '/goods', '/hotel']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
                                     {isAdmin &&
                                     <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
                                         <Menu.Item key="/user/partner/list" group="회원 관리" title="파트너 목록">파트너 목록</Menu.Item>

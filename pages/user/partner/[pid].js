@@ -1,10 +1,11 @@
 import styled from 'styled-components'
-import { Descriptions, Input, Button, message, Image, Modal } from 'antd'
+import { Descriptions, Input, Button, message, Image, Modal, Upload } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
-const Partner = () => {
+const PartnerDetail = () => {
     const data = {
         key: '1',
         partner: '가나다라',
@@ -36,6 +37,8 @@ const Partner = () => {
     const [address, setAddress] = useState(data.address)
     const [address2, setAddress2] = useState(data.address2)
     const [zonecode, setZonecode] = useState(data.zonecode)
+    const [loading, setLoading] = useState(false)
+    const [imageUrl, setImageUrl] = useState();
     const [tel, setTel] = useState(data.tel)
     const [memo, setMemo] = useState(data.memo)
     const [showAddress, setShowAddress] = useState(false)
@@ -68,6 +71,9 @@ const Partner = () => {
         const pwRegExp = /^[a-z0-9]{8,20}$/;
         if (!router.query.type) router.push('/user/partner/1?type=modi');
         else {
+            if (!partner) {
+                return message.warning('파트너명을 입력해 주세요')
+            }
             if (!name) {
                 return message.warning('담당자명을 입력해 주세요')
             }
@@ -94,10 +100,40 @@ const Partner = () => {
         }
     }
 
+    let isImage = false;
+
+    const beforeUpload = (file) => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+            message.error('JPG 및 PNG 파일만 업로드 가능합니다.');
+        }
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+            message.error('이미지 사이즈는 2MB보다 작아야 합니다.');
+        }
+        return isJpgOrPng && isLt2M;
+    }
+
+    const onUploadChange = (e) => {
+        console.log(e.file.status);
+        if (e.file.status === 'uploading') {
+            return setLoading(true);
+        }
+        if (e.file.status === 'done') {
+            const reader = new FileReader();
+            reader.addEventListener('load', () => callback(reader.result));
+            reader.readAsDataURL(e.file.originFileObj);
+            
+            setLoading(false);
+            setImageUrl(reader.result)
+        }
+        
+    }
+
     return (
         <Wrapper>
             <Detail>
-                <Descriptions title={<Title>파트너 상세 정보</Title>} bordered column={1} extra={<Button onClick={() => router.push('/user/partner/list')}>목록으로 돌아가기</Button>}>
+                <Descriptions title={<Title>파트너 정보</Title>} bordered column={1} extra={<Button onClick={() => router.push('/user/partner/list')}>목록으로 돌아가기</Button>}>
                     <Descriptions.Item label="파트너명">
                         <InputValue 
                         value={partner} 
@@ -176,10 +212,28 @@ const Partner = () => {
                         bordered={modiStatus} />
                     </Descriptions.Item>
                     <Descriptions.Item label="사업자 등록증">
-                        <Image width={100} src="/image/logo.png" />
+                        {
+                            modiStatus ?
+                            <Upload 
+                            listType="picture-card"
+                            showUploadList={false}
+                            action=""
+                            beforeUpload={beforeUpload}
+                            onChange={onUploadChange}>
+                                {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                                : 
+                                <div>
+                                    {loading ? <LoadingOutlined /> : <PlusOutlined />}
+                                    <div style={{ marginTop: 8 }}>Upload</div>
+                                </div>}
+                            </Upload>
+                            : isImage ?
+                            <Image width={100} src="/image/logo.png" />
+                            : null
+                        }
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 정보">
-                        <HotelBtn type="primary" onClick={() => router.push('/hotel/1')}>{data.hotel}</HotelBtn>
+                        <HotelBtn onClick={() => router.push('/hotel/1')}>{data.hotel}</HotelBtn>
                     </Descriptions.Item>
                     {isAdmin &&
                     <Descriptions.Item label="관리자 메모">
@@ -253,4 +307,4 @@ const ButtonWrap = styled.div`
     }
 `
 
-export default Partner
+export default PartnerDetail
