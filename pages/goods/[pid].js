@@ -2,7 +2,6 @@ import styled from 'styled-components'
 import { Descriptions, Input, Button, message, Space, Upload, Checkbox, Radio, Modal } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import DaumPostcode from 'react-daum-postcode';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import UploadImgs from '../../components/atom/UploadImgs'
 
@@ -43,6 +42,7 @@ const GoodsDetail = () => {
     const [desc, setDesc] = useState(data.desc)
     const [thumb, setThumb] = useState(data.thumb)
     const [imgList, setImgList] = useState(data.imgList)
+    const [thumbLoading, setThumbLoading] = useState(false)
     const [loading, setLoading] = useState(false)
     const [imageUrl, setImageUrl] = useState()
     const [showDelete, setShowDelete] = useState(false)
@@ -78,16 +78,19 @@ const GoodsDetail = () => {
     
     const onUploadThumb = (e) => {
         if (!router.query.type) return;
-
+        if (e.file.status === 'uploading') {
+            return setThumbLoading(true);
+        }
         if (e.file.status === 'done') {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => (setThumb(reader.result)));
-        reader.readAsDataURL(e.file.originFileObj);
+            const reader = new FileReader();
+            reader.addEventListener('load', () => (setThumb(reader.result)));
+            reader.readAsDataURL(e.file.originFileObj);
+            setThumbLoading(false)
         }
     }
 
     const onUploadChange = async(e) => {
-        if (!router.query.type) return;
+        setImgList(e.fileList)
     }
     
     const onModi = () => {
@@ -184,32 +187,41 @@ const GoodsDetail = () => {
                         rows={4}
                         onChange={(e) => onDataChange(e, 'desc')} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="상품 사진">
+                    <Descriptions.Item label="상품 썸네일">
                         {modiStatus ?
-                        <>
                             <Upload
                             listType="picture-card"
                             showUploadList={false}
                             action="http://localhost:3000/"
                             beforeUpload={beforeUpload}
                             onChange={onUploadThumb}>
-                                {thumb ? <img src={thumb} alt="avatar" style={{ width: '100%' }} /> : <UploadBtn>썸네일 업로드</UploadBtn>}
+                                {
+                                    thumb ? <img src={thumb} style={{ width: '100%' }} /> 
+                                    : 
+                                    <div>
+                                        {thumbLoading ? <LoadingOutlined /> : <PlusOutlined />}
+                                        <UploadBtn>썸네일 업로드</UploadBtn>
+                                    </div>
+                                }
                             </Upload>
-                            <Space>
+                            :
+                            thumb && <img src={thumb} style={{ width: '300px' }} />
+                        }
+                    </Descriptions.Item>
+                    <Descriptions.Item label="상품 사진">
+                        {modiStatus ?
+                            <>
                                 <UploadImgs 
                                 fileList={imgList}
                                 loading={loading}
                                 onUploadChange={onUploadChange} />
-                                <UploadLength>({imgList.length} / 10)</UploadLength>
-                            </Space>
-                        </>
+                                <UploadLength style={imgList.length == 10 ? {color:'red'} : null}>({imgList.length} / 10)</UploadLength>
+                            </>
                             :
                             <ImgWrap>
-                                {thumb &&
-                                <img src={thumb} alt="avatar" />}
                                 {imgList.map(img => {
                                     return (
-                                        <img src={img.url} alt="avatar" />
+                                        <img src={img.thumbUrl} style={{ width: '300px' }} />
                                     )
                                 })}
                             </ImgWrap>

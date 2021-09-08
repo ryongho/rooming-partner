@@ -10,28 +10,28 @@ const PartnerList = () => {
         key: '1',
         partner: '가나다라',
         user_id: 'test1234',
-        joinAt: '2021-08-31',
+        joinAt: new Date('2021-08-30'),
         name: '김루밍',
         phone: '010-1234-1234'
     }, {
         key: '2',
         partner: '파트너2',
         user_id: 'test1234',
-        joinAt: '2021-08-31',
+        joinAt: new Date('2021-08-20'),
         name: '이루밍',
         phone: '010-1234-1234'
     }, {
         key: '3',
         partner: '파트너3',
         user_id: 'test1234',
-        joinAt: '2021-08-31',
+        joinAt: new Date('2021-08-11'),
         name: '박루밍',
         phone: '010-1234-1234'
     }, {
         key: '4',
         partner: '파트너4',
         user_id: 'test1234',
-        joinAt: '2021-08-31',
+        joinAt: new Date('2021-05-31'),
         name: '김루밍',
         phone: '010-1234-1234'
     }];
@@ -41,7 +41,7 @@ const PartnerList = () => {
         dataIndex: 'partner',
         key: 'partner',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => {  },
+        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
         render: (partner) => {
             return (
                 <Link href={`/user/partner/1`}>{partner}</Link>
@@ -68,7 +68,11 @@ const PartnerList = () => {
         title: '가입일',
         dataIndex: 'joinAt',
         key: 'joinAt',
-        sorter: ()=>{  }
+        render: (joinAt) => {
+            return moment(joinAt).format('YYYY-MM-DD')
+        },
+        sortDirections: ['descend', 'ascend'],
+        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 }
     }];
     
     const [isAdmin, setIsAdmin] = useState(true);

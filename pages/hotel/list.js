@@ -13,25 +13,25 @@ const HotelList = () => {
         category: '호텔',
         hotel: '라마다 프라자 바이 윈덤 여수 호텔',
         partner: '파트너1',
-        createdAt: '2021-09-06',
+        createdAt: new Date('2021-09-05'),
     }, {
         key: '2',
         category: '호텔',
         hotel: '호텔1234',
         partner: '파트너2',
-        createdAt: '2021-09-06'
+        createdAt: new Date('2021-08-12')
     }, {
         key: '3',
         category: '호텔',
         hotel: '호텔1234',
         partner: '파트너3',
-        createdAt: '2021-09-06'
+        createdAt: new Date('2021-09-26')
     }, {
         key: '4',
         category: '호텔',
         hotel: '호텔1234',
         partner: '파트너4',
-        createdAt: '2021-09-06'
+        createdAt: new Date('2021-07-30')
     }];
 
     const columns = [{
@@ -46,7 +46,9 @@ const HotelList = () => {
             return (
                 <Link href={`/hotel/1`}>{hotel}</Link>
             )
-        }
+        },
+        sortDirections: ['descend', 'ascend'],
+        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
     }, {
         title: '파트너명',
         dataIndex: 'partner',
@@ -56,7 +58,12 @@ const HotelList = () => {
         dataIndex: 'createdAt',
         key: 'createdAt',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => {},
+        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        render: (createdAt) => {
+            return (
+                moment(createdAt).format('YYYY-MM-DD')
+            )
+        }
     }];
 
     const [isAdmin, setIsAdmin] = useState(true);

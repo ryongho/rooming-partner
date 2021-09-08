@@ -15,39 +15,35 @@ const GoodsList = () => {
         goods: '여름날 치맥 파티',
         rooms: '스탠다드 트윈 시티뷰',
         hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-        price: '50000',
-        sale_price: '44000',
-        rate: '10',
+        price: '40000',
+        sale_price: '34000',
         active: true,
     }, {
         key: '2',
         category: '호텔',
         goods: '여름날 치맥 파티',
         rooms: '스탠다드 트윈 시티뷰',
-        hotel: '호텔1234',
-        price: '50000',
-        sale_price: '44000',
-        rate: '10',
+        hotel: '호텔1111',
+        price: '60000',
+        sale_price: '54000',
         active: true,
     }, {
         key: '3',
         category: '호텔',
-        goods: '여름날 치맥 파티',
+        goods: '봄날 파전 파티',
         rooms: '스탠다드 트윈 시티뷰',
-        hotel: '호텔1234',
-        price: '50000',
-        sale_price: '44000',
-        rate: '10',
+        hotel: '호텔2222',
+        price: '55000',
+        sale_price: '40000',
         active: false,
     }, {
         key: '4',
         category: '호텔',
-        goods: '여름날 치맥 파티',
+        goods: '겨울날 군고구마 파티',
         rooms: '스탠다드 트윈 시티뷰',
-        hotel: '호텔1234',
-        price: '50000',
-        sale_price: '44000',
-        rate: '10',
+        hotel: '호텔3333',
+        price: '73000',
+        sale_price: '24000',
         active: true,
     }];
 
@@ -65,7 +61,7 @@ const GoodsList = () => {
             )
         },
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => {},
+        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
     }, {
         title: '객실명',
         dataIndex: 'rooms',
@@ -75,28 +71,19 @@ const GoodsList = () => {
         dataIndex: 'hotel',
         key: 'hotel',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => {},
+        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
     }, {
         title: '원가',
         dataIndex: 'price',
         key: 'price',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => {},
+        sorter: (a, b) => a.price - b.price,
     }, {
         title: '할인가',
         dataIndex: 'sale_price',
         key: 'sale_price',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => {},
-    }, {
-        title: '할인율',
-        dataIndex: 'rate',
-        key: 'rate',
-        sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => {},
-        render: (rate) => {
-            return <p style={{color: 'red'}}>{rate}</p>
-        }
+        sorter: (a, b) => a.sale_price - b.sale_price,
     }, {
         title: '상태값',
         dataIndex: 'active',
@@ -108,9 +95,7 @@ const GoodsList = () => {
                     <Radio.Button value="notActive">비활성화</Radio.Button>
                 </Radio.Group>
             )
-        },
-        sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => {},
+        }
     }];
 
     const [isAdmin, setIsAdmin] = useState(true);
