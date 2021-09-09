@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "initstart": "pm2 start next --name \"rooming-admin\" -- start ",
+    "start": "pm2 restart rooming-admin",
     "lint": "next lint"
   },
   "dependencies": {
