@@ -8,7 +8,7 @@ import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 const HotelWrite = () => {
 
     const router = useRouter();
-    const options = ['주차가능', '레스토랑', '수영장', '스파', '피트니스', '무료 wifi']
+    const options = ['주차가능', '레스토랑', '수영장', '스파', '피트니스', '무료 wifi', 'cctv', '소형냉장고']
     const [category, setCategory] = useState()
     const [hotel, setHotel] = useState()
     const [facility, setFacility] = useState([])

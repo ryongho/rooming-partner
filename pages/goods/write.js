@@ -1,8 +1,8 @@
 import styled from "styled-components"
-import { Descriptions, Radio, Input, Button, message, Upload, Space } from 'antd'
+import { Descriptions, Select, Input, Button, message, Upload, Space } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 
 const GoodsWrite = () => {
 
@@ -18,6 +18,19 @@ const GoodsWrite = () => {
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     const [imageUrl, setImageUrl] = useState()
+    
+    const options = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
+    const [people, setPeople] = useState()
+    const [checkIn, setCheckIn] = useState()
+    const [checkOut, setCheckOut] = useState()
+    const [bed, setBed] = useState()
+    const [bed2, setBed2] = useState()
+    const [bed3, setBed3] = useState()
+    const [bedNum, setBedNum] = useState()
+    const [bedNum2, setBedNum2] = useState()
+    const [bedNum3, setBedNum3] = useState()
+    const [roomsDesc, setRoomsDesc] = useState()
+    const [showAddBed, setShowAddBed] = useState(0)
 
 
     const onWrite = () => {
@@ -85,7 +98,7 @@ const GoodsWrite = () => {
     return (
         <Wrapper>
             <Detail>
-                <Descriptions title={<Title>숙소 정보 입력</Title>} bordered column={1} extra={<Button onClick={() => router.push('/goods/list')}>목록으로 돌아가기</Button>}>
+                <Descriptions title={<Title>상품 정보 입력</Title>} bordered column={1} extra={<Button onClick={() => router.push('/goods/list')}>목록으로 돌아가기</Button>}>
                     <Descriptions.Item label="상품명">
                         <InputValue
                         value={goods} 
@@ -93,11 +106,11 @@ const GoodsWrite = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
-                            <Radio.Group defaultValue={"standard twin"} onChange={(e) => setRooms(e)}>
-                                <Radio.Button value="standard twin" buttonStyle="solid">스탠다드 트윈</Radio.Button>
-                                <Radio.Button value="standard double">스탠다드 더블</Radio.Button>
-                                <Radio.Button value="suite junior">스위트 주니어</Radio.Button>
-                            </Radio.Group>
+                            <SelectBar onChange={(e) => setRooms(e)}>
+                                <Select.Option value="스탠다드 트윈">스탠다드 트윈</Select.Option>
+                                <Select.Option value="스탠다드 더블">스탠다드 더블</Select.Option>
+                                <Select.Option value="스위트 주니어">스위트 주니어</Select.Option>
+                            </SelectBar>
                             <Button type="primary" size="small" onClick={() => router.push('/rooms/1?type="modi"')} style={{fontSize: '12px'}}>객실 추가 및 삭제</Button>
                         </RoomsWrap>
                     </Descriptions.Item>
@@ -151,6 +164,92 @@ const GoodsWrite = () => {
                         </Space>
                     </Descriptions.Item>
                 </Descriptions>
+                
+                <Empty />
+
+                <Descriptions title={<Title>객실 기본 정보</Title>} bordered column={1}>
+                    <Descriptions.Item label="인원 제한수">
+                        <InputValue
+                        value={people} 
+                        onChange={e => {
+                        const numRegExp = /^[0-9]*$/;
+                        if (!numRegExp.test(e.target.value)) return;
+                        setPeople(e.target.value)}} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크인 시간">
+                        <SelectBar onChange={(e) => setCheckIn(e)}>
+                            {options.map(time => {
+                            return <Select.Option value={time}>{time}</Select.Option>})}
+                        </SelectBar>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크아웃 시간">
+                        <SelectBar onChange={(e) => setCheckOut(e)}>
+                            {options.map(time => {
+                            return <Select.Option value={time}>{time}</Select.Option>})}
+                        </SelectBar>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="침대 사이즈">
+                        <InputValue
+                        style={{width: '190px', marginRight: '5px'}}
+                        placeholder={"침대 종류를 입력하세요"}
+                        value={bed} 
+                        onChange={e => setBed(e.target.value)} />
+                        <InputValue
+                        style={{width: '190px'}}
+                        placeholder={"침대 갯수를 입력하세요"}
+                        value={bedNum} 
+                        onChange={e => {
+                            const numRegExp = /^[0-9]*$/;
+                            if (!numRegExp.test(e.target.value)) return;setBedNum(e.target.value)
+                        }} />
+                        {(showAddBed == 1 || showAddBed == 2) &&
+                        <>
+                            <InputValue
+                            style={{width: '190px', marginRight: '5px'}}
+                            placeholder={"침대 종류를 입력하세요"}
+                            value={bed2} 
+                            onChange={e => setBed2(e.target.value)} />
+                            <InputValue
+                            style={{width: '190px', marginRight: '5px'}}
+                            placeholder={"침대 갯수를 입력하세요"}
+                            value={bedNum2} 
+                            onChange={e => {
+                                const numRegExp = /^[0-9]*$/;
+                                if (!numRegExp.test(e.target.value)) return;setBedNum2(e.target.value)}} />
+                        </>
+                        }
+                        {showAddBed == 2 &&
+                        <>
+                            <InputValue
+                            style={{width: '190px', marginRight: '5px'}}
+                            placeholder={"침대 종류를 입력하세요"}
+                            value={bed3} 
+                            onChange={e => setBed3(e.target.value)} />
+                            <InputValue
+                            style={{width: '190px', marginRight: '5px'}}
+                            placeholder={"침대 갯수를 입력하세요"}
+                            value={bedNum3} 
+                            onChange={e => {
+                                const numRegExp = /^[0-9]*$/;
+                                if (!numRegExp.test(e.target.value)) return;setBedNum3(e.target.value)
+                            }} />
+                        </>
+                        }
+                        {
+                            (showAddBed == 0 || showAddBed == 1) ?
+                            <AddBtn onClick={() => showAddBed == 0 ? setShowAddBed(1) : setShowAddBed(2)}><PlusSquareOutlined /></AddBtn>
+                            : <DeleteBtn onClick={() => setShowAddBed(0)}><MinusSquareOutlined /></DeleteBtn>
+                        }
+                    </Descriptions.Item>
+                    <Descriptions.Item label="기본 정보">
+                        <Input.TextArea
+                        value={roomsDesc} 
+                        rows={4}
+                        onChange={(e) => setRoomsDesc(e.target.value)} />
+                    </Descriptions.Item>
+
+                </Descriptions>
+
                 <ButtonWrap>
                     <Button type="primary" onClick={onWrite}>등록하기</Button>
                     <Button onClick={() => router.push('/goods/list')}>목록</Button>
@@ -180,6 +279,10 @@ const InputValue = styled(Input)`
     width: 400px;
 `
 
+const SelectBar = styled(Select)`
+    width: 150px;
+`
+
 const RoomsWrap = styled.div`
     display: flex;
     justify-content: space-between;
@@ -204,5 +307,18 @@ const UploadLength = styled.div`
     font-size: 12px;
     color: #999
 `
+
+const AddBtn = styled(Button)`
+    border: none;
+`
+
+const DeleteBtn = styled(Button)`
+    border: none;
+`
+
+const Empty = styled.div`
+    padding-top: 30px;
+`
+
 
 export default GoodsWrite

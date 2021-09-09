@@ -111,7 +111,7 @@ const MyApp = ({ Component, pageProps }) => {
                                     <HeaderLogo src={'/image/logo.png'} />
                                 </LogoArea>
                                 {/* <Menu defaultOpenKeys={['/user', '/reserved', '/goods', '/hotel', '/review', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline"> */}
-                                <Menu defaultOpenKeys={['/user', '/goods', '/hotel']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
+                                <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
                                     {isAdmin &&
                                     <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
                                         <Menu.Item key="/user/partner/list" group="회원 관리" title="파트너 목록">파트너 목록</Menu.Item>

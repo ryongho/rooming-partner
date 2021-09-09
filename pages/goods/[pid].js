@@ -1,8 +1,8 @@
 import styled from 'styled-components'
-import { Descriptions, Input, Button, message, Space, Upload, Checkbox, Radio, Modal } from 'antd'
+import { Descriptions, Input, Button, message, Select, Upload, Checkbox, Radio, Modal } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { LoadingOutlined, PlusOutlined, PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 import UploadImgs from '../../components/atom/UploadImgs'
 
 const GoodsDetail = () => {
@@ -10,7 +10,7 @@ const GoodsDetail = () => {
         key: '1',
         goods: '여름날 치맥 파티',
         active: true,
-        rooms: 'standard twin',
+        rooms: '스탠다드 트윈',
         roomDetail: '',
         category: '호텔',
         hotel: '라마다 프라자 바이 윈덤 여수 호텔',
@@ -47,6 +47,19 @@ const GoodsDetail = () => {
     const [imageUrl, setImageUrl] = useState()
     const [showDelete, setShowDelete] = useState(false)
 
+    const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
+    const [people, setPeople] = useState()
+    const [checkIn, setCheckIn] = useState()
+    const [checkOut, setCheckOut] = useState()
+    const [bed, setBed] = useState()
+    const [bed2, setBed2] = useState()
+    const [bed3, setBed3] = useState()
+    const [bedNum, setBedNum] = useState()
+    const [bedNum2, setBedNum2] = useState()
+    const [bedNum3, setBedNum3] = useState()
+    const [roomsDesc, setRoomsDesc] = useState()
+    const [showAddBed, setShowAddBed] = useState(0)
+
     useEffect(() => {
         console.log(router.query.type)
         if (router.query.type) setModiStatus(true)
@@ -54,14 +67,28 @@ const GoodsDetail = () => {
     }, [router])
 
     const onDataChange = (e, val) => {
+        const numRegExp = /^[0-9]*$/;
         if (!router.query.type) return;
+        if (val == 'bedNum' || val == 'bedNum2' || val == 'bedNum3') {
+            if (!numRegExp.test(e.target.value)) return;
+        }
         if (val == 'goods') setGoods(e.target.value);
         if (val == 'active') setActive(e);
         if (val == 'rooms') setRooms(e);
         if (val == 'price') setPrice(e.target.value);
         if (val == 'salePrice') setSalePrice(e.target.value);
         if (val == 'rate') setRate(e.target.value);
-        if (val == 'desc') setDesc(e.target.value);
+        if (val == 'people') setDesc(e.target.value);
+        if (val == 'desc') setPeople(e.target.value);
+        if (val == 'checkIn') setCheckIn(e.target.value);
+        if (val == 'checkOut') setCheckOut(e.target.value);
+        if (val == 'bed') setBed(e.target.value);
+        if (val == 'bed2') setBed2(e.target.value);
+        if (val == 'bed3') setBed3(e.target.value);
+        if (val == 'bedNum') setBedNum(e.target.value);
+        if (val == 'bedNum2') setBedNum2(e.target.value);
+        if (val == 'bedNum3') setBedNum3(e.target.value);
+        if (val == 'roomsDesc') setRoomsDesc(e.target.value);
     }
 
     const beforeUpload = (file) => {
@@ -155,11 +182,11 @@ const GoodsDetail = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
-                            <Radio.Group defaultValue={rooms} onChange={(e) => onDataChange(e, 'rooms')}>
-                                <Radio.Button value="standard twin" buttonStyle="solid">스탠다드 트윈</Radio.Button>
-                                <Radio.Button value="standard double">스탠다드 더블</Radio.Button>
-                                <Radio.Button value="suite junior">스위트 주니어</Radio.Button>
-                            </Radio.Group>
+                            <SelectBar defaultValue={rooms} onChange={(e) => setRooms(e)}>
+                                <Select.Option value="스탠다드 트윈">스탠다드 트윈</Select.Option>
+                                <Select.Option value="스탠다드 더블">스탠다드 더블</Select.Option>
+                                <Select.Option value="스위트 주니어">스위트 주니어</Select.Option>
+                            </SelectBar>
                             <Button type="primary" size="small" onClick={() => router.push('/rooms/1?type="modi"')} style={{fontSize: '12px'}}>객실 추가 및 삭제</Button>
                         </RoomsWrap>
                     </Descriptions.Item>
@@ -227,6 +254,80 @@ const GoodsDetail = () => {
                             </ImgWrap>
                         }
                     </Descriptions.Item>
+                </Descriptions>
+
+                <Empty />
+
+                <Descriptions title={<Title>객실 기본 정보</Title>} bordered column={1}>
+                    <Descriptions.Item label="인원 제한수">
+                        <InputValue
+                        value={people} 
+                        onChange={e => onDataChange(e, 'people')} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크인 시간">
+                        <SelectBar onChange={(e) => onDataChange(e, 'checkIn')}>
+                            {times.map(time => {
+                            return <Select.Option value={time}>{time}</Select.Option>})}
+                        </SelectBar>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크아웃 시간">
+                        <SelectBar onChange={(e) => onDataChange(e, 'checkOut')}>
+                            {times.map(time => {
+                            return <Select.Option value={time}>{time}</Select.Option>})}
+                        </SelectBar>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="침대 사이즈">
+                        <InputValue
+                        style={{width: '190px', marginRight: '5px'}}
+                        placeholder={"침대 종류를 입력하세요"}
+                        value={bed} 
+                        onChange={e => onDataChange(e, 'bed')} />
+                        <InputValue
+                        style={{width: '190px'}}
+                        placeholder={"침대 갯수를 입력하세요"}
+                        value={bedNum} 
+                        onChange={e => onDataChange(e, 'bedNum')} />
+                        {(showAddBed == 1 || showAddBed == 2) &&
+                        <>
+                            <InputValue
+                            style={{width: '190px', marginRight: '5px'}}
+                            placeholder={"침대 종류를 입력하세요"}
+                            value={bed2} 
+                            onChange={e => onDataChange(e, 'bed2')} />
+                            <InputValue
+                            style={{width: '190px', marginRight: '5px'}}
+                            placeholder={"침대 갯수를 입력하세요"}
+                            value={bedNum2} 
+                            onChange={e => onDataChange(e, 'bedNum2')} />
+                        </>
+                        }
+                        {showAddBed == 2 &&
+                        <>
+                            <InputValue
+                            style={{width: '190px', marginRight: '5px'}}
+                            placeholder={"침대 종류를 입력하세요"}
+                            value={bed3} 
+                            onChange={e => onDataChange(e, 'bed3')} />
+                            <InputValue
+                            style={{width: '190px', marginRight: '5px'}}
+                            placeholder={"침대 갯수를 입력하세요"}
+                            value={bedNum3} 
+                            onChange={e => onDataChange(e, 'bedNum3') } />
+                        </>
+                        }
+                        {
+                            (showAddBed == 0 || showAddBed == 1) ?
+                            <AddBtn onClick={() => showAddBed == 0 ? setShowAddBed(1) : setShowAddBed(2)}><PlusSquareOutlined /></AddBtn>
+                            : <DeleteBtn onClick={() => setShowAddBed(0)}><MinusSquareOutlined /></DeleteBtn>
+                        }
+                    </Descriptions.Item>
+                    <Descriptions.Item label="기본 정보">
+                        <Input.TextArea
+                        value={roomsDesc} 
+                        rows={4}
+                        onChange={(e) => onDataChange(e, 'setRoomsDesc')} />
+                    </Descriptions.Item>
+
                 </Descriptions>
 
                 <Empty />
@@ -337,6 +438,10 @@ const InputValue = styled(Input)`
     width: 400px;
 `
 
+const SelectBar = styled(Select)`
+    width: 150px;
+`
+
 const ImgWrap = styled.div`
     img {
         width: 100px;
@@ -384,6 +489,14 @@ const ButtonWrap = styled.div`
     button:first-child {
         margin-right: 10px;
     }
+`
+
+const AddBtn = styled(Button)`
+    border: none;
+`
+
+const DeleteBtn = styled(Button)`
+    border: none;
 `
 
 const Empty = styled.div`
