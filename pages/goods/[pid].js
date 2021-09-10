@@ -262,63 +262,91 @@ const GoodsDetail = () => {
                     <Descriptions.Item label="인원 제한수">
                         <InputValue
                         value={people} 
-                        onChange={e => onDataChange(e, 'people')} />
+                        onChange={e => onDataChange(e, 'people')}
+                        bordered={modiStatus} />
                     </Descriptions.Item>
                     <Descriptions.Item label="체크인 시간">
+                        {modiStatus ?
                         <SelectBar onChange={(e) => onDataChange(e, 'checkIn')}>
                             {times.map(time => {
                             return <Select.Option value={time}>{time}</Select.Option>})}
                         </SelectBar>
+                        : checkIn}
                     </Descriptions.Item>
                     <Descriptions.Item label="체크아웃 시간">
+                        {modiStatus ?
                         <SelectBar onChange={(e) => onDataChange(e, 'checkOut')}>
                             {times.map(time => {
                             return <Select.Option value={time}>{time}</Select.Option>})}
                         </SelectBar>
+                        : checkOut}
                     </Descriptions.Item>
                     <Descriptions.Item label="침대 사이즈">
-                        <InputValue
-                        style={{width: '190px', marginRight: '5px'}}
-                        placeholder={"침대 종류를 입력하세요"}
-                        value={bed} 
-                        onChange={e => onDataChange(e, 'bed')} />
-                        <InputValue
-                        style={{width: '190px'}}
-                        placeholder={"침대 갯수를 입력하세요"}
-                        value={bedNum} 
-                        onChange={e => onDataChange(e, 'bedNum')} />
+                        {modiStatus ?
+                        <InputBedWrap>
+                            <>
+                            <InputValueBed
+                            placeholder={"침대 종류를 입력하세요"}
+                            value={bed} 
+                            onChange={e => onDataChange(e, 'bed')} />
+                            <InputValueBed
+                            placeholder={"침대 갯수를 입력하세요"}
+                            value={bedNum} 
+                            onChange={e => onDataChange(e, 'bedNum')} />
+                            </>
+                            {showAddBed == 0 ? 
+                            <AddBtn onClick={() => setShowAddBed(1)}><PlusSquareOutlined /></AddBtn> : null}
+                        </InputBedWrap>
+                        : <>{bed} {bedNum} 개</>}
+
                         {(showAddBed == 1 || showAddBed == 2) &&
-                        <>
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
+                        <InputBedWrap>
+                            <>
+                            <InputValueBed
                             placeholder={"침대 종류를 입력하세요"}
                             value={bed2} 
                             onChange={e => onDataChange(e, 'bed2')} />
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
+                            <InputValueBed
                             placeholder={"침대 갯수를 입력하세요"}
                             value={bedNum2} 
                             onChange={e => onDataChange(e, 'bedNum2')} />
-                        </>
+                            </>
+                            {showAddBed == 1 &&
+                                <>
+                                    <AddBtn onClick={() => setShowAddBed(2)}><PlusSquareOutlined /></AddBtn>
+                                    <DeleteBtn onClick={() => {
+                                        setBedNum2('');
+                                        setBed2('');
+                                        setShowAddBed(0)}}><MinusSquareOutlined /></DeleteBtn>
+                                </>
+                            }
+                            {showAddBed == 2 &&
+                                <DeleteBtn onClick={() => {
+                                    setBedNum2(bedNum3);
+                                    setBed2(bed3);
+                                    setBedNum3('');
+                                    setBed3('');
+                                    setShowAddBed(1)}}><MinusSquareOutlined /></DeleteBtn>
+                            }
+                        </InputBedWrap>
                         }
                         {showAddBed == 2 &&
+                        <InputBedWrap>
                         <>
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
+                            <InputValueBed
                             placeholder={"침대 종류를 입력하세요"}
                             value={bed3} 
                             onChange={e => onDataChange(e, 'bed3')} />
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
+                            <InputValueBed
                             placeholder={"침대 갯수를 입력하세요"}
                             value={bedNum3} 
                             onChange={e => onDataChange(e, 'bedNum3') } />
                         </>
-                        }
-                        {
-                            (showAddBed == 0 || showAddBed == 1) ?
-                            <AddBtn onClick={() => showAddBed == 0 ? setShowAddBed(1) : setShowAddBed(2)}><PlusSquareOutlined /></AddBtn>
-                            : <DeleteBtn onClick={() => setShowAddBed(0)}><MinusSquareOutlined /></DeleteBtn>
+                        <DeleteBtn onClick={() => {
+                                setBedNum3('');
+                                setBed3('');
+                                setShowAddBed(1)}}><MinusSquareOutlined /></DeleteBtn>
+                        </InputBedWrap>
                         }
                     </Descriptions.Item>
                     <Descriptions.Item label="기본 정보">
@@ -440,6 +468,19 @@ const InputValue = styled(Input)`
 
 const SelectBar = styled(Select)`
     width: 150px;
+`
+
+const InputBedWrap = styled.div`
+    display: flex;
+    margin-bottom: 8px;
+`
+
+const InputValueBed = styled(Input)`
+    width: 190px;
+    
+    &:first-child {
+        margin-right: 5px;
+    }
 `
 
 const ImgWrap = styled.div`

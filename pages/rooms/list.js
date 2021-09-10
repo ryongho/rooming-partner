@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState } from 'react'
-import { Space, Select, Table, Tag, message, Radio, Button, Input, Modal, DatePicker } from 'antd'
+import { Space, Select, Table, Tag, message, Radio, Button, Input, DatePicker, Popconfirm } from 'antd'
 import { PlusSquareOutlined } from '@ant-design/icons';
 import Link from 'next/link'
 import moment from 'moment'
@@ -15,28 +15,32 @@ const RoomsList = () => {
         goods: '여름날 치맥 파티',
         rooms: '스탠다드 트윈 시티뷰',
         hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-        createdAt: new Date('2021-09-05')
+        createdAt: new Date('2021-09-05'),
+        active: false,
     }, {
         key: '2',
         category: '호텔',
         goods: '여름날 치맥 파티',
         rooms: '스탠다드 트윈 시티뷰',
         hotel: '호텔1111',
-        createdAt: new Date('2021-08-12')
+        createdAt: new Date('2021-08-12'),
+        active: true,
     }, {
         key: '3',
         category: '호텔',
         goods: '봄날 파전 파티',
         rooms: '주니어 스위트 룸',
         hotel: '호텔2222',
-        createdAt: new Date('2021-09-26')
+        createdAt: new Date('2021-09-26'),
+        active: true,
     }, {
         key: '4',
         category: '호텔',
         goods: '겨울날 군고구마 파티',
         rooms: '디럭스 더블 오션뷰',
         hotel: '호텔3333',
-        createdAt: new Date('2021-07-30')
+        createdAt: new Date('2021-07-30'),
+        active: false,
     }];
 
     const columns = [{
@@ -67,11 +71,11 @@ const RoomsList = () => {
         }
     }, {
         title: '상품 상태값',
-        dataIndex: 'goods',
-        key: 'goods',
-        render: (goods) => {
+        dataIndex: 'active',
+        key: 'active',
+        render: (active) => {
             return (
-                goods ? <Tag color="blue">활성화</Tag> : <Tag color="grey">비활성화</Tag>
+                active ? <Tag color="blue">활성화</Tag> : <Tag color="default">비활성화</Tag>
             )
         }
     }, {
@@ -82,18 +86,26 @@ const RoomsList = () => {
         sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
     }, {
         title: '삭제',
-        render: (index) => {
-            return <Button type="danger" onClick={onClickDelete}>삭제</Button>
+        dataIndex: 'delete',
+        render: (_, idx) => {
+            return (<Popconfirm
+                title='정말 삭제하시겠습니까?'
+                okText='삭제'
+                okType='danger'
+                onConfirm={async () => {
+                    console.log(idx.key)
+
+                    // success
+                    message.success('삭제 완료')
+                }}
+                cancelText='취소'>
+            <Button type="danger">삭제</Button>
+            </Popconfirm>)
         }
     }];
 
     const [isAdmin, setIsAdmin] = useState(true);
-    const [selectedIdx, setSelectedIdx] = useState([])
-    const [showDelete, setShowDelete] = useState(false)
 
-    const onChangeActive = (e, item) => {
-        console.log(item)
-    }
 
     const onCategory = (e) => {
         console.log(e)
@@ -107,17 +119,6 @@ const RoomsList = () => {
 
     }
 
-    const onClickDelete = (index) => {
-        console.log(index);
-        // setSelectedIdx(index);
-        setShowDelete(true);
-    }
-
-    const onDeleteLists = () => {
-        // let lists = dataSource.filter((item) => item.key !== selectedList)
-        // setDataSource(lists)
-        setShowDelete(false);
-    }
 
     return (
         <Wrapper>
@@ -161,16 +162,6 @@ const RoomsList = () => {
                 </Space>
             </TableTop>
             <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
-
-            <Modal
-            visible={showDelete}
-            okText={'네'}
-            cancelText={'아니오'}
-            onOk={onDeleteLists}
-            onCancel={() => setShowDelete(false)}
-            >
-                정말 삭제하시겠습니까?
-            </Modal>
         </Wrapper>
     )
 }

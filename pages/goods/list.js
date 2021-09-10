@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState } from 'react'
-import { Space, Select, Table, Tag, message, Radio, Button, Input, Modal } from 'antd'
+import { Space, Select, Table, Tag, message, Radio, Button, Input, Popconfirm } from 'antd'
 import { PlusSquareOutlined } from '@ant-design/icons';
 import Link from 'next/link'
 import moment from 'moment'
@@ -88,24 +88,36 @@ const GoodsList = () => {
         title: '상태값',
         dataIndex: 'active',
         key: 'active',
-        render: (active, item) => {
+        render: (active) => {
             return (
-                <Radio.Group defaultValue={active ? 'active' : 'notActive'} onChange={(e) => onChangeActive(e, item)}>
-                    <Radio.Button value="active" buttonStyle="solid">활성화</Radio.Button>
-                    <Radio.Button value="notActive">비활성화</Radio.Button>
-                </Radio.Group>
+                <>
+                    {active ? 
+                    <Tag color="blue">활성화</Tag>
+                    : <Tag color="default">비활성화</Tag>}
+                </>
             )
+        }
+    }, {
+        title: '삭제',
+        dataIndex: 'delete',
+        render: (_, idx) => {
+            return (<Popconfirm
+                title='정말 삭제하시겠습니까?'
+                okText='삭제'
+                okType='danger'
+                onConfirm={async () => {
+                    console.log(idx.key)
+
+                    // success
+                    message.success('삭제 완료')
+                }}
+                cancelText='취소'>
+            <Button type="danger" size="small">삭제</Button>
+            </Popconfirm>)
         }
     }];
 
     const [isAdmin, setIsAdmin] = useState(true);
-    const [selectedList, setSelectedList] = useState([])
-    const [showDelete, setShowDelete] = useState(false)
-
-    console.log(selectedList)
-    const onChangeActive = (e, item) => {
-        console.log(item)
-    }
 
     const onCategory = (e) => {
         console.log(e)
@@ -117,20 +129,6 @@ const GoodsList = () => {
 
     const onExcelDown = () => {
 
-    }
-
-    const onClickDelete = () => {
-        if (selectedList.length < 1) {
-            message.warning('삭제할 상품을 1개 이상 선택해 주세요')
-        }
-
-        setShowDelete(true);
-    }
-
-    const onDeleteLists = () => {
-        // let lists = dataSource.filter((item) => item.key !== selectedList)
-        // setDataSource(lists)
-        setShowDelete(false);
     }
 
     return (
@@ -163,30 +161,20 @@ const GoodsList = () => {
             </TopBox>
 
             <TableTop>
-                {/* <TotalNum>총 {data.length}건</TotalNum> */}
-                <Button type="danger" onClick={onClickDelete}>삭제</Button>
+                <TotalNum>총 {data.length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={() => router.push('/goods/write')}><PlusSquareOutlined /> 상품 등록</Button>
                     <Button onClick={onExcelDown}>엑셀 다운로드</Button>
                 </Space>
             </TableTop>
             <Table 
-            rowSelection={{
-                type: 'checkbox',
-                onChange: (e) => {setSelectedList(e)},
-                selectedRowKeys: selectedList
-            }}
+            // rowSelection={{
+            //     type: 'checkbox',
+            //     onChange: (e) => {setSelectedList(e)},
+            //     selectedRowKeys: selectedList
+            // }}
             columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
 
-            <Modal
-            visible={showDelete}
-            okText={'네'}
-            cancelText={'아니오'}
-            onOk={onDeleteLists}
-            onCancel={() => setShowDelete(false)}
-            >
-                정말 삭제하시겠습니까?
-            </Modal>
         </Wrapper>
     )
 }
