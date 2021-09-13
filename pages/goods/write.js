@@ -5,12 +5,15 @@ import { useState, useEffect } from 'react'
 import { PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
 import UploadImgs from '../../components/atom/UploadImgs'
 import UploadThumb from '../../components/atom/UploadThumb'
+import { observer } from 'mobx-react-lite'
+import { useStore } from '../../store/StoreProvider'
 
-const GoodsWrite = () => {
+const GoodsWrite = observer(() => {
 
     const router = useRouter();
+    const { goods } = useStore()
     
-    const [goods, setGoods] = useState()
+    const [name, setName] = useState()
     const [rooms, setRooms] = useState()
     const [price, setPrice] = useState()
     const [salePrice, setSalePrice] = useState()
@@ -35,7 +38,7 @@ const GoodsWrite = () => {
     const [showAddBed, setShowAddBed] = useState(0)
 
     const onWrite = () => {
-        if (!goods) {
+        if (!name) {
             message.warning('상품명을 입력해 주세요')
         }
         if (!price) {
@@ -60,20 +63,27 @@ const GoodsWrite = () => {
         // success
     }
     
-    const onUploadThumb = (e) => {
+    const onUploadThumb = async(e) => {
+        console.log(e.file.status);
         if (e.file.status === 'uploading') {
             return setThumbLoading(true);
         }
         if (e.file.status === 'done') {
-            const reader = new FileReader();
-            reader.addEventListener('load', () => setThumb(reader.result));
-            reader.readAsDataURL(e.file.originFileObj);
-            setThumbLoading(false)    
-        }
+            await goods.thumbImageUpload(e.file, undefined, (success, data) => {
+                if (success) {
+                    setTimeout(() => {
+                        console.log(data)
+                        setThumb(e.file)
+                        setThumbLoading(false)
+                    }, 2000)
+                    setThumbLoading(false);
+                }
+            
+            })
+        }   
     }
 
-    const onUploadChange = (e) => {
-        console.log(e.file.status);
+    const onUploadChange = async(e) => {
         if (e.file.status === 'uploading') {
             return setLoading(true);
         }
@@ -81,14 +91,10 @@ const GoodsWrite = () => {
             const reader = new FileReader();
             reader.addEventListener('load', () => setImgList(reader.result));
             reader.readAsDataURL(e.file.originFileObj);
-            
-            setLoading(false);
-        }   
+            setLoading(false)    
+        }
     }
 
-    useEffect(() => {
-        console.log(showAddBed)
-    }, [showAddBed])
 
     return (
         <Wrapper>
@@ -96,8 +102,8 @@ const GoodsWrite = () => {
                 <Descriptions title={<Title>상품 정보 입력</Title>} bordered column={1} extra={<Button onClick={() => router.push('/goods/list')}>목록으로 돌아가기</Button>}>
                     <Descriptions.Item label="상품명">
                         <InputValue
-                        value={goods} 
-                        onChange={e => setGoods(e.target.value)} />
+                        value={name} 
+                        onChange={e => setName(e.target.value)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
@@ -265,7 +271,7 @@ const GoodsWrite = () => {
             </Detail>
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;

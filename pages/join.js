@@ -2,8 +2,12 @@ import styled from 'styled-components'
 import { useState } from 'react'
 import { Descriptions, Input, Button, message } from 'antd'
 import router from 'next/router'
+import { observer } from 'mobx-react-lite'
+import { useStore } from '../store/StoreProvider'
 
-const Join = () => {
+const Join = observer(() => {
+
+    const { admin } = useStore()
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -13,7 +17,7 @@ const Join = () => {
     const [pw2, setPw2] = useState('')
     const [partner, setPartner] = useState('')
 
-    const onJoin = () => {
+    const onJoin = async() => {
         const idRegExp = /^[a-zA-Z0-9]{6,16}$/;
         const pwRegExp = /^[a-z0-9]{8,20}$/;
 
@@ -91,7 +95,7 @@ const Join = () => {
             </JoinWrap>
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;

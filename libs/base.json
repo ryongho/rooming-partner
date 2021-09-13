@@ -1,0 +1,11 @@
+{
+    "development": {
+        "baseUrl": "https://rooming.link/api"
+    },
+    "test": {
+        "baseUrl": "https://rooming.link/api"
+    },
+    "production": {
+        "baseUrl": "https://rooming.link/api"
+    }
+}

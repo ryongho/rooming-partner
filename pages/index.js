@@ -3,40 +3,55 @@ import styled from 'styled-components'
 import { useRouter } from 'next/router'
 import { Card, Input, Button, message, Modal, Space } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import { observer } from 'mobx-react-lite'
+import { useStore } from '../store/StoreProvider'
 
-const Login = () => {
+const Login = observer(() => {
 
     const router = useRouter();
-    const [email, setEmail] = useState('');
-    const [id, setId] = useState('');
-    const [pw, setPw] = useState('');
-    const [idFind, setIdFind] = useState('');
+    const { admin } = useStore()
 
-    const [showFindId, setShowFindId] = useState(false)
+    const [email, setEmail] = useState('');
+    // const [id, setId] = useState('');
+    const [pw, setPw] = useState('');
+    // const [idFind, setIdFind] = useState('');
+
+    // const [showFindId, setShowFindId] = useState(false)
     const [showFindPassword, setShowFindPassword] = useState(false)
 
-    const [resultId, setResultId] = useState('')
+    // const [resultId, setResultId] = useState('')
     const [resultPw, setResultPw] = useState('')
 
-    const onLogin = () => {
-        if (!id || !pw) {
+    const onLogin = async () => {
+        if (!email || !pw) {
             return message.warning('이메일 또는 비밀번호를 입력해 주세요.')
         }
-
-        router.push('/user/partner/list')
-    }
-
-    const onFindId = () => {
-        if (email) {
-            setResultId(`회원님의 아이디는 ${"rooming1234"} 입니다.`)
-        } else {
-            // 입력한 이메일 정보가 없을 경우
-            setResultId("입력하신 이메일과 일치하는 아이디가 존재하지 않습니다.")
+        
+        const data = {
+            email: email,
+            password: pw
         }
+
+        await admin.login(data, (success, result) => {
+            if (success) {
+                router.push('/user/partner/list')
+            } else {
+                console.log(data, result)
+            }
+        })
     }
+
+    // const onFindId = () => {
+    //     if (email) {
+    //         setResultId(`회원님의 아이디는 ${"rooming1234"} 입니다.`)
+    //     } else {
+    //         // 입력한 이메일 정보가 없을 경우
+    //         setResultId("입력하신 이메일과 일치하는 아이디가 존재하지 않습니다.")
+    //     }
+    // }
 
     const onFindPw = () => {
-        if (email && idFind) {
+        if (email) {
             setResultPw(`이메일 ${email}로 임시 비밀번호가 발급되었습니다.`)
         } else {
             // 입력한 이메일 정보가 없을 경우
@@ -50,9 +65,9 @@ const Login = () => {
                 <Logo src="/image/logo.png" />
                 <Title>루밍 관리자 페이지</Title>
                 <InputStyle 
-                value={id}
+                value={email}
                 prefix={<UserOutlined />} 
-                onChange={e=> setId(e.target.value)}
+                onChange={e=> setEmail(e.target.value)}
                 placeholder="관리자 이메일" />
                 <InputStyle 
                 value={pw}
@@ -67,12 +82,14 @@ const Login = () => {
                 </BtnWrap>
                 
                 <FindBtnWrap>
-                    <FindBtn onClick={() => setShowFindId(true)}>아이디 찾기</FindBtn>
-                    <FindBtn onClick={() => setShowFindPassword(true)}>비밀번호 찾기</FindBtn>
+                    {/* <FindBtn onClick={() => setShowFindId(true)}>아이디 찾기</FindBtn> */}
+                    <FindBtn onClick={() => {
+                        setEmail(''); 
+                        setShowFindPassword(true)}}>비밀번호 찾기</FindBtn>
                 </FindBtnWrap>
             </LoginBox>
 
-            <Modal
+            {/* <Modal
             title="아이디 찾기"
             visible={showFindId}
             onCancel={() => setShowFindId(false)}
@@ -87,7 +104,7 @@ const Login = () => {
                     <Result>{resultId}</Result>
                     }
                 </ModalWrap>
-            </Modal>
+            </Modal> */}
             
             <Modal
             title="비밀번호 찾기"
@@ -97,16 +114,16 @@ const Login = () => {
             footer={null}
             width={480}>
                 <ModalWrap>
-                    <FindPwSpace>
+                    {/* <FindPwSpace>
                         <Label>아이디</Label>
                         <Input placeholder="아이디를 입력해 주세요" value={idFind} onChange={e => {setIdFind(e.target.value)}} style={{width: 300}} />
-                    </FindPwSpace>
+                    </FindPwSpace> */}
                     <FindPwSpace>
                         <Label>이메일 주소</Label>
                         <Input placeholder="가입 시 등록한 이메일 주소를 입력해 주세요" value={email} onChange={e => {setEmail(e.target.value)}} style={{width: 300}} />
                     </FindPwSpace>
                     <FindPwBtnWrap>
-                        <Button type="primary" onClick={onFindPw}>비밀번호 찾기</Button>
+                        <Button type="primary" onClick={onFindPw}>임시 비밀번호 전송</Button>
                     </FindPwBtnWrap>
                     {resultPw &&
                     <Result>{resultPw}</Result>
@@ -116,7 +133,7 @@ const Login = () => {
 
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;
@@ -187,15 +204,15 @@ const FindBtn = styled.div`
         color: #888
     }
 
-    &:first-child:after {
-        content: '';
-        display: inline-block;
-        width: 1px;
-        height: 13px;
-        margin: 0 8px 2px;
-        vertical-align: middle;
-        background-color: #bbb;
-    }
+    // &:first-child:after {
+    //     content: '';
+    //     display: inline-block;
+    //     width: 1px;
+    //     height: 13px;
+    //     margin: 0 8px 2px;
+    //     vertical-align: middle;
+    //     background-color: #bbb;
+    // }
 `
 
 const ModalWrap = styled.div`

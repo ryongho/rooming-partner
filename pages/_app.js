@@ -6,6 +6,7 @@ import { Layout, Menu } from 'antd'
 import { UserOutlined, ScheduleOutlined, ShoppingCartOutlined, FormOutlined, ShopOutlined, SettingOutlined, BarChartOutlined, RightCircleFilled, ClearOutlined } from '@ant-design/icons'
 import Header from '../components/organism/Header'
 import 'moment/locale/ko'
+import { StoreProvider } from '../store/StoreProvider'
 
 
 const GlobalStyle = createGlobalStyle`
@@ -102,7 +103,9 @@ const MyApp = ({ Component, pageProps }) => {
             <GlobalStyle />
             <ThemeProvider theme={theme}>
                 {router.pathname == '/' || router.pathname == '/join' ?
-                    <Component {...pageProps} />
+                    <StoreProvider {...pageProps}>
+                        <Component {...pageProps} />
+                    </StoreProvider>
                     :
                     (
                         <Layout style={{minHeight: '100vh'}}>
@@ -146,15 +149,17 @@ const MyApp = ({ Component, pageProps }) => {
                                 </Menu>
                             </Sider>
                             <Layout>
-                                <Header title={group} />
-                                <Content>
-                                    <ContentTitle>
-                                        <RightCircleFilled style={{color: "#F57D6A", fontSize: '11px', backgroundColor: '#fff', borderRadius: '100%'}} /> {title}
-                                    </ContentTitle>
-                                    <ContentWrap>
-                                        <Component {...pageProps} />
-                                    </ContentWrap>
-                                </Content>
+                                <StoreProvider {...pageProps}>
+                                    <Header title={group} />
+                                    <Content>
+                                        <ContentTitle>
+                                            <RightCircleFilled style={{color: "#F57D6A", fontSize: '11px', backgroundColor: '#fff', borderRadius: '100%'}} /> {title}
+                                        </ContentTitle>
+                                        <ContentWrap>
+                                            <Component {...pageProps} />
+                                        </ContentWrap>
+                                    </Content>
+                                </StoreProvider>
                             </Layout>
                         </Layout>
                     )
