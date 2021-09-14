@@ -64,10 +64,10 @@ const theme = {}
 const MyApp = ({ Component, pageProps }) => {
     const router = useRouter();
 
-    const [isAdmin, setIsAdmin] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
-    const [group, setGroup] = useState('회원 관리');
-    const [title, setTitle] = useState('파트너 목록')
+    const [group, setGroup] = useState('상품 관리');
+    const [title, setTitle] = useState('상품 목록')
 
     const { Sider, Content } = Layout
     const { SubMenu } = Menu
@@ -79,10 +79,10 @@ const MyApp = ({ Component, pageProps }) => {
     }
 
     useEffect(() => {
-        setIsAdmin(localStorage.getItem('rmaauth') == 1)
-        if(!isAdmin) {
-            setGroup('상품 관리')
-            setTitle('상품 목록')
+        setIsAdmin(localStorage.getItem('rmaauth') == 1 ? false : true)
+        if(isAdmin) {
+            setGroup('회원 관리')
+            setTitle('파트너 목록')
         }
 
         if (router.pathname == '/user/partner/[pid]') setTitle('파트너 상세')
@@ -121,7 +121,7 @@ const MyApp = ({ Component, pageProps }) => {
                                     <HeaderLogo src={'/image/logo.png'} />
                                 </LogoArea>
                                 {/* <Menu defaultOpenKeys={['/user', '/reserved', '/goods', '/hotel', '/review', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline"> */}
-                                <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
+                                <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={router.pathname} mode="inline">
                                     {isAdmin &&
                                     <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
                                         <Menu.Item key="/user/partner/list" group="회원 관리" title="파트너 목록">파트너 목록</Menu.Item>

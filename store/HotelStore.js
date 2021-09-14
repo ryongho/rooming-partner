@@ -35,7 +35,7 @@ export default class HotelStore {
         try {
             const result = await postImagesUpload(file, token)
             if (result.status === 200) {
-                callback(true, result)
+                callback(true, result.data)
             }
         } catch (err) {
             // authFail(err)

@@ -29,6 +29,7 @@ export default class UserStore {
     email = typeof window == 'object' ? localStorage.getItem('rmaemail') ? localStorage.getItem('rmaemail') : null : null
     auth = typeof window == 'object' ? localStorage.getItem('rmaauth') ? localStorage.getItem('rmaauth') : null : null
     userid = typeof window == 'object' ? localStorage.getItem('rmaid') ? localStorage.getItem('rmaid') : null : null
+    hotelid = typeof window == 'object' ? localStorage.getItem('rmahotelid') ? localStorage.getItem('rmahotelid') : null : null
 
     login = async (data, callback) => {
         try {
@@ -44,7 +45,6 @@ export default class UserStore {
         }
     }
     
-    hotelid = null
     callInfo = async (token) => {
         try {
             const result = await getUserInfo(token)
@@ -58,6 +58,7 @@ export default class UserStore {
                 await localStorage.setItem('rmaemail', result.data.data.email)
                 await localStorage.setItem('rmaauth', result.data.data.user_type)
                 await localStorage.setItem('rmaid', result.data.data.user_id)
+                await localStorage.setItem('rmahotelid', result.data.hotel_id)
                 
                 // console.log(result.data)
             }

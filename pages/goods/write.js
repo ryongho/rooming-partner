@@ -1,9 +1,8 @@
 import styled from "styled-components"
-import { Descriptions, Select, Input, Button, message, DatePicker, Space } from 'antd'
+import { Descriptions, Select, Input, Button, message, DatePicker, Checkbox } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import UploadImgs from '../../components/atom/UploadImgs'
-import UploadThumb from '../../components/atom/UploadThumb'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../store/StoreProvider'
 import moment from 'moment'
@@ -14,7 +13,6 @@ const GoodsWrite = observer(() => {
     const { goods, user, room } = useStore()
     
     const options = ['룸서비스', '사진 무한 촬영', '조식 패키지', '파티 용품 제공']
-    const [hotelId, setHotelId] = useState()
     const [roomId, setRoomId] = useState()
     const [name, setName] = useState()
     const [start, setStart] = useState()
@@ -26,52 +24,22 @@ const GoodsWrite = observer(() => {
     const [minNight, setMinNight] = useState()
     const [maxNight, setMaxNight] = useState()
     const [option, setOption] = useState(false)
-    const [thumb, setThumb] = useState()
-    const [thumbLoading, setThumbLoading] = useState(false)
-    const [previewImage, setPreviewImage] = useState('')
+    const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
 
 
     useEffect(() => {
-        const callRoomsList = async() => {
-            
+    
+        const callRoomList = async() => {
+            await room.callRoomList({hotel_id: user.hotelid}, user.token)
+            // await console.log('rooms', room.rooms)
         }
-        callRoomsList()
-
+        callRoomList()
+        
     }, [])
 
-
-    const onUploadThumb = async (e) => {
-        setThumbLoading(true);
-
-        if (e.file.status === 'done') {
-            await hotel.thumbImageUpload(e.file, user.token, (success, data) => {
-                if (success) {
-                    console.log(data.images)
-                    setThumbLoading(false);
-                    // setThumb(data.images)
-                }
-            })
-        }
-    }
-
-    const onUploadChange = async (e) => {
-        if (e.file.status === 'uploading') {
-            setLoading(true);
-
-            await hotel.imagesUpload(e.file, user.token, (success, data) => {
-                if (success) {
-                    console.log(data)
-                    setLoading(false);
-                    setImgList(imgList.concat(data.status))
-                }
-            })
-        }
-        
-    }
-
-    const onWrite = () => {
+    const onWrite = async() => {
         if (!name) {
             return message.warning('상품명을 입력해 주세요')
         }
@@ -84,9 +52,6 @@ const GoodsWrite = observer(() => {
         if (!rate) {
             return message.warning('할인율을 입력해 주세요')
         }
-        if (!thumb) {
-            return message.warning('상품 썸네일을 입력해 주세요')
-        }
         if (imgList.length < 1) {
             return message.warning('상품 사진을 입력해 주세요')
         }
@@ -96,20 +61,54 @@ const GoodsWrite = observer(() => {
 
         // success
         const data = {
-            hotel_id: hotelId,
+            hotel_id: user.hotelid,
+            roomId: roomId,
+            goods_name: name,
+            start_date: start,
+            end_date: end,
+            type: type,
+            price: price,
+            sale_price: salePrice,
+            rate: rate,
+            min_nights: minNight,
+            max_nights: maxNight,
             options: optionList,
+            images: images,
+            parking: "",
+            breakfast: ""
         }
 
         console.log(data)
         await goods.addInfo(data, user.token, (success, result) => {
             if (success) {
-                message.success('게시 완료')
-                console.log(result)
-                // message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+                // console.log(result)
+                message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
             }
         })
     }
     
+    const onUploadChange = async (e) => {
+        if (e.file.status === 'uploading') {
+            setLoading(true);
+
+            await goods.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
+                if (success) {
+                    setFileList(fileList.concat(e.file.originFileObj))
+                    setLoading(false);
+                    setImgList(imgList.concat(data.images))
+                    console.log(fileList, imgList)
+                }
+            })
+        }
+    }
+    
+    const onRemoveImgs = async(file) => {
+        let idx = fileList.indexOf(file);
+        imgList.splice(idx, 1);
+        await setImgList(imgList)
+        await setFileList(fileList.filter(e => e !== file))
+    }
+
 
     return (
         <Wrapper>
@@ -130,10 +129,13 @@ const GoodsWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
-                            <SelectBar placeholder={'객실을 선택해 주세요'} onChange={(e) => setRooms(e)}>
-                                <Select.Option value="스탠다드 트윈">스탠다드 트윈</Select.Option>
-                                <Select.Option value="스탠다드 더블">스탠다드 더블</Select.Option>
-                                <Select.Option value="스위트 주니어">스위트 주니어</Select.Option>
+                            <SelectBar placeholder={'객실을 선택해 주세요'} onChange={(e) => setRoomId(e)}>
+                                {room.rooms && 
+                                room.rooms.slice().map(item => {
+                                    return (
+                                        <Select.Option value={item.id}>{item.name}</Select.Option>
+                                    )
+                                })}
                             </SelectBar>
                             <Button type="primary" size="small" onClick={() => router.push('/rooms/1?type="modi"')} style={{fontSize: '12px'}}>객실 추가 및 삭제</Button>
                         </RoomsWrap>
@@ -160,22 +162,12 @@ const GoodsWrite = observer(() => {
                             const numRegExp = /^[0-9]*$/;
                             if (!numRegExp.test(e.target.value)) return;setRate(e.target.value)}} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="썸네일 사진">
-                        <UploadThumb 
-                            thumb={thumb}
-                            thumbLoading={thumbLoading}
-                            onUploadThumb={onUploadThumb} />
-                    </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <UploadImgs 
-                            fileList={imgList}
+                            fileList={fileList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            previewImage={previewImage}
-                            onRemoveImgs={(file) => {
-                                setImgList(imgList.filter(e => e !== file))
-                            }} />
-                        <UploadLength style={imgList.length == 10 ? {color:'red'} : null}>({imgList.length} / 10)</UploadLength>
+                            onRemoveImgs={onRemoveImgs} />
                     </Descriptions.Item>
                     
                     <Descriptions.Item label="최소 박 수">
@@ -194,7 +186,7 @@ const GoodsWrite = observer(() => {
                         const numRegExp = /^[0-9]*$/;
                         if (!numRegExp.test(e.target.value)) return;
                         setMaxNight(e.target.value)}}
-                        style={{width:50}} /> 명
+                        style={{width:50}} /> 일
                     </Descriptions.Item>
                     <Descriptions.Item label="옵션">
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} />
@@ -262,5 +254,23 @@ const Empty = styled.div`
     padding-top: 30px;
 `
 
+// export async function getServerSideProps(context) {
+//     let content = null
+//     try {
+//         const result = await getBridgeContent({ bridgeIdx: context.params.pid })
+//         if (result.status === 200) {
+//             content = result.data.content
+//         }
+//     } catch (err) {
+        
+//     } finally {
+//         return {
+//             props: {
+//                 content: content,
+//                 pid: context.params.pid
+//             }
+//         }
+//     }
+// }
 
 export default GoodsWrite

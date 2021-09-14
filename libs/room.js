@@ -33,3 +33,15 @@ export function postImagesUpload(file, token) {
         }
     })
 }
+
+export function getRoomListByHotel(params, token) {
+    return axios({
+        method: 'get',
+        url: '/room/list_by_hotel',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

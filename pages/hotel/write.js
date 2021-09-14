@@ -7,6 +7,7 @@ import UploadImgs from '../../components/atom/UploadImgs'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../store/StoreProvider'
 import moment from 'moment'
+import { concat } from "lodash";
 
 const HotelWrite = observer(() => {
 
@@ -21,7 +22,7 @@ const HotelWrite = observer(() => {
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
-    const [previewImage, setPreviewImage] = useState('')
+    const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     const [breakfast, setBreakfast] = useState()
@@ -59,6 +60,7 @@ const HotelWrite = observer(() => {
         }
 
         const images = imgList.join();
+        const option = facility.join();
 
         const data = {
             name: name,
@@ -74,20 +76,19 @@ const HotelWrite = observer(() => {
             images: images,
             latitude: latitude,
             longtitude: longtitude,
-            // category: category,
-            // facility: facility,
-            // breakfast: breakfast,
-            // parking: parking,
-            // cancel: cancel
+            type: category,
+            options: option,
+            parking: parking,
+            refund_rule: cancel
         }
 
         console.log(data)
 
         await hotel.addInfo(data, user.token, (success, result) => {
             if (success) {
-                message.success('게시 완료')
-                console.log(result)
-                // message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+                // message.success('게시 완료')
+                // console.log(result)
+                message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
             }
         })
         
@@ -97,16 +98,23 @@ const HotelWrite = observer(() => {
     const onUploadChange = async (e) => {
         if (e.file.status === 'uploading') {
             setLoading(true);
-
-            await hotel.imagesUpload(e.file, user.token, (success, data) => {
+            await hotel.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
                 if (success) {
-                    console.log(data)
+                    setFileList(fileList.concat(e.file.originFileObj))
                     setLoading(false);
-                    setImgList(imgList.concat(data.status))
+                    setImgList(imgList.concat(data.images))
+                    console.log(fileList, imgList)
                 }
             })
         }
         
+    }
+    
+    const onRemoveImgs = async(file) => {
+        let idx = fileList.indexOf(file);
+        imgList.splice(idx, 1);
+        await setImgList(imgList)
+        await setFileList(fileList.filter(e => e !== file))
     }
 
     return (
@@ -183,14 +191,10 @@ const HotelWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 이미지">
                         <UploadImgs 
-                            fileList={imgList}
+                            fileList={fileList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            previewImage={previewImage}
-                            onRemoveImgs={(file) => {
-                                setImgList(imgList.filter(e => e !== file))
-                            }} />
-                        <UploadLength style={imgList.length == 10 ? {color:'red'} : null}>({imgList.length} / 10)</UploadLength>
+                            onRemoveImgs={onRemoveImgs} />
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                         <Checkbox.Group options={options} value={facility} onChange={e => setFacility(e)} />
@@ -291,11 +295,6 @@ const ButtonWrap = styled.div`
     button:first-child {
         margin-right: 10px;
     }
-`
-
-const UploadLength = styled.div`
-    font-size: 12px;
-    color: #999
 `
 
 export default HotelWrite

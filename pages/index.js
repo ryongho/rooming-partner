@@ -36,8 +36,9 @@ const Login = observer(() => {
             if (success) {
                 if (result.status == 200) {
                     user.callInfo(user.token)
-                    // await router.push('/user/partner/list')
-                    await router.push('/user/goods/list')
+                    if (user.auth == 1) {
+                        await router.push('/user/partner/list')
+                    } await router.push('/goods/list')
                 } else {
                     message.error(`${result.msg}입니다`)
                 }

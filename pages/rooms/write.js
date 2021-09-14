@@ -17,7 +17,7 @@ const GoodsWrite = observer(() => {
     const [name, setName] = useState()
     const [bed, setBed] = useState()
     const [bedNum, setBedNum] = useState()
-    const [previewImage, setPreviewImage] = useState('')
+    const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     const [people, setPeople] = useState()
@@ -59,38 +59,43 @@ const GoodsWrite = observer(() => {
 
         await room.addInfo(data, user.token, (success, result) => {
             if (success) {
-                message.success('게시 완료')
-                console.log(result)
-                // message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+                // message.success('게시 완료')
+                // console.log(result)
+                message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
             }
         })
     }
 
     useEffect(() => {
-
         const callInfo = async() => {
             await user.callInfo(user.token)
             await setHotelId(user.hotelid)
         }
         callInfo()
-
     }, [])
-
     
 
     const onUploadChange = async (e) => {
         if (e.file.status === 'uploading') {
             setLoading(true);
+            console.log(e)
 
-            await room.imagesUpload(e.file, user.token, (success, data) => {
+            await room.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
                 if (success) {
-                    console.log(data)
-                    setLoading(false);
-                    setImgList(imgList.concat(data.status))
+                    setFileList(fileList.concat(e.file.originFileObj))
+                    setLoading(false)
+                    setImgList(imgList.concat(data.images))
+                    // https://rooming-img.s3.ap-northeast-2.amazonaws.com/
                 }
             })
         }
-        
+    }
+
+    const onRemoveImgs = async(file) => {
+        let idx = fileList.indexOf(file);
+        imgList.splice(idx, 1);
+        await setImgList(imgList)
+        await setFileList(fileList.filter(e => e !== file))
     }
 
     return (
@@ -140,14 +145,10 @@ const GoodsWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 이미지">
                         <UploadImgs 
-                            fileList={imgList}
+                            fileList={fileList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            previewImage={previewImage}
-                            onRemoveImgs={(file) => {
-                                setImgList(imgList.filter(e => e !== file))
-                            }} />
-                        <UploadLength style={imgList.length == 10 ? {color:'red'} : null}>({imgList.length} / 10)</UploadLength>
+                            onRemoveImgs={onRemoveImgs} />
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>

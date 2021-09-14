@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState } from 'react'
-import { Upload } from 'antd'
+import { Upload, message, Button } from 'antd'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 
@@ -22,25 +22,43 @@ const UploadImgs = ({ fileList, loading, onUploadChange, maxLength = 10, preview
     return (
         <>
             <Upload 
-            listType="picture-card"
             fileList={fileList}
             beforeUpload={beforeUpload}
             onChange={onUploadChange}
             onRemove={onRemoveImgs}>
-                {fileList.length >= maxLength ? null :
-                <div>
-                    {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                    <UploadBtn>이미지 업로드</UploadBtn>
-                </div>
-                }
+                <UpBtnWrap>
+                    {fileList.length >= maxLength ? null :
+                    <UploadBtn>
+                        {loading ? <LoadingOutlined /> : <PlusOutlined />}
+                        이미지 업로드
+                    </UploadBtn>
+                    }
+                    
+                    <UploadLength style={fileList.length == 10 ? {color:'red'} : null}>({fileList.length} / 10)</UploadLength>
+                </UpBtnWrap>
             </Upload> 
-            <img style={{ width: '100%' }} src={previewImage} />
+            {previewImage &&
+                <img style={{ width: '150px' }} src={previewImage} />
+            }
         </>
     )
 }
 
-const UploadBtn = styled.div`
-    margin-top: 8px;
+const UpBtnWrap = styled.div`
+    display: flex;
+    align-items: center;
 `
+
+const UploadBtn = styled(Button)`
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+`
+
+const UploadLength = styled.div`
+    font-size: 12px;
+    color: #999
+`
+
 
 export default UploadImgs

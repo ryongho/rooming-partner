@@ -12,7 +12,7 @@ export default class GoodsStore {
     constructor() {
         makeObservable(this, {
             addInfo: action,
-            thumbImageUpload: action
+            imagesUpload: action
         })
     }
 
@@ -28,7 +28,7 @@ export default class GoodsStore {
         }
     }
 
-    thumbImageUpload = async (file, token, callback) => {
+    imagesUpload = async (file, token, callback) => {
         try {
             const result = await postImagesUpload(file, token)
             if (result.status === 200) {

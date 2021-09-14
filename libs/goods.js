@@ -23,7 +23,7 @@ export function postImagesUpload(file, token) {
     return axios({
         method: 'post',
         url: '/image/upload',
-        baseUrl: baseUrl[env].baseUrl,
+        baseURL: baseUrl[env].baseUrl,
         data: formData,
         headers: {
             'Authorization': 'Bearer '+token,
