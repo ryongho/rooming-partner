@@ -1,7 +1,8 @@
 import { action, observable, makeObservable } from 'mobx'
 import { enableStaticRendering } from 'mobx-react-lite'
 import { 
-    postSquareThumbnailImageUpload
+    postImagesUpload,
+    postGoodsRegist
 } from '../libs/goods'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -10,13 +11,26 @@ export default class GoodsStore {
 
     constructor() {
         makeObservable(this, {
+            addInfo: action,
             thumbImageUpload: action
         })
     }
 
+    addInfo = async(data, token, callback) => {
+        try {
+            const result = await postGoodsRegist(data, token)
+            if (result.status === 200) {
+                callback(true, result.data)
+            }
+
+        } catch (err) {
+            callback(false, null)
+        }
+    }
+
     thumbImageUpload = async (file, token, callback) => {
         try {
-            const result = await postSquareThumbnailImageUpload(file, token)
+            const result = await postImagesUpload(file, token)
             if (result.status === 200) {
                 callback(true, result.data)
             }

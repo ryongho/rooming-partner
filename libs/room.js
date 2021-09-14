@@ -15,3 +15,21 @@ export function postRoomRegist(data, token) {
         }
     })
 }
+
+
+export function postImagesUpload(file, token) {
+    let formData = new FormData()
+    formData.append('img_01', file);
+    formData.append('type', 'room');
+
+    return axios({
+        method: 'post',
+        url: '/image/upload',
+        baseURL: baseUrl[env].baseUrl,
+        data: formData,
+        headers: {
+            'Authorization': 'Bearer '+token,
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}

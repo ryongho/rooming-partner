@@ -32,10 +32,12 @@ const Login = observer(() => {
             password: pw
         }
 
-        await user.login(data, (success, result) => {
+        await user.login(data, async (success, result) => {
             if (success) {
                 if (result.status == 200) {
-                    router.push('/user/partner/list')
+                    user.callInfo(user.token)
+                    // await router.push('/user/partner/list')
+                    await router.push('/user/goods/list')
                 } else {
                     message.error(`${result.msg}입니다`)
                 }

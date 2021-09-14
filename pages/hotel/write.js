@@ -1,11 +1,12 @@
 import styled from "styled-components"
-import { Descriptions, Select, Input, Button, Checkbox, message, Modal, Upload, Space } from 'antd'
+import { Descriptions, Select, Input, Button, Checkbox, message, Modal, DatePicker, Upload, Space } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import UploadImgs from '../../components/atom/UploadImgs'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../store/StoreProvider'
+import moment from 'moment'
 
 const HotelWrite = observer(() => {
 
@@ -17,94 +18,93 @@ const HotelWrite = observer(() => {
     const [name, setName] = useState()
     const [facility, setFacility] = useState([])
     const [address, setAddress] = useState()
-    const [address2, setAddress2] = useState()
+    const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
-    const [thumb, setThumb] = useState()
+    const [previewImage, setPreviewImage] = useState('')
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
-    const [imageUrl, setImageUrl] = useState()
     const [breakfast, setBreakfast] = useState()
     const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
 
+    const [content, setContent] = useState('')
+    const [owner, setOwner] = useState('')
+    const [reg, setReg] = useState('')
+    const [openDate, setOpenDate] = useState('')
+    const [traffic, setTraffic] = useState('')
+    const [level, setLevel] = useState('')
     const [fax, setFax] = useState('')
-    const [latitude, setLatitude] = useState()
     const [longtitude, setLongtitude] = useState()
-    const [openDate, setOpenDate] = useState()
+    const [latitude, setLatitude] = useState()
 
     const [showAddress, setShowAddress] = useState(false)
 
     const onWrite = async () => {
+
         if (!name) {
-            message.warning('숙소명을 입력해 주세요')
+            return message.warning('숙소명을 입력해 주세요')
         }
         if (!address || !zonecode) {
-            message.warning('숙소 주소를 입력해 주세요')
+            return message.warning('숙소 주소를 입력해 주세요')
         }
         if (!tel) {
-            message.warning('숙소 연락처를 입력해 주세요')
+            return message.warning('숙소 연락처를 입력해 주세요')
         }
         if (imgList.length < 1) {
-            message.warning('숙소 사진을 입력해 주세요')
+            return message.warning('상품 사진을 입력해 주세요')
         }
         if (!cancel) {
-            message.warning('취소 및 환불 규정을 입력해 주세요')
+            return message.warning('취소 및 환불 규정을 입력해 주세요')
         }
+
+        const images = imgList.join();
 
         const data = {
             name: name,
-            open_date: openDate,
-            address: address + address2 + zonecode,
+            content: content,
+            owner: owner,
+            open_date: moment(openDate).format('YYYY-MM-DD'),
+            reg_no: reg,
+            address: address +' '+ address2 +' '+ zonecode,
             tel: tel,
             fax: fax,
+            level: level,
             traffic: traffic,
-            images: imgList,
+            images: images,
             latitude: latitude,
-            longtitude: longtitude
+            longtitude: longtitude,
+            // category: category,
+            // facility: facility,
+            // breakfast: breakfast,
+            // parking: parking,
+            // cancel: cancel
         }
 
-        await hotel.addInfo(data, user.token, (success) => {
+        console.log(data)
+
+        await hotel.addInfo(data, user.token, (success, result) => {
             if (success) {
-                message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+                message.success('게시 완료')
+                console.log(result)
+                // message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
             }
         })
         
     }
 
 
-    const beforeUpload = (file) => {
-        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-        if (!isJpgOrPng) {
-            message.error('JPG 및 PNG 파일만 업로드 가능합니다.');
-        }
-        const isLt2M = file.size / 1024 / 1024 < 2;
-        if (!isLt2M) {
-            message.error('이미지 사이즈는 2MB보다 작아야 합니다.');
-        }
-        return isJpgOrPng && isLt2M;
-    }
-
-    const onUploadThumb = (e) => {
-        if (e.file.status === 'done') {
-        const reader = new FileReader();
-        reader.addEventListener('load', () => (setThumb(reader.result)));
-        reader.readAsDataURL(e.file.originFileObj);
-        }
-    }
-
-    const onUploadChange = (e) => {
-        console.log(e.file.status);
+    const onUploadChange = async (e) => {
         if (e.file.status === 'uploading') {
-            return setLoading(true);
-        }
-        if (e.file.status === 'done') {
-            const reader = new FileReader();
-            reader.addEventListener('load', () => callback(reader.result));
-            reader.readAsDataURL(e.file.originFileObj);
-            
-            setLoading(false);
-            setImgList(reader.result)
+            setLoading(true);
+
+            await hotel.imagesUpload(e.file, user.token, (success, data) => {
+                if (success) {
+                    console.log(data)
+                    setLoading(false);
+                    setImgList(imgList.concat(data.status))
+                }
+            })
         }
         
     }
@@ -139,6 +139,21 @@ const HotelWrite = observer(() => {
                         value={address2} 
                         onChange={(e) => setAddress2(e.target.value)} />
                     </Descriptions.Item>
+                    <Descriptions.Item label="숙소 상세 위치">
+                        <Input 
+                        placeholder={"경도"}
+                        value={longtitude}
+                        style={{width:100}}
+                        onChange={(e) => setLongtitude(e.target.value)} />
+                        <Input 
+                        placeholder={"위도"}
+                        value={latitude}
+                        style={{width:100, marginRight: '20px', marginLeft: '5px'}}
+                        onChange={(e) => setLatitude(e.target.value)} />
+                        <a href="http://www.dawuljuso.com/" target='_blank'>
+                            <Button>주소로 경도/위도 찾기</Button>
+                        </a>
+                    </Descriptions.Item>
                     <Descriptions.Item label="숙소 연락처">
                         <InputValue
                         placeholder={"'-'없이 번호만 입력해 주세요"}
@@ -148,37 +163,62 @@ const HotelWrite = observer(() => {
                             if (!numRegExp.test(e.target.value)) return;
                             setTel(e.target.value)}} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="숙소 사진">
-                        <Upload
-                        listType="picture-card"
-                        showUploadList={false}
-                        action="http://localhost:3000/"
-                        beforeUpload={beforeUpload}
-                        onChange={onUploadThumb}>
-                            {thumb ? <img src={thumb} alt="avatar" style={{ width: '100%' }} /> : <UploadBtn>썸네일 업로드</UploadBtn>}
-                        </Upload>
-
-                        <Space>
-                            <Upload 
-                            listType="picture-card"
+                    <Descriptions.Item label="숙소 팩스">
+                        <InputValue
+                        placeholder={"'-'없이 번호만 입력해 주세요"}
+                        value={fax} 
+                        onChange={(e) => {
+                            const numRegExp = /^[0-9]*$/;
+                            if (!numRegExp.test(e.target.value)) return;
+                            setFax(e.target.value)}} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="숙소 등급">
+                        <InputValue
+                        placeholder={"숫자로 입력해 주세요"}
+                        value={level} 
+                        onChange={(e) => {
+                            const numRegExp = /^[0-9]*$/;
+                            if (!numRegExp.test(e.target.value)) return;
+                            setLevel(e.target.value)}} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="숙소 이미지">
+                        <UploadImgs 
                             fileList={imgList}
-                            showUploadList={false}
-                            action=""
-                            beforeUpload={beforeUpload}
-                            onChange={onUploadChange}>
-                                {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-                                : imgList.length >= 10 ? null :
-                                <div>
-                                    {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                                    
-                                    <UploadBtn>이미지 업로드</UploadBtn>
-                                </div>}
-                            </Upload>
-                            <UploadLength>({imgList.length} / 10)</UploadLength>
-                        </Space>
+                            loading={loading}
+                            onUploadChange={onUploadChange}
+                            previewImage={previewImage}
+                            onRemoveImgs={(file) => {
+                                setImgList(imgList.filter(e => e !== file))
+                            }} />
+                        <UploadLength style={imgList.length == 10 ? {color:'red'} : null}>({imgList.length} / 10)</UploadLength>
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                         <Checkbox.Group options={options} value={facility} onChange={e => setFacility(e)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="대표자">
+                        <InputValue
+                        value={owner} 
+                        onChange={e => setOwner(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="사업자 번호">
+                        <InputValue
+                        value={reg} 
+                        onChange={e => setReg(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="개업일">
+                        <DatePicker onChange={(e) => setOpenDate(e)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="호텔 소개">
+                        <Input.TextArea
+                        value={content} 
+                        rows={4}
+                        onChange={(e) => setContent(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="교통 정보">
+                        <Input.TextArea
+                        value={traffic} 
+                        rows={4}
+                        onChange={(e) => setTraffic(e.target.value)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="조식 정보">
                         <Input.TextArea
@@ -241,10 +281,6 @@ const InputValue = styled(Input)`
 
 const SelectBar = styled(Select)`
     width: 150px;
-`
-
-const UploadBtn = styled.div`
-    margin-top: 8px;
 `
 
 const ButtonWrap = styled.div`

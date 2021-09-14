@@ -4,9 +4,7 @@ import { Upload } from 'antd'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 
-const UploadImgs = ({ fileList, loading, onUploadChange, maxLength = 10 }) => {
-
-    const [previewImage, setPreviewImage] = useState('')
+const UploadImgs = ({ fileList, loading, onUploadChange, maxLength = 10, previewImage, onRemoveImgs }) => {
 
     const beforeUpload = (file) => {
         const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -20,32 +18,15 @@ const UploadImgs = ({ fileList, loading, onUploadChange, maxLength = 10 }) => {
         return isJpgOrPng && isLt2M;
     }
 
-    const previewUpload = async(file) => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase64(file.originFileObj);
-          }
-          setPreviewImage(file.url || file.preview)
-    }
-    
-    const getBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = error => reject(error);
-        });
-    }
     
     return (
         <>
             <Upload 
             listType="picture-card"
             fileList={fileList}
-            action="http://localhost:3000/"
             beforeUpload={beforeUpload}
-            onPreview={previewUpload}
             onChange={onUploadChange}
-            onRemove={(file) => setPreviewImage('')}>
+            onRemove={onRemoveImgs}>
                 {fileList.length >= maxLength ? null :
                 <div>
                     {loading ? <LoadingOutlined /> : <PlusOutlined />}

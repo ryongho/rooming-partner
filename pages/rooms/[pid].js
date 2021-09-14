@@ -164,7 +164,7 @@ const RoomsDetail = () => {
                         bordered={modiStatus} />
                         <InputValue
                         style={{width: '190px'}}
-                        placeholder={"침대 갯수를 입력하세요"}
+                        placeholder={"침대 개수를 입력하세요"}
                         value={bedNum} 
                         bordered={modiStatus}
                         onChange={e => onDataChange(e, 'bedNum')} />개
@@ -178,7 +178,7 @@ const RoomsDetail = () => {
                             onChange={e => onDataChange(e, 'bed2')} />
                             <InputValue
                             style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 갯수를 입력하세요"}
+                            placeholder={"침대 개수를 입력하세요"}
                             value={bedNum2}
                             bordered={modiStatus} 
                             onChange={e => onDataChange(e, 'bedNum2')} />
@@ -194,7 +194,7 @@ const RoomsDetail = () => {
                             onChange={e => onDataChange(e, 'bed3')} />
                             <InputValue
                             style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 갯수를 입력하세요"}
+                            placeholder={"침대 개수를 입력하세요"}
                             value={bedNum3} 
                             bordered={modiStatus}
                             onChange={e => onDataChange(e, 'bedNum3')} />

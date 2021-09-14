@@ -22,7 +22,6 @@ const UploadThumb = ({ thumb, onUploadThumb, thumbLoading }) => {
         <Upload
         listType="picture-card"
         showUploadList={false}
-        action="http://localhost:3000/"
         beforeUpload={beforeUpload}
         onChange={onUploadThumb}>
             {

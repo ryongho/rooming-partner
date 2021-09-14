@@ -1,51 +1,97 @@
 import styled from "styled-components"
-import { Descriptions, Select, Input, Button, message, Space } from 'antd'
+import { Descriptions, Select, Input, Button, message, Checkbox } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
+import UploadImgs from '../../components/atom/UploadImgs'
+import { observer } from 'mobx-react-lite'
+import { useStore } from '../../store/StoreProvider'
 
-const GoodsWrite = () => {
+const GoodsWrite = observer(() => {
 
     const router = useRouter();
+    const { user, room } = useStore()
     
-    const options = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
+    const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
+
+    const [hotelId, setHotelId] = useState()
     const [name, setName] = useState()
+    const [bed, setBed] = useState()
+    const [bedNum, setBedNum] = useState()
+    const [previewImage, setPreviewImage] = useState('')
+    const [imgList, setImgList] = useState([])
+    const [loading, setLoading] = useState(false)
     const [people, setPeople] = useState()
     const [checkIn, setCheckIn] = useState()
     const [checkOut, setCheckOut] = useState()
-    const [bed, setBed] = useState()
-    const [bed2, setBed2] = useState()
-    const [bed3, setBed3] = useState()
-    const [bedNum, setBedNum] = useState()
-    const [bedNum2, setBedNum2] = useState()
-    const [bedNum3, setBedNum3] = useState()
-    const [desc, setDesc] = useState()
-    const [showAddBed, setShowAddBed] = useState(0)
 
-    const onWrite = () => {
+    const onWrite = async() => {
         if (!name) {
-            message.warning('객실명을 입력해 주세요')
+            return message.warning('객실명을 입력해 주세요')
         }
         if (!people) {
-            message.warning('기준 인원수를 입력해 주세요')
+            return message.warning('기준 인원수를 입력해 주세요')
         }
         if (!bed || !bedNum) {
-            message.warning('침대 사이즈를 입력해 주세요')
-        }
-        if (!desc) {
-            message.warning('객실 기본정보를 입력해 주세요')
+            return message.warning('침대 사이즈를 입력해 주세요')
         }
         if (!checkIn) {
-            message.warning('체크인 시간을 입력해 주세요')
+            return message.warning('체크인 시간을 입력해 주세요')
         }
         if (!checkOut) {
-            message.warning('체크아웃 시간을 입력해 주세요')
+            return message.warning('체크아웃 시간을 입력해 주세요')
         }
+        
+        const images = imgList.join();
 
         // success
+        const data = {
+            hotel_id: hotelId,
+            name: name,
+            bed: bed,
+            amount: bedNum,
+            peoples: people,
+            images: images,
+            checkin: checkIn,
+            checkout: checkOut,
+        }
+
+        console.log(data)
+
+        await room.addInfo(data, user.token, (success, result) => {
+            if (success) {
+                message.success('게시 완료')
+                console.log(result)
+                // message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+            }
+        })
     }
 
+    useEffect(() => {
 
+        const callInfo = async() => {
+            await user.callInfo(user.token)
+            await setHotelId(user.hotelid)
+        }
+        callInfo()
+
+    }, [])
+
+    
+
+    const onUploadChange = async (e) => {
+        if (e.file.status === 'uploading') {
+            setLoading(true);
+
+            await room.imagesUpload(e.file, user.token, (success, data) => {
+                if (success) {
+                    console.log(data)
+                    setLoading(false);
+                    setImgList(imgList.concat(data.status))
+                }
+            })
+        }
+        
+    }
 
     return (
         <Wrapper>
@@ -56,26 +102,6 @@ const GoodsWrite = () => {
                         value={name} 
                         onChange={e => setName(e.target.value)} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="인원 제한수">
-                        <InputValue
-                        value={people} 
-                        onChange={e => {
-                        const numRegExp = /^[0-9]*$/;
-                        if (!numRegExp.test(e.target.value)) return;
-                        setPeople(e.target.value)}} />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="체크인 시간">
-                        <SelectBar onChange={(e) => setCheckIn(e)}>
-                            {options.map(time => {
-                            return <Select.Option value={time}>{time}</Select.Option>})}
-                        </SelectBar>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="체크아웃 시간">
-                        <SelectBar onChange={(e) => setCheckOut(e)}>
-                            {options.map(time => {
-                            return <Select.Option value={time}>{time}</Select.Option>})}
-                        </SelectBar>
-                    </Descriptions.Item>
                     <Descriptions.Item label="침대 사이즈">
                         <InputValue
                         style={{width: '190px', marginRight: '5px'}}
@@ -84,56 +110,44 @@ const GoodsWrite = () => {
                         onChange={e => setBed(e.target.value)} />
                         <InputValue
                         style={{width: '190px'}}
-                        placeholder={"침대 갯수를 입력하세요"}
+                        placeholder={"침대 개수를 입력하세요"}
                         value={bedNum} 
                         onChange={e => {
                             const numRegExp = /^[0-9]*$/;
                             if (!numRegExp.test(e.target.value)) return;setBedNum(e.target.value)
                         }} />
-                        {(showAddBed == 1 || showAddBed == 2) &&
-                        <>
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 종류를 입력하세요"}
-                            value={bed2} 
-                            onChange={e => setBed2(e.target.value)} />
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 갯수를 입력하세요"}
-                            value={bedNum2} 
-                            onChange={e => {
-                                const numRegExp = /^[0-9]*$/;
-                                if (!numRegExp.test(e.target.value)) return;setBedNum2(e.target.value)}} />
-                        </>
-                        }
-                        {showAddBed == 2 &&
-                        <>
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 종류를 입력하세요"}
-                            value={bed3} 
-                            onChange={e => setBed3(e.target.value)} />
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 갯수를 입력하세요"}
-                            value={bedNum3} 
-                            onChange={e => {
-                                const numRegExp = /^[0-9]*$/;
-                                if (!numRegExp.test(e.target.value)) return;setBedNum3(e.target.value)
-                            }} />
-                        </>
-                        }
-                        {
-                            (showAddBed == 0 || showAddBed == 1) ?
-                            <AddBtn onClick={() => showAddBed == 0 ? setShowAddBed(1) : setShowAddBed(2)}><PlusSquareOutlined /></AddBtn>
-                            : <DeleteBtn onClick={() => setShowAddBed(0)}><MinusSquareOutlined /></DeleteBtn>
-                        }
                     </Descriptions.Item>
-                    <Descriptions.Item label="기본 정보">
-                        <Input.TextArea
-                        value={desc} 
-                        rows={4}
-                        onChange={(e) => setDesc(e.target.value)} />
+                    <Descriptions.Item label="인원 제한수">
+                        <Input
+                        value={people} 
+                        onChange={e => {
+                        const numRegExp = /^[0-9]*$/;
+                        if (!numRegExp.test(e.target.value)) return;
+                        setPeople(e.target.value)}}
+                        style={{width:50}} /> 명
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크인 시간">
+                        <SelectBar placeholder={'체크인 가능 시간을 선택하세요'} onChange={(e) => setCheckIn(e)} style={{width:250}}>
+                            {times.map(time => {
+                            return <Select.Option value={time}>{time}</Select.Option>})}
+                        </SelectBar>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크아웃 시간">
+                        <SelectBar placeholder={'체크아웃 가능 시간을 선택하세요'} onChange={(e) => setCheckOut(e)} style={{width:250}}>
+                            {times.map(time => {
+                            return <Select.Option value={time}>{time}</Select.Option>})}
+                        </SelectBar>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="객실 이미지">
+                        <UploadImgs 
+                            fileList={imgList}
+                            loading={loading}
+                            onUploadChange={onUploadChange}
+                            previewImage={previewImage}
+                            onRemoveImgs={(file) => {
+                                setImgList(imgList.filter(e => e !== file))
+                            }} />
+                        <UploadLength style={imgList.length == 10 ? {color:'red'} : null}>({imgList.length} / 10)</UploadLength>
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>
@@ -143,7 +157,7 @@ const GoodsWrite = () => {
             </Detail>
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;
@@ -179,12 +193,9 @@ const ButtonWrap = styled.div`
     }
 `
 
-const AddBtn = styled(Button)`
-    border: none;
-`
-
-const DeleteBtn = styled(Button)`
-    border: none;
+const UploadLength = styled.div`
+    font-size: 12px;
+    color: #999
 `
 
 export default GoodsWrite

@@ -3,6 +3,7 @@ import { CaretDownOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import { useRouter } from 'next/router'
 import { useStore } from '../../store/StoreProvider'
+import { useEffect } from 'react'
 
 
 const Header = ({ title }) => {
@@ -19,6 +20,7 @@ const Header = ({ title }) => {
         <Menu>
             <Menu.Item>
                 <List onClick={()=>{router.push('/user/partner/1')}}>내 정보</List>
+                {/* <List onClick={()=>{router.push(`/user/partner/${user.userid}`)}}>내 정보</List> */}
             </Menu.Item>
         </Menu>
     )
@@ -29,8 +31,8 @@ const Header = ({ title }) => {
             <RightSide>
                 <Dropdown overlay={menu}>
                     <User>
-                        <Name>{'루밍'} 님</Name>
-                        <Email>(test@rooming.com) <CaretDownOutlined /></Email>
+                        <Name>{user.name} 님</Name>
+                        <Email>({user.email}) <CaretDownOutlined /></Email>
                     </User>
                 </Dropdown>
                 <Logout type={'default'} size={'small'} onClick={onLogout}>

@@ -290,7 +290,7 @@ const GoodsDetail = () => {
                             value={bed} 
                             onChange={e => onDataChange(e, 'bed')} />
                             <InputValueBed
-                            placeholder={"침대 갯수를 입력하세요"}
+                            placeholder={"침대 개수를 입력하세요"}
                             value={bedNum} 
                             onChange={e => onDataChange(e, 'bedNum')} />
                             </>
@@ -307,7 +307,7 @@ const GoodsDetail = () => {
                             value={bed2} 
                             onChange={e => onDataChange(e, 'bed2')} />
                             <InputValueBed
-                            placeholder={"침대 갯수를 입력하세요"}
+                            placeholder={"침대 개수를 입력하세요"}
                             value={bedNum2} 
                             onChange={e => onDataChange(e, 'bedNum2')} />
                             </>
@@ -338,7 +338,7 @@ const GoodsDetail = () => {
                             value={bed3} 
                             onChange={e => onDataChange(e, 'bed3')} />
                             <InputValueBed
-                            placeholder={"침대 갯수를 입력하세요"}
+                            placeholder={"침대 개수를 입력하세요"}
                             value={bedNum3} 
                             onChange={e => onDataChange(e, 'bedNum3') } />
                         </>

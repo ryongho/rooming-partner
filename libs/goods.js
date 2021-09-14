@@ -3,14 +3,26 @@ import baseUrl from './base.json'
 
 const env = process.env.API_ENV || 'development';
 
-export function postSquareThumbnailImageUpload(file, token) {
+export function postGoodsRegist(data, token) {
+    return axios({
+        method: 'post',
+        url: '/goods/regist',
+        baseURL: baseUrl[env].baseUrl,
+        data: data,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function postImagesUpload(file, token) {
     let formData = new FormData()
-    formData.append('image', file);
-    console.log(formData)
+    formData.append('img_01', file);
+    formData.append('type', 'goods');
 
     return axios({
         method: 'post',
-        url: '/goods/thumbnail/image-upload',
+        url: '/image/upload',
         baseUrl: baseUrl[env].baseUrl,
         data: formData,
         headers: {

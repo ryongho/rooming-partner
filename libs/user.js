@@ -22,3 +22,14 @@ export function putRegistPartner(data) {
     })
 
 }
+
+export function getUserInfo(token) {
+    return axios({
+        method: 'get',
+        url: '/user/info',
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

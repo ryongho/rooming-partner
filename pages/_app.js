@@ -79,7 +79,12 @@ const MyApp = ({ Component, pageProps }) => {
     }
 
     useEffect(() => {
-        console.log(router.pathname)
+        setIsAdmin(localStorage.getItem('rmaauth') == 1)
+        if(!isAdmin) {
+            setGroup('상품 관리')
+            setTitle('상품 목록')
+        }
+
         if (router.pathname == '/user/partner/[pid]') setTitle('파트너 상세')
         if (router.pathname == '/user/partner/list') setTitle('파트너 목록')
         
