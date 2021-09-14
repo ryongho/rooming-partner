@@ -9,7 +9,7 @@ import { useStore } from '../store/StoreProvider'
 const Login = observer(() => {
 
     const router = useRouter();
-    const { admin } = useStore()
+    const { user } = useStore()
 
     const [email, setEmail] = useState('');
     // const [id, setId] = useState('');
@@ -32,11 +32,13 @@ const Login = observer(() => {
             password: pw
         }
 
-        await admin.login(data, (success, result) => {
+        await user.login(data, (success, result) => {
             if (success) {
-                router.push('/user/partner/list')
-            } else {
-                console.log(data, result)
+                if (result.status == 200) {
+                    router.push('/user/partner/list')
+                } else {
+                    message.error(`${result.msg}입니다`)
+                }
             }
         })
     }

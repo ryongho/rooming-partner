@@ -2,13 +2,16 @@ import { Layout, Dropdown, Menu, Button } from 'antd'
 import { CaretDownOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import { useRouter } from 'next/router'
+import { useStore } from '../../store/StoreProvider'
 
 
 const Header = ({ title }) => {
 
     const router = useRouter();
+    const { user } = useStore()
 
-    const onLogout = () => {
+    const onLogout = async() => {
+        await user.logout()
         router.push('/');
     }
 

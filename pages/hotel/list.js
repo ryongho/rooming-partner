@@ -1,13 +1,15 @@
 import styled from 'styled-components'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input } from 'antd'
 import { PlusSquareOutlined } from '@ant-design/icons';
 import Link from 'next/link'
 import moment from 'moment'
 import xlsx from 'xlsx'
 import router from 'next/router';
+import { useStore } from '../../store/StoreProvider'
+import { observer } from 'mobx-react-lite'
 
-const HotelList = () => {
+const HotelList = observer(() => {
     const data = [{
         key: '1',
         category: '호텔',
@@ -66,7 +68,21 @@ const HotelList = () => {
         }
     }];
 
+    const { hotel } = useStore();
+
     const [isAdmin, setIsAdmin] = useState(true);
+
+    useEffect(() => {
+        const callList = async () => {
+            await hotel.callList(
+                10,
+                5
+            )
+        }
+
+        callList()
+        console.log(hotel.list)
+    }, [])
 
     const onCategory = (e) => {
         console.log(e)
@@ -117,7 +133,7 @@ const HotelList = () => {
             <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;

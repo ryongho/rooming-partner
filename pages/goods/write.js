@@ -11,7 +11,7 @@ import { useStore } from '../../store/StoreProvider'
 const GoodsWrite = observer(() => {
 
     const router = useRouter();
-    const { goods } = useStore()
+    const { goods, user } = useStore()
     
     const [name, setName] = useState()
     const [rooms, setRooms] = useState()
@@ -69,7 +69,7 @@ const GoodsWrite = observer(() => {
             return setThumbLoading(true);
         }
         if (e.file.status === 'done') {
-            await goods.thumbImageUpload(e.file, undefined, (success, data) => {
+            await goods.thumbImageUpload(e.file, user.token, (success, data) => {
                 if (success) {
                     setTimeout(() => {
                         console.log(data)

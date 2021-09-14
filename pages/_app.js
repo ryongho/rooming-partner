@@ -92,6 +92,8 @@ const MyApp = ({ Component, pageProps }) => {
         if (router.pathname == '/goods/[pid]') setTitle('상품 상세')
     }, [router])
 
+    
+
     return (
         <>
             <Head>

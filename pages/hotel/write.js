@@ -4,13 +4,17 @@ import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { observer } from 'mobx-react-lite'
+import { useStore } from '../../store/StoreProvider'
 
-const HotelWrite = () => {
+const HotelWrite = observer(() => {
 
     const router = useRouter();
+    const { user, hotel } = useStore()
+
     const options = ['주차가능', '레스토랑', '수영장', '스파', '피트니스', '무료 wifi', 'cctv', '소형냉장고']
     const [category, setCategory] = useState()
-    const [hotel, setHotel] = useState()
+    const [name, setName] = useState()
     const [facility, setFacility] = useState([])
     const [address, setAddress] = useState()
     const [address2, setAddress2] = useState()
@@ -24,11 +28,15 @@ const HotelWrite = () => {
     const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
 
+    const [fax, setFax] = useState('')
+    const [latitude, setLatitude] = useState()
+    const [longtitude, setLongtitude] = useState()
+    const [openDate, setOpenDate] = useState()
+
     const [showAddress, setShowAddress] = useState(false)
 
-
-    const onWrite = () => {
-        if (!hotel) {
+    const onWrite = async () => {
+        if (!name) {
             message.warning('숙소명을 입력해 주세요')
         }
         if (!address || !zonecode) {
@@ -43,6 +51,25 @@ const HotelWrite = () => {
         if (!cancel) {
             message.warning('취소 및 환불 규정을 입력해 주세요')
         }
+
+        const data = {
+            name: name,
+            open_date: openDate,
+            address: address + address2 + zonecode,
+            tel: tel,
+            fax: fax,
+            traffic: traffic,
+            images: imgList,
+            latitude: latitude,
+            longtitude: longtitude
+        }
+
+        await hotel.addInfo(data, user.token, (success) => {
+            if (success) {
+                message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+            }
+        })
+        
     }
 
 
@@ -94,8 +121,8 @@ const HotelWrite = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소명">
                         <InputValue
-                        value={hotel} 
-                        onChange={e => setHotel(e.target.value)} />
+                        value={name} 
+                        onChange={e => setName(e.target.value)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 주소">
                         <Input 
@@ -190,7 +217,7 @@ const HotelWrite = () => {
             </Modal>
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;

@@ -7,7 +7,7 @@ import { useStore } from '../store/StoreProvider'
 
 const Join = observer(() => {
 
-    const { admin } = useStore()
+    const { user } = useStore()
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -51,6 +51,26 @@ const Join = observer(() => {
         if (pw !== pw2) {
             return message.warning('비밀번호와 비밀번호 확인을 동일하게 입력해 주세요')
         }
+
+        const data = {
+            name: partner,
+            email: email,
+            phone: phone,
+            user_id: id,
+            password: pw,
+            user_type: 1
+        }
+
+        await user.join(data, (success, result) => {
+            if (success) {
+                if (result.status == 200) {
+                    alert('회원가입이 완료되었습니다')
+                    router.push('/')
+                } else {
+                    message.error(result.msg)
+                }
+            }
+        })
 
     }
 

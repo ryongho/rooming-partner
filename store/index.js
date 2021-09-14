@@ -1,10 +1,14 @@
 import GoodsStore from './GoodsStore'
-import AdminStore from './AdminStore'
+import UserStore from './UserStore'
+import HotelStore from './HotelStore'
+import RoomStore from './RoomStore'
 
 class RootStore {
     constructor() {
         this.goods = new GoodsStore(this)
-        this.admin = new AdminStore(this)
+        this.user = new UserStore(this)
+        this.hotel = new HotelStore(this)
+        this.room = new RoomStore(this)
     }
 }
 
