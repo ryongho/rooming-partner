@@ -225,12 +225,12 @@ const HotelWrite = observer(() => {
                         rows={4}
                         onChange={(e) => setTraffic(e.target.value)} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="조식 정보">
+                    {/* <Descriptions.Item label="조식 정보">
                         <Input.TextArea
                         value={breakfast} 
                         rows={4}
                         onChange={(e) => setBreakfast(e.target.value)} />
-                    </Descriptions.Item>
+                    </Descriptions.Item> */}
                     {/* <Descriptions.Item label="주차 정보">
                         <Input.TextArea
                         value={parking} 
