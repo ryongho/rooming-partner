@@ -31,3 +31,15 @@ export function postImagesUpload(file, token) {
         }
     })
 }
+
+
+export function getGoodsListByPartners(token) {
+    return axios({
+        method: 'get',
+        url: '/goods/list_by_partner',
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

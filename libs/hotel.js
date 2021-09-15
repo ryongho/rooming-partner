@@ -36,9 +36,21 @@ export function postImagesUpload(file, token) {
 export function getHotelList(params, token) {
     return axios({
         method: 'get',
-        url: '/goods/detail',
+        url: '/hotel/list',
         baseURL: baseUrl[env].baseUrl,
         params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+
+export function getHotelListByPartners(token) {
+    return axios({
+        method: 'get',
+        url: '/hotel/list_by_partner',
+        baseURL: baseUrl[env].baseUrl,
         headers: {
             'Authorization': 'Bearer '+token
         }

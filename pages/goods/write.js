@@ -62,7 +62,7 @@ const GoodsWrite = observer(() => {
         // success
         const data = {
             hotel_id: user.hotelid,
-            roomId: roomId,
+            room_id: roomId,
             goods_name: name,
             start_date: start,
             end_date: end,
@@ -82,7 +82,7 @@ const GoodsWrite = observer(() => {
         await goods.addInfo(data, user.token, (success, result) => {
             if (success) {
                 // console.log(result)
-                message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+                message.success('게시 완료').then(() => router.push('/goods/list').then(() => window.scrollTo(0,0)))
             }
         })
     }
@@ -133,7 +133,7 @@ const GoodsWrite = observer(() => {
                                 {room.rooms && 
                                 room.rooms.slice().map(item => {
                                     return (
-                                        <Select.Option value={item.id}>{item.name}</Select.Option>
+                                        <Select.Option key={item.id} value={item.id}>{item.name}</Select.Option>
                                     )
                                 })}
                             </SelectBar>

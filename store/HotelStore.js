@@ -3,7 +3,8 @@ import { enableStaticRendering } from 'mobx-react-lite'
 import { 
     postHotelRegist,
     getHotelList,
-    postImagesUpload
+    postImagesUpload,
+    getHotelListByPartners
 } from '../libs/hotel'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -15,6 +16,8 @@ export default class HotelStore {
             callList: action,
             list: observable,
             imagesUpload: action,
+            callListPartner: action,
+            partnerList: observable
         })
     }
 
@@ -46,12 +49,12 @@ export default class HotelStore {
 
 
     list = []
-    row = 10
-    id = 5
-    callList = async (row, id, token) => {
+    // row = 10
+    // start_no = 0
+    callList = async (row, start_no, token) => {
         const params = {
             row: row,
-            id: id
+            start_no: start_no
         }
 
         try {
@@ -61,6 +64,18 @@ export default class HotelStore {
             }
         } catch (error) {
             console.log(error)
+        }
+    }
+
+    partnerList = []
+    callListPartner = async (token) => {
+        try {
+            const result = await getHotelListByPartners(token)
+            if (result.status === 200) {
+                this.partnerList = result.data
+            }
+        } catch (err) {
+            console.log(err)
         }
     }
 }

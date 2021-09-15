@@ -73,6 +73,12 @@ const MyApp = ({ Component, pageProps }) => {
     const { SubMenu } = Menu
 
     const onMenuSelect = ({ item, key }) => {
+        console.log(item, key)
+        if(key == '/reserved/list' ||
+        key == '/review/list' ||
+        key == '/stats/list' ||
+        key == '/user/partner/list' ||
+        key == '/user/customer/list') return;
         setGroup(item.props.group);
         setTitle(item.props.title);
         router.push(key).then(() => window.scrollTo(0,0));

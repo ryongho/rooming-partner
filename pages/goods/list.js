@@ -1,14 +1,16 @@
 import styled from 'styled-components'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Space, Select, Table, Tag, message, Radio, Button, Input, Popconfirm } from 'antd'
 import { PlusSquareOutlined } from '@ant-design/icons';
 import Link from 'next/link'
 import moment from 'moment'
 import xlsx from 'xlsx'
 import router from 'next/router';
+import { useStore } from '../../store/StoreProvider'
+import { observer } from 'mobx-react-lite'
 
 
-const GoodsList = () => {
+const GoodsList = observer(() => {
     const data = [{
         key: '1',
         category: '호텔',
@@ -48,30 +50,20 @@ const GoodsList = () => {
     }];
 
     const columns = [{
-        title: '카테고리',
-        dataIndex: 'category',
-        key: 'category',
-    }, {
         title: '상품명',
-        dataIndex: 'goods',
-        key: 'goods',
-        render: (goods) => {
+        dataIndex: 'goods_name',
+        key: 'goods_name',
+        render: (goods_name) => {
             return (
-                <Link href={`/goods/1`}>{goods}</Link>
+                <Link href={`/goods/1`}>{goods_name}</Link>
             )
         },
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
     }, {
         title: '객실명',
-        dataIndex: 'rooms',
-        key: 'rooms',
-    }, {
-        title: '숙소명',
-        dataIndex: 'hotel',
-        key: 'hotel',
-        sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        dataIndex: 'name',
+        key: 'name',
     }, {
         title: '원가',
         dataIndex: 'price',
@@ -84,20 +76,22 @@ const GoodsList = () => {
         key: 'sale_price',
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => a.sale_price - b.sale_price,
-    }, {
-        title: '상태값',
-        dataIndex: 'active',
-        key: 'active',
-        render: (active) => {
-            return (
-                <>
-                    {active ? 
-                    <Tag color="blue">활성화</Tag>
-                    : <Tag color="default">비활성화</Tag>}
-                </>
-            )
-        }
-    }, {
+    },
+    //  {
+    //     title: '상태값',
+    //     dataIndex: 'active',
+    //     key: 'active',
+    //     render: (active) => {
+    //         return (
+    //             <>
+    //                 {active ? 
+    //                 <Tag color="blue">활성화</Tag>
+    //                 : <Tag color="default">비활성화</Tag>}
+    //             </>
+    //         )
+    //     }
+    // },
+     {
         title: '삭제',
         dataIndex: 'delete',
         render: (_, idx) => {
@@ -117,7 +111,17 @@ const GoodsList = () => {
         }
     }];
 
+    const { user, goods } = useStore()
     const [isAdmin, setIsAdmin] = useState(true);
+
+    useEffect(() => {
+        const callList = async () => {
+            await goods.callListPartner(user.token)
+            console.log(user.token, goods.partnerList.data)
+        }
+
+        callList()
+    }, [])
 
     const onCategory = (e) => {
         console.log(e)
@@ -164,7 +168,7 @@ const GoodsList = () => {
                 <TotalNum>총 {data.length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={() => router.push('/goods/write')}><PlusSquareOutlined /> 상품 등록</Button>
-                    <Button onClick={onExcelDown}>엑셀 다운로드</Button>
+                    {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
                 </Space>
             </TableTop>
             <Table 
@@ -173,11 +177,11 @@ const GoodsList = () => {
             //     onChange: (e) => {setSelectedList(e)},
             //     selectedRowKeys: selectedList
             // }}
-            columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
+            columns={columns} dataSource={goods.partnerList.data} pagination={{ position: ['bottomCenter'] }}/>
 
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;

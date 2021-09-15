@@ -1,14 +1,16 @@
 import styled from 'styled-components'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Space, Select, Table, Tag, message, Radio, Button, Input, DatePicker, Popconfirm } from 'antd'
 import { PlusSquareOutlined } from '@ant-design/icons';
 import Link from 'next/link'
 import moment from 'moment'
 import xlsx from 'xlsx'
 import router from 'next/router';
+import { observer } from 'mobx-react-lite'
+import { useStore } from '../../store/StoreProvider'
 
 
-const RoomsList = () => {
+const RoomsList = observer(() => {
     const data = [{
         key: '1',
         category: '호텔',
@@ -43,48 +45,58 @@ const RoomsList = () => {
         active: false,
     }];
 
-    const columns = [{
-        title: '카테고리',
-        dataIndex: 'category',
-        key: 'category',
-    }, {
+    const columns = [
+    // {
+    //     title: '카테고리',
+    //     dataIndex: 'type',
+    //     key: 'type',
+    // }, 
+    {
         title: '객실명',
-        dataIndex: 'rooms',
-        key: 'rooms',
-        render: (rooms) => {
+        dataIndex: 'name',
+        key: 'name',
+        render: (name) => {
             return (
-                <Link href={`/rooms/1`}>{rooms}</Link>
+                <Link href={`/rooms/1`}>{name}</Link>
             )
         },
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
     }, {
+        title: '침대 사이즈',
+        dataIndex: 'bed',
+        key: 'bed',
+        sortDirections: ['descend', 'ascend'],
+        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+    }, {
+        title: '최대 인원수',
+        dataIndex: 'peoples',
+        key: 'peoples',
+        sortDirections: ['descend', 'ascend'],
+        sorter: (a, b) => a.peoples - b.peoples,
+    }, {
         title: '객실 생성일',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
+        dataIndex: 'created_at',
+        key: 'created_at',
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
-        render: (createdAt) => {
+        render: (created_at) => {
             return (
-                moment(createdAt).format('YYYY-MM-DD')
+                moment(created_at).format('YYYY-MM-DD')
             )
         }
-    }, {
-        title: '상품 상태값',
-        dataIndex: 'active',
-        key: 'active',
-        render: (active) => {
-            return (
-                active ? <Tag color="blue">활성화</Tag> : <Tag color="default">비활성화</Tag>
-            )
-        }
-    }, {
-        title: '숙소명',
-        dataIndex: 'hotel',
-        key: 'hotel',
-        sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
-    }, {
+    }, 
+    // {
+    //     title: '상품 상태값',
+    //     dataIndex: 'active',
+    //     key: 'active',
+    //     render: (active) => {
+    //         return (
+    //             active ? <Tag color="blue">활성화</Tag> : <Tag color="default">비활성화</Tag>
+    //         )
+    //     }
+    // }, 
+    {
         title: '삭제',
         dataIndex: 'delete',
         render: (_, idx) => {
@@ -104,7 +116,16 @@ const RoomsList = () => {
         }
     }];
 
-    const [isAdmin, setIsAdmin] = useState(true);
+    const { room, user } = useStore();
+
+    useEffect(() => {
+        const callList = async () => {
+            await room.callListPartner(user.token)
+            console.log(user.token, room.partnerList.data)
+        }
+
+        callList()
+    }, [])
 
 
     const onCategory = (e) => {
@@ -158,13 +179,16 @@ const RoomsList = () => {
                 <TotalNum>총 {data.length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={() => router.push('/rooms/write')}><PlusSquareOutlined /> 객실 등록</Button>
-                    <Button onClick={onExcelDown}>엑셀 다운로드</Button>
+                    {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
                 </Space>
             </TableTop>
-            <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
+            {room.partnerList.data &&
+                <Table columns={columns} dataSource={room.partnerList.data[0]} pagination={{ position: ['bottomCenter'] }}/>
+            }
         </Wrapper>
     )
-}
+})
+
 
 const Wrapper = styled.div`
     width: 100%;

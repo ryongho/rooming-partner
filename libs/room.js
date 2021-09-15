@@ -45,3 +45,15 @@ export function getRoomListByHotel(params, token) {
         }
     })
 }
+
+
+export function getRoomListByPartners(token) {
+    return axios({
+        method: 'get',
+        url: '/room/list_by_partner',
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

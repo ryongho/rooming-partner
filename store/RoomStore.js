@@ -3,7 +3,8 @@ import { enableStaticRendering } from 'mobx-react-lite'
 import { 
     postRoomRegist,
     postImagesUpload,
-    getRoomListByHotel
+    getRoomListByHotel,
+    getRoomListByPartners
 } from '../libs/room'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -14,7 +15,9 @@ export default class RoomStore {
             addInfo: action,
             imagesUpload: action,
             callRoomList: action,
-            rooms: observable
+            rooms: observable,
+            callListPartner: action,
+            partnerList: observable
         })
     }
 
@@ -53,6 +56,19 @@ export default class RoomStore {
             }
         } catch (err) {
             // callback(false, err)
+        }
+    }
+
+    
+    partnerList = []
+    callListPartner = async (token) => {
+        try {
+            const result = await getRoomListByPartners(token)
+            if (result.status === 200) {
+                this.partnerList = result.data
+            }
+        } catch (err) {
+            console.log(err)
         }
     }
 }

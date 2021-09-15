@@ -61,7 +61,7 @@ const GoodsWrite = observer(() => {
             if (success) {
                 // message.success('게시 완료')
                 // console.log(result)
-                message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+                message.success('게시 완료').then(() => router.push('/rooms/list').then(() => window.scrollTo(0,0)))
             }
         })
     }

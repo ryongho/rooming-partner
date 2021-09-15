@@ -2,7 +2,8 @@ import { action, observable, makeObservable } from 'mobx'
 import { enableStaticRendering } from 'mobx-react-lite'
 import { 
     postImagesUpload,
-    postGoodsRegist
+    postGoodsRegist,
+    getGoodsListByPartners
 } from '../libs/goods'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -12,7 +13,9 @@ export default class GoodsStore {
     constructor() {
         makeObservable(this, {
             addInfo: action,
-            imagesUpload: action
+            imagesUpload: action,
+            callListPartner: action,
+            partnerList: observable
         })
     }
 
@@ -40,4 +43,16 @@ export default class GoodsStore {
         }
     }
 
+    
+    partnerList = []
+    callListPartner = async (token) => {
+        try {
+            const result = await getGoodsListByPartners(token)
+            if (result.status === 200) {
+                this.partnerList = result.data
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
 }

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useState, useEffect } from 'react'
-import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input } from 'antd'
+import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input, message } from 'antd'
 import { PlusSquareOutlined } from '@ant-design/icons';
 import Link from 'next/link'
 import moment from 'moment'
@@ -38,50 +38,48 @@ const HotelList = observer(() => {
 
     const columns = [{
         title: '카테고리',
-        dataIndex: 'category',
-        key: 'category',
+        dataIndex: 'type',
+        key: 'type',
     }, {
         title: '숙소명',
-        dataIndex: 'hotel',
-        key: 'hotel',
-        render: (hotel) => {
+        dataIndex: 'name',
+        key: 'name',
+        render: (name) => {
             return (
-                <Link href={`/hotel/1`}>{hotel}</Link>
+                <Link href={`/hotel/1`}>{name}</Link>
             )
         },
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
     }, {
         title: '파트너명',
-        dataIndex: 'partner',
-        key: 'partner',
+        dataIndex: 'owner',
+        key: 'owner',
     }, {
         title: '등록일',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
+        dataIndex: 'created_at',
+        key: 'created_at',
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
-        render: (createdAt) => {
+        render: (created_at) => {
             return (
-                moment(createdAt).format('YYYY-MM-DD')
+                moment(created_at).format('YYYY-MM-DD')
             )
         }
     }];
 
-    const { hotel } = useStore();
+    const { hotel, user } = useStore();
 
     const [isAdmin, setIsAdmin] = useState(true);
 
     useEffect(() => {
+        setIsAdmin(user.auth == 1 ? false : true)
         const callList = async () => {
-            await hotel.callList(
-                10,
-                5
-            )
+            await hotel.callListPartner(user.token)
+            console.log(user.token, hotel.partnerList)
         }
 
         callList()
-        console.log(hotel.list)
     }, [])
 
     const onCategory = (e) => {
@@ -94,6 +92,12 @@ const HotelList = observer(() => {
 
     const onExcelDown = () => {
 
+    }
+
+    const onWriteHotel = () => {
+        if (user.hotelid) {
+            return message.error("숙소는 업체당 1개씩만 등록 가능합니다.")
+        } else router.push('/hotel/write')
     }
 
     return (
@@ -126,14 +130,16 @@ const HotelList = observer(() => {
             <TableTop>
                 <TotalNum>총 {data.length}건</TotalNum>
                 <Space>
-                    <Button type="primary" onClick={() => router.push('/hotel/write')}><PlusSquareOutlined /> 숙소 등록</Button>
-                    <Button onClick={onExcelDown}>엑셀 다운로드</Button>
+                    <Button type="primary" onClick={onWriteHotel}><PlusSquareOutlined /> 숙소 등록</Button>
+                    {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
                 </Space>
             </TableTop>
-            <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
+            <Table columns={columns} dataSource={hotel.partnerList.data} pagination={{ position: ['bottomCenter'] }}/>
         </Wrapper>
     )
 })
+
+
 
 const Wrapper = styled.div`
     width: 100%;

@@ -19,7 +19,7 @@ const Header = ({ title }) => {
     const menu = (
         <Menu>
             <Menu.Item>
-                <List onClick={()=>{router.push('/user/partner/1')}}>내 정보</List>
+                <List>내 정보</List>
                 {/* <List onClick={()=>{router.push(`/user/partner/${user.userid}`)}}>내 정보</List> */}
             </Menu.Item>
         </Menu>

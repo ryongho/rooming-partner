@@ -15,7 +15,7 @@ const HotelWrite = observer(() => {
     const { user, hotel } = useStore()
 
     const options = ['주차가능', '레스토랑', '수영장', '스파', '피트니스', '무료 wifi', 'cctv', '소형냉장고']
-    const [category, setCategory] = useState()
+    const [category, setCategory] = useState('호텔')
     const [name, setName] = useState()
     const [facility, setFacility] = useState([])
     const [address, setAddress] = useState()
@@ -26,7 +26,7 @@ const HotelWrite = observer(() => {
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     const [breakfast, setBreakfast] = useState()
-    const [parking, setParking] = useState()
+    // const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
 
     const [content, setContent] = useState('')
@@ -78,7 +78,6 @@ const HotelWrite = observer(() => {
             longtitude: longtitude,
             type: category,
             options: option,
-            parking: parking,
             refund_rule: cancel
         }
 
@@ -122,9 +121,11 @@ const HotelWrite = observer(() => {
             <Detail>
                 <Descriptions title={<Title>숙소 정보 입력</Title>} bordered column={1} extra={<Button onClick={() => router.push('/hotel/list')}>목록으로 돌아가기</Button>}>
                     <Descriptions.Item label="숙소 카테고리">
-                        <SelectBar defaultValue={"hotel"} onChange={(e) => setCategory(e)}>
-                            <Select.Option value={"hotel"}>호텔</Select.Option>
-                            <Select.Option value={"resort"}>리조트</Select.Option>
+                        <SelectBar defaultValue={"호텔"} onChange={(e) => setCategory(e)}>
+                            <Select.Option value={"호텔"}>호텔</Select.Option>
+                            <Select.Option value={"모텔"}>모텔</Select.Option>
+                            <Select.Option value={"펜션"}>펜션</Select.Option>
+                            <Select.Option value={"콘도"}>콘도</Select.Option>
                         </SelectBar>
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소명">
@@ -230,12 +231,12 @@ const HotelWrite = observer(() => {
                         rows={4}
                         onChange={(e) => setBreakfast(e.target.value)} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="주차 정보">
+                    {/* <Descriptions.Item label="주차 정보">
                         <Input.TextArea
                         value={parking} 
                         rows={4}
                         onChange={(e) => setParking(e.target.value)} />
-                    </Descriptions.Item>
+                    </Descriptions.Item> */}
                     <Descriptions.Item label="취소 및 환불 규정">
                         <Input.TextArea
                         value={cancel} 
