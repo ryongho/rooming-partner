@@ -62,8 +62,8 @@ const GoodsList = observer(() => {
         sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
     }, {
         title: '객실명',
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'room_name',
+        key: 'room_name',
     }, {
         title: '원가',
         dataIndex: 'price',
