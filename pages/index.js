@@ -38,7 +38,10 @@ const Login = observer(() => {
                     user.callInfo(user.token)
                     if (user.auth == 1) {
                         await router.push('/user/partner/list')
-                    } await router.push('/goods/list')
+                    } 
+                    setTimeout(() => {
+                        router.push('/hotel/list')
+                    }, 800) 
                 } else {
                     message.error(`${result.msg}입니다`)
                 }

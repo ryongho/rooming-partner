@@ -66,8 +66,8 @@ const MyApp = ({ Component, pageProps }) => {
 
     const [isAdmin, setIsAdmin] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
-    const [group, setGroup] = useState('상품 관리');
-    const [title, setTitle] = useState('상품 목록')
+    const [group, setGroup] = useState('숙소 관리');
+    const [title, setTitle] = useState('숙소 목록')
 
     const { Sider, Content } = Layout
     const { SubMenu } = Menu
@@ -134,14 +134,14 @@ const MyApp = ({ Component, pageProps }) => {
                                         <Menu.Item key="/user/customer/list" group="회원 관리" title="고객 목록">고객 목록</Menu.Item>
                                     </SubMenu>
                                     }
-                                    <SubMenu key="/goods" icon={<ShoppingCartOutlined />} title="상품 관리">
-                                        <Menu.Item key="/goods/list" group="상품 관리" title="상품 목록">상품 목록</Menu.Item>
-                                    </SubMenu>
                                     <SubMenu key="/hotel" icon={<ShopOutlined />} title="숙소 관리">
                                         <Menu.Item key="/hotel/list" group="숙소 관리" title="숙소 목록">숙소 목록</Menu.Item>
                                     </SubMenu>
                                     <SubMenu key="/rooms" icon={<ClearOutlined />} title="객실 관리">
                                         <Menu.Item key="/rooms/list" group="객실 관리" title="객실 목록">객실 목록</Menu.Item>
+                                    </SubMenu>
+                                    <SubMenu key="/goods" icon={<ShoppingCartOutlined />} title="상품 관리">
+                                        <Menu.Item key="/goods/list" group="상품 관리" title="상품 목록">상품 목록</Menu.Item>
                                     </SubMenu>
                                     <SubMenu key="/reserved" icon={<ScheduleOutlined />} title="예약 관리">
                                         <Menu.Item key="/reserved/list" group="예약 관리" title="예약 목록">예약 목록</Menu.Item>

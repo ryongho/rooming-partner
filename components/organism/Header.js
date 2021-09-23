@@ -4,17 +4,29 @@ import styled from 'styled-components'
 import { useRouter } from 'next/router'
 import { useStore } from '../../store/StoreProvider'
 import { useEffect } from 'react'
+import { observer } from 'mobx-react-lite'
 
 
-const Header = ({ title }) => {
+const Header = observer(({ title }) => {
 
     const router = useRouter();
     const { user } = useStore()
 
     const onLogout = async() => {
         await user.logout()
+        console.log(localStorage.getItem('rmatoken'), user.hotelid)
         router.push('/');
     }
+
+    console.log('email', user.email)
+
+    useEffect(() => {
+        const callInfo = async () => {
+            await user.callInfo(user.token)
+            console.log('유저인포', user.email, user.token, user.hotelid, user.auth)
+        }
+        callInfo();
+    }, [router])
 
     const menu = (
         <Menu>
@@ -31,7 +43,7 @@ const Header = ({ title }) => {
             <RightSide>
                 <Dropdown overlay={menu}>
                     <User>
-                        <Name>{user.name} 님</Name>
+                        <Name>{user.nickname} 님</Name>
                         <Email>({user.email}) <CaretDownOutlined /></Email>
                     </User>
                 </Dropdown>
@@ -41,7 +53,7 @@ const Header = ({ title }) => {
             </RightSide>
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled(Layout.Header)`
     display: flex;

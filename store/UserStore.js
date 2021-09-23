@@ -3,7 +3,9 @@ import { enableStaticRendering } from 'mobx-react-lite'
 import {
     postUserLogin,
     putRegistPartner,
-    getUserInfo
+    getUserInfo,
+    postUserCheckEmail,
+    postUserCheckNick
 } from '../libs/user'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -15,12 +17,14 @@ export default class UserStore {
             name: observable,
             email: observable,
             auth: observable,
-            userid: observable,
+            nickname: observable,
             hotelid: observable,
             login: action,
             logout: action,
             join: action,
             callInfo: action,
+            checkEmailDuplicate: action,
+            checkNickDuplicate: action
         })
     }
 
@@ -28,7 +32,7 @@ export default class UserStore {
     name = typeof window == 'object' ? localStorage.getItem('rmaname') ? localStorage.getItem('rmaname') : null : null
     email = typeof window == 'object' ? localStorage.getItem('rmaemail') ? localStorage.getItem('rmaemail') : null : null
     auth = typeof window == 'object' ? localStorage.getItem('rmaauth') ? localStorage.getItem('rmaauth') : null : null
-    userid = typeof window == 'object' ? localStorage.getItem('rmaid') ? localStorage.getItem('rmaid') : null : null
+    nickname = typeof window == 'object' ? localStorage.getItem('rmanick') ? localStorage.getItem('rmanick') : null : null
     hotelid = typeof window == 'object' ? localStorage.getItem('rmahotelid') ? localStorage.getItem('rmahotelid') : null : null
 
     login = async (data, callback) => {
@@ -49,18 +53,17 @@ export default class UserStore {
         try {
             const result = await getUserInfo(token)
             if (result.status === 200) {
+                console.log(result.data)
                 this.name = result.data.data.name
                 this.email = result.data.data.email
                 this.auth = result.data.data.user_type
-                this.userid = result.data.data.user_id
+                // this.nickname = result.data.data.nickname
                 this.hotelid = result.data.hotel_id
                 await localStorage.setItem('rmaname', result.data.data.name)
                 await localStorage.setItem('rmaemail', result.data.data.email)
                 await localStorage.setItem('rmaauth', result.data.data.user_type)
-                await localStorage.setItem('rmaid', result.data.data.user_id)
+                // await localStorage.setItem('rmanick', result.data.data.nickname)
                 await localStorage.setItem('rmahotelid', result.data.hotel_id)
-                
-                // console.log(result.data)
             }
         } catch (error) {
             console.log(error)
@@ -73,6 +76,8 @@ export default class UserStore {
         this.name = null
         this.email = null
         this.auth = null
+        // this.nickname = null
+        this.hotelid = null
     }
 
     join = async (data, callback) => {
@@ -87,4 +92,26 @@ export default class UserStore {
         }
     }
 
+
+  checkEmailDuplicate = async (params, callback) => {
+    try {
+        const result = await postUserCheckEmail(params)
+        if (result.status === 200) {
+            callback(true, result.data)
+        }
+    } catch (err) {
+        callback(false, null)
+    }
+  }
+
+  checkNickDuplicate = async (params, callback) => {
+    try {
+        const result = await postUserCheckNick(params)
+        if (result.status === 200) {
+            callback(true, result.data)
+        }
+    } catch (err) {
+        callback(false, null)
+    }
+  }
 }

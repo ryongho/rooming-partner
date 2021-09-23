@@ -9,35 +9,28 @@ const Join = observer(() => {
 
     const { user } = useStore()
 
+    const [nick, setNick] = useState('')
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
-    const [id, setId] = useState('')
     const [pw, setPw] = useState('')
     const [pw2, setPw2] = useState('')
-    const [partner, setPartner] = useState('')
 
     const onJoin = async() => {
-        const idRegExp = /^[a-zA-Z0-9]{6,16}$/;
+        // const idRegExp = /^[a-zA-Z0-9]{6,16}$/;
         const pwRegExp = /^[a-z0-9]{8,20}$/;
 
-        if (!partner) {
-            return message.warning('파트너명을 입력해 주세요')
-        }
         if (!name) {
             return message.warning('담당자명을 입력해 주세요')
+        }
+        if (!nick) {
+            return message.warning('파트너명을 입력해 주세요')
         }
         if (!email) {
             return message.warning('이메일주소를 입력해 주세요')
         }
         if (!phone) {
             return message.warning('담당자 연락처를 입력해 주세요')
-        }
-        if (!id) {
-            return message.warning('아이디를 입력해 주세요')
-        }
-        if (!idRegExp.test(id)) {
-            return message.warning('아이디는 영문 대소문자, 숫자 6~16자리로 입력해야 합니다')
         }
         if (!pw) {
             return message.warning('비밀번호를 입력해 주세요')
@@ -53,25 +46,65 @@ const Join = observer(() => {
         }
 
         const data = {
-            name: partner,
+            name: name,
+            nickname: nick,
             email: email,
             phone: phone,
-            user_id: id,
             password: pw,
-            user_type: 1
+            user_type: 1,
         }
 
-        await user.join(data, (success, result) => {
-            if (success) {
-                if (result.status == 200) {
-                    message.success('회원가입이 완료되었습니다')
-                    router.push('/')
-                } else {
-                    message.error(result.msg)
-                }
+        await user.checkNickDuplicate({nickname: nick}, (success, result) => {
+            if (result.usable == 'N') {
+                return message.warning('파트너명 중복 체크를 해주세요')
+            } else {
+                user.checkEmailDuplicate({email}, (success, result) => {
+                    if (result.usable == 'N') {
+                        return message.warning('이메일 중복 체크를 해주세요')
+                    } else {
+                        user.join(data, (success, result) => {
+                            if (success) {
+                                if (result.status == 200) {
+                                    console.log(data)
+                                    message.success('회원가입이 완료되었습니다')
+                                    router.push('/')
+                                } else {
+                                    message.error(result.msg)
+                                }
+                            }
+                        })
+                    }
+                })
             }
         })
 
+
+    }
+
+    const onCheckNick = async() => {
+        await user.checkNickDuplicate({nickname: nick}, (success, result) => {
+            if (success) {
+                // console.log(result)
+                alert(`${result.msg}입니다.`)
+
+                if (result.usable == 'N') {
+                    setNick('')
+                }
+            }
+        })
+    }
+
+    const onCheckEmail = async() => {
+        await user.checkEmailDuplicate({email}, (success, result) => {
+            if (success) {
+                // console.log(result)
+                alert(`${result.msg}입니다.`)
+
+                if (result.usable == 'N') {
+                    setEmail('')
+                }
+            }
+        })
     }
 
 
@@ -82,7 +115,8 @@ const Join = observer(() => {
                 <JoinForm>
                     <Descriptions title="루밍 파트너 회원가입" bordered column={1}>
                         <Descriptions.Item label="파트너명">
-                            <Input placeholder="소속된 업체명을 입력해 주세요" value={partner} onChange={e => setPartner(e.target.value)} />
+                            <Input placeholder="소속된 업체명을 입력해 주세요" value={nick} onChange={e => setNick(e.target.value)} style={{width: 250, marginRight: 10}} />
+                            <Button onClick={onCheckNick}>파트너명 중복 체크</Button>
                         </Descriptions.Item>
                         <Descriptions.Item label="담당자명">
                             <Input placeholder="담당자명을 입력해 주세요" value={name} onChange={e => setName(e.target.value)} />
@@ -94,10 +128,8 @@ const Join = observer(() => {
                                 setPhone(e.target.value)}} />
                         </Descriptions.Item>
                         <Descriptions.Item label="이메일 주소">
-                            <Input placeholder="이메일 주소를 입력해 주세요" value={email} onChange={e => setEmail(e.target.value)} />
-                        </Descriptions.Item>
-                        <Descriptions.Item label="아이디">
-                            <Input placeholder="영문, 숫자 조합 6자 이상 입력해 주세요" value={id} onChange={e => setId(e.target.value)} />
+                            <Input placeholder="이메일 주소를 입력해 주세요" value={email} onChange={e => setEmail(e.target.value)} style={{width: 250, marginRight: 10}}/>
+                            <Button onClick={onCheckEmail}>이메일 중복 체크</Button>
                         </Descriptions.Item>
                         <Descriptions.Item label="비밀번호">
                             <Input type="password" placeholder="영문, 숫자 조합 8자 이상 입력해 주세요" value={pw} onChange={e => setPw(e.target.value)} />
@@ -156,5 +188,6 @@ const BtnWrap = styled.div`
 const JoinBtn = styled(Button)`
     margin: 0 5px;
 `
+
 
 export default Join

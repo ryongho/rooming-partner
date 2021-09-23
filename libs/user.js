@@ -33,3 +33,20 @@ export function getUserInfo(token) {
         }
     })
 }
+
+export function postUserCheckEmail(params) {
+    return axios({
+        method: 'post',
+        url: '/check_email',
+        baseURL: baseUrl[env].baseUrl,
+        params: params
+    })
+}
+export function postUserCheckNick(params) {
+    return axios({
+        method: 'post',
+        url: '/check_nickname',
+        baseURL: baseUrl[env].baseUrl,
+        params: params
+    })
+}
