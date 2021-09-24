@@ -57,12 +57,12 @@ export default class UserStore {
                 this.name = result.data.data.name
                 this.email = result.data.data.email
                 this.auth = result.data.data.user_type
-                // this.nickname = result.data.data.nickname
+                this.nickname = result.data.data.nickname
                 this.hotelid = result.data.hotel_id
                 await localStorage.setItem('rmaname', result.data.data.name)
                 await localStorage.setItem('rmaemail', result.data.data.email)
                 await localStorage.setItem('rmaauth', result.data.data.user_type)
-                // await localStorage.setItem('rmanick', result.data.data.nickname)
+                await localStorage.setItem('rmanick', result.data.data.nickname)
                 await localStorage.setItem('rmahotelid', result.data.hotel_id)
             }
         } catch (error) {

@@ -18,16 +18,6 @@ const Header = observer(({ title }) => {
         router.push('/');
     }
 
-    console.log('email', user.email)
-
-    useEffect(() => {
-        const callInfo = async () => {
-            await user.callInfo(user.token)
-            console.log('유저인포', user.email, user.token, user.hotelid, user.auth)
-        }
-        callInfo();
-    }, [router])
-
     const menu = (
         <Menu>
             <Menu.Item>
