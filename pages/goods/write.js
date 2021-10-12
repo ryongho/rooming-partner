@@ -123,7 +123,7 @@ const GoodsWrite = observer(() => {
                         <DatePicker
                         onChange={e => setStart(moment(e).format('YYYY-MM-DD'))} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="상품 판매 개시일">
+                    <Descriptions.Item label="상품 판매 종료일">
                         <DatePicker
                         onChange={e => setEnd(moment(e).format('YYYY-MM-DD'))} />
                     </Descriptions.Item>
