@@ -59,7 +59,7 @@ const GoodsList = observer(() => {
             )
         },
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
     }, {
         title: '객실명',
         dataIndex: 'room_name',
@@ -116,7 +116,7 @@ const GoodsList = observer(() => {
 
     useEffect(() => {
         const callList = async () => {
-            await goods.callListPartner(user.token)
+            await goods.callListPartner({id: user.hotelid}, user.token)
             console.log(user.token, goods.partnerList.data)
         }
 

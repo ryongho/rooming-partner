@@ -4,8 +4,10 @@ import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input } from 'ant
 import Link from 'next/link'
 import moment from 'moment'
 import xlsx from 'xlsx'
+import { observer } from 'mobx-react-lite'
+import { useStore } from '../../../store/StoreProvider'
 
-const PartnerList = () => {
+const PartnerList = observer(() => {
     const data = [{
         key: '1',
         partner: '가나다라',
@@ -36,25 +38,42 @@ const PartnerList = () => {
         phone: '010-1234-1234'
     }];
 
+    const { user } = useStore();
+    const [isAdmin, setIsAdmin] = useState(true);
+
+    useEffect(() => {
+        const callDetail = async() => {
+            await user.callInfo(user.token);
+        }
+        callDetail();
+        setIsAdmin(localStorage.getItem('rmaauth') == 1 ? false : true)
+    }, [])
+
+    const partnerData = [{
+        partner: user.nickname,
+        user_id: user.email,
+        joinAt: moment(user.created_at).format('YYYY-MM-DD'),
+        name: user.name,
+        phone: user.info && user.info.data.phone
+    }]
+
     const columns = [{
         title: '파트너명',
         dataIndex: 'partner',
         key: 'partner',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
         render: (partner) => {
-            return (
-                <Link href={`/user/partner/1`}>{partner}</Link>
-            )
+            if (isAdmin) return <Link href={`/user/partner/1`}><a>{partner}</a></Link>
+            else return <Link href={'/user/partner/detail'}><a>{partner}</a></Link>
         }
     }, {
         title: '아이디',
         dataIndex: 'user_id',
         key: 'user_id',
         render: (user_id) => {
-            return (
-                <Link href={`/user/partner/1`}>{user_id}</Link>
-            )
+            if (isAdmin) return <Link href={`/user/partner/1`}><a>{user_id}</a></Link>
+            else return <Link href={'/user/partner/detail'}><a>{user_id}</a></Link>
         }
     }, {
         title: '담당자명',
@@ -72,10 +91,8 @@ const PartnerList = () => {
             return moment(joinAt).format('YYYY-MM-DD')
         },
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 }
+        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
     }];
-    
-    const [isAdmin, setIsAdmin] = useState(true);
 
     const onCategory = (e) => {
         console.log(e)
@@ -87,9 +104,6 @@ const PartnerList = () => {
 
     const onExcelDown = () => {
 
-    }
-
-    const onSortChange = (sorter) => {
     }
 
     return (
@@ -128,12 +142,11 @@ const PartnerList = () => {
         }
             <Table 
             columns={columns} 
-            dataSource={data} 
-            pagination={{ position: ['bottomCenter'] }}
-            onChange={onSortChange} />
+            dataSource={isAdmin ? data : partnerData} 
+            pagination={{ position: ['bottomCenter'] }} />
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;

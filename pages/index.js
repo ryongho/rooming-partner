@@ -36,14 +36,14 @@ const Login = observer(() => {
             if (success) {
                 if (result.status == 200) {
                     user.callInfo(user.token)
-                    if (user.auth == 1) {
-                        await router.push('/user/partner/list')
-                    } 
+                    // if (user.auth == 1) {
+                    //     await router.push('/user/partner/list')
+                    // }  
                     setTimeout(() => {
-                        router.push('/hotel/list')
-                    }, 800) 
+                        router.push('/user/partner/list')
+                    }, 400)
                 } else {
-                    message.error(`${result.msg}입니다`)
+                    message.error(`${result.msg}`)
                 }
             }
         })

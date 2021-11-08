@@ -1,71 +1,83 @@
 import styled from 'styled-components'
 import { Descriptions, Button } from 'antd'
-import moment from 'moment'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
+import { useStore } from '../../store/StoreProvider'
+import { observer } from 'mobx-react-lite'
 
-const ReservedDetail = () => {
-    const data = {
-        key: '1',
-        reservedNum: '1352056',
-        name: '홍길동',
-        phone: '01012345678',
-        reservedName: '김철수',
-        reservedPhone: '01022225555',
-        category: 'hotel',
-        hotel: '금강호텔',
-        goods: '뜨끈뜨끈 온천욕을 즐겨봐요',
-        room: '스위트 주니어 룸',
-        checkin: new Date('2021-09-22'),
-        checkout: new Date('2021-09-30'),
-        howto: '도보로 이용',
-        pay: '신용카드',
-        amount: '102000' 
-    }
+const ReservedDetail = observer(() => {
     
+    const { user, reservation } = useStore();
     const router = useRouter();
+    const [data, setData] = useState();
+
+    useEffect(() => {
+        const callDetail = async() => {
+            await reservation.callDetail({reservation_no: router.query.pid}, user.token, (success, result) => {
+                if (success) {
+                    console.log(result.data)
+                    setData(result.data[0])
+                }
+            });
+        }
+        callDetail();
+    }, [])
 
     return (
         <Wrapper>
             <Detail>
                 <Descriptions title={<Title>예약 상세 정보</Title>} bordered column={1} extra={<Button onClick={() => router.push('/reserved/list')}>목록으로 돌아가기</Button>}>
-                    <Descriptions.Item label="예약번호">
-                        <Desc>{data.reservedNum}</Desc>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="예약자">
-                        <Desc>{data.name} / {data.phone}</Desc>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="투숙객">
-                        <Desc>{data.reservedName} / {data.reservedPhone}</Desc>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="숙소 카테고리">
-                        {data.category == 'hotel' ?
-                            <Desc>호텔</Desc> : <Desc>리조트</Desc>
-                        }
-                    </Descriptions.Item>
-                    <Descriptions.Item label="숙소명">
-                        <Desc>{data.hotel}</Desc>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="상품명">
-                        <Desc>{data.goods}</Desc>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="객실명">
-                        <Desc>{data.room}</Desc>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="체크인 / 체크아웃">
-                        <Desc>{moment(data.checkin).format('YYYY-MM-DD')} ~ {moment(data.checkout).format(('YYYY-MM-DD'))}</Desc>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="숙소 방문 수단">
-                        <Desc>{data.howto}</Desc>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="결제정보">
-                        <Desc>{data.pay} / {data.amount}원</Desc>
-                    </Descriptions.Item>
+                    {data &&
+                    <>
+                        <Descriptions.Item label="예약번호">
+                            <Desc>{data.reservation_no}</Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="예약자">
+                            <Desc>{data.name} / {data.phone}</Desc>
+                        </Descriptions.Item>
+                        {/* <Descriptions.Item label="투숙객">
+                            <Desc>{data.reservedName} / {data.reservedPhone}</Desc>
+                        </Descriptions.Item> */}
+                        <Descriptions.Item label="숙소 카테고리">
+                            <Desc>{data.shop_type}</Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="숙소">
+                            <Desc>{data.hotel_name}</Desc>
+                            <Desc>{data.address}</Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="상품명">
+                            <Desc>{data.goods_name}</Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="객실명">
+                            <Desc>{data.room_name}</Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="숙박 인원수">
+                            <Desc>{data.peoples}</Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="체크인 / 체크아웃">
+                            <Desc>{data.start_date} {data.checkin} ~ {data.end_date} {data.checkout}</Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="숙소 방문 수단">
+                            <Desc>{data.visit_way}</Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="예약 상태">
+                            <Desc>
+                                {data.status == 'W' && '예약대기'}
+                                {data.status == 'S' && '예약확정'}
+                                {data.status == 'C' && '취소완료'}
+                                {data.status == 'X' && '취소신청'}
+                            </Desc>
+                        </Descriptions.Item>
+                        <Descriptions.Item label="결제정보">
+                            <Desc>결제 수단 없음 / {data.sale_price == '' ? data.price : data.sale_price}원</Desc>
+                        </Descriptions.Item>
+                    </>
+                    }
                 </Descriptions>
             </Detail>
         </Wrapper>
     )
-}
+})
 
 
 const Wrapper = styled.div`

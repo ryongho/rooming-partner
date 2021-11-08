@@ -10,31 +10,20 @@ import { useStore } from '../../store/StoreProvider'
 import { observer } from 'mobx-react-lite'
 
 const HotelList = observer(() => {
-    const data = [{
-        key: '1',
-        category: '호텔',
-        hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-        partner: '파트너1',
-        createdAt: new Date('2021-09-05'),
-    }, {
-        key: '2',
-        category: '호텔',
-        hotel: '호텔1234',
-        partner: '파트너2',
-        createdAt: new Date('2021-08-12')
-    }, {
-        key: '3',
-        category: '호텔',
-        hotel: '호텔1234',
-        partner: '파트너3',
-        createdAt: new Date('2021-09-26')
-    }, {
-        key: '4',
-        category: '호텔',
-        hotel: '호텔1234',
-        partner: '파트너4',
-        createdAt: new Date('2021-07-30')
-    }];
+
+    const { hotel, user } = useStore();
+
+    const [isAdmin, setIsAdmin] = useState(true);
+
+    useEffect(() => {
+        setIsAdmin(user.auth == 1 ? false : true)
+        const callList = async () => {
+            await hotel.callListPartner(user.token)
+            // console.log(user.token, hotel.partnerList)
+        }
+
+        callList()
+    }, [])
 
     const columns = [{
         title: '카테고리',
@@ -46,11 +35,11 @@ const HotelList = observer(() => {
         key: 'name',
         render: (name) => {
             return (
-                <Link href={`/hotel/1`}>{name}</Link>
+                <Link href={`/hotel/${user.hotelid}`}>{name}</Link>
             )
         },
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
     }, {
         title: '파트너명',
         dataIndex: 'owner',
@@ -60,27 +49,13 @@ const HotelList = observer(() => {
         dataIndex: 'created_at',
         key: 'created_at',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
         render: (created_at) => {
             return (
                 moment(created_at).format('YYYY-MM-DD')
             )
         }
     }];
-
-    const { hotel, user } = useStore();
-
-    const [isAdmin, setIsAdmin] = useState(true);
-
-    useEffect(() => {
-        setIsAdmin(user.auth == 1 ? false : true)
-        const callList = async () => {
-            await hotel.callListPartner(user.token)
-            console.log(user.token, hotel.partnerList)
-        }
-
-        callList()
-    }, [])
 
     const onCategory = (e) => {
         console.log(e)
@@ -102,9 +77,9 @@ const HotelList = observer(() => {
 
     return (
         <Wrapper>
+            {isAdmin &&
             <TopBox>
                 <FilterWrap>
-                    {isAdmin &&
                     <Filter>
                         <FilterLabel>카테고리</FilterLabel>
                         <SelectBar defaultValue={"total"} onChange={onCategory}>
@@ -113,7 +88,6 @@ const HotelList = observer(() => {
                             <Select.Option value={"resort"}>리조트</Select.Option>
                         </SelectBar>
                     </Filter>
-                    }
                     
                     <Filter>
                         <FilterLabel>숙소 등록일</FilterLabel>
@@ -126,15 +100,16 @@ const HotelList = observer(() => {
                     <SearchBar placeholder="숙소명 또는 파트너명을 입력해주세요" onSearch={onSearch} />
                 </SearchWrap>
             </TopBox>
+            }
 
             <TableTop>
-                <TotalNum>총 {data.length}건</TotalNum>
+                <TotalNum>총 {hotel.partnerList.data && hotel.partnerList.data.length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={onWriteHotel}><PlusSquareOutlined /> 숙소 등록</Button>
                     {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
                 </Space>
             </TableTop>
-            <Table columns={columns} dataSource={hotel.partnerList.data} pagination={{ position: ['bottomCenter'] }}/>
+            <Table columns={columns} dataSource={hotel.partnerList.data} pagination={false}/>
         </Wrapper>
     )
 })

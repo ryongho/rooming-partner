@@ -7,7 +7,6 @@ import UploadImgs from '../../components/atom/UploadImgs'
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../store/StoreProvider'
 import moment from 'moment'
-import { concat } from "lodash";
 
 const HotelWrite = observer(() => {
 
@@ -25,7 +24,7 @@ const HotelWrite = observer(() => {
     const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
-    const [breakfast, setBreakfast] = useState()
+    // const [breakfast, setBreakfast] = useState()
     // const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
 
@@ -62,13 +61,17 @@ const HotelWrite = observer(() => {
         const images = imgList.join();
         const option = facility.join();
 
+        let total_address;
+        if (address2) total_address = address +' '+ address2 +' '+ zonecode;
+        if (address2 == '') total_address = address +' '+ zonecode;
+
         const data = {
             name: name,
             content: content,
             owner: owner,
             open_date: moment(openDate).format('YYYY-MM-DD'),
             reg_no: reg,
-            address: address +' '+ address2 +' '+ zonecode,
+            address: total_address,
             tel: tel,
             fax: fax,
             level: level,
@@ -159,7 +162,7 @@ const HotelWrite = observer(() => {
                         value={latitude}
                         style={{width:100, marginRight: '20px', marginLeft: '5px'}}
                         onChange={(e) => setLatitude(e.target.value)} />
-                        <a href="http://www.dawuljuso.com/" target='_blank'>
+                        <a href="https://www.google.com/maps/search/" target='_blank'>
                             <Button>주소로 경도/위도 찾기</Button>
                         </a>
                     </Descriptions.Item>

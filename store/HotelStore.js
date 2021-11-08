@@ -1,6 +1,7 @@
 import { action, observable, makeObservable } from 'mobx'
 import { enableStaticRendering } from 'mobx-react-lite'
 import { 
+    getHotelDetail,
     postHotelRegist,
     getHotelList,
     postImagesUpload,
@@ -12,13 +13,27 @@ enableStaticRendering(typeof window === 'undefined')
 export default class HotelStore {
     constructor() {
         makeObservable(this, {
+            callInfo: action,
             addInfo: action,
             callList: action,
             list: observable,
             imagesUpload: action,
             callListPartner: action,
-            partnerList: observable
+            partnerList: observable,
+            info: observable
         })
+    }
+
+    info = null
+    callInfo = async (params, token) => {
+        try {
+            const result = await getHotelDetail(params, token)
+            if (result.status === 200) {
+                this.info = result.data
+            }
+        } catch (err) {
+            console.log(false)
+        }
     }
 
     addInfo = async (data, token, callback) => {

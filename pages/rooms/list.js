@@ -11,39 +11,17 @@ import { useStore } from '../../store/StoreProvider'
 
 
 const RoomsList = observer(() => {
-    const data = [{
-        key: '1',
-        category: '호텔',
-        goods: '여름날 치맥 파티',
-        rooms: '스탠다드 트윈 시티뷰',
-        hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-        createdAt: new Date('2021-09-05'),
-        active: false,
-    }, {
-        key: '2',
-        category: '호텔',
-        goods: '여름날 치맥 파티',
-        rooms: '스탠다드 트윈 시티뷰',
-        hotel: '호텔1111',
-        createdAt: new Date('2021-08-12'),
-        active: true,
-    }, {
-        key: '3',
-        category: '호텔',
-        goods: '봄날 파전 파티',
-        rooms: '주니어 스위트 룸',
-        hotel: '호텔2222',
-        createdAt: new Date('2021-09-26'),
-        active: true,
-    }, {
-        key: '4',
-        category: '호텔',
-        goods: '겨울날 군고구마 파티',
-        rooms: '디럭스 더블 오션뷰',
-        hotel: '호텔3333',
-        createdAt: new Date('2021-07-30'),
-        active: false,
-    }];
+
+    const { room, user } = useStore();
+
+    useEffect(() => {
+        const callList = async () => {
+            await room.callListPartner(user.token)
+            console.log(user.token, room.partnerList.data)
+        }
+
+        callList()
+    }, [])
 
     const columns = [
     // {
@@ -61,13 +39,13 @@ const RoomsList = observer(() => {
             )
         },
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
     }, {
         title: '침대 사이즈',
         dataIndex: 'bed',
         key: 'bed',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
     }, {
         title: '최대 인원수',
         dataIndex: 'peoples',
@@ -79,7 +57,7 @@ const RoomsList = observer(() => {
         dataIndex: 'created_at',
         key: 'created_at',
         sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => { return (a < b) ? -1 : (a == b) ? 0 : 1 },
+        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
         render: (created_at) => {
             return (
                 moment(created_at).format('YYYY-MM-DD')
@@ -115,18 +93,6 @@ const RoomsList = observer(() => {
             </Popconfirm>)
         }
     }];
-
-    const { room, user } = useStore();
-
-    useEffect(() => {
-        const callList = async () => {
-            await room.callListPartner(user.token)
-            console.log(user.token, room.partnerList.data)
-        }
-
-        callList()
-    }, [])
-
 
     const onCategory = (e) => {
         console.log(e)
@@ -176,7 +142,7 @@ const RoomsList = observer(() => {
             </TopBox>
 
             <TableTop>
-                <TotalNum>총 {data.length}건</TotalNum>
+                <TotalNum>총 {room.partnerList.data && room.partnerList.data[0].length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={() => router.push('/rooms/write')}><PlusSquareOutlined /> 객실 등록</Button>
                     {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}

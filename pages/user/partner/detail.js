@@ -4,43 +4,49 @@ import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { useStore } from '../../../store/StoreProvider'
+import { observer } from 'mobx-react-lite'
 
-const PartnerDetail = () => {
-    const data = {
-        key: '1',
-        partner: '가나다라',
-        user_id: 'test1234',
-        joinAt: '2021-08-31',
-        name: '김루밍',
-        phone: '01012341234',
-        password: '',
-        zonecode: '1234',
-        address: '주소가',
-        address2: '',
-        email: 'test@rooming.com',
-        tel: '0212341234',
-        hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-        memo: '메모입니다.'
-    }
-
+const PartnerDetail = observer(() => {
+    
+    const { user, hotel } = useStore(); 
     const router = useRouter();
 
     const [modiStatus, setModiStatus] = useState(false)
-
-    const [partner, setPartner] = useState(data.partner)
-    const [pw, setPw] = useState(data.pw)
+    const [partner, setPartner] = useState('')
+    const [pw, setPw] = useState('')
     const [pw2, setPw2] = useState('')
-    const [name, setName] = useState(data.name)
-    const [phone, setPhone] = useState(data.phone)
-    const [email, setEmail] = useState(data.email)
-    const [address, setAddress] = useState(data.address)
-    const [address2, setAddress2] = useState(data.address2)
-    const [zonecode, setZonecode] = useState(data.zonecode)
+    const [name, setName] = useState('')
+    const [hotelName, setHotelName] = useState('')
+    const [phone, setPhone] = useState('')
+    const [email, setEmail] = useState('')
+    const [address, setAddress] = useState('')
+    const [address2, setAddress2] = useState('')
+    const [zonecode, setZonecode] = useState('')
     const [loading, setLoading] = useState(false)
     const [imageUrl, setImageUrl] = useState();
-    const [tel, setTel] = useState(data.tel)
-    const [memo, setMemo] = useState(data.memo)
+    const [tel, setTel] = useState('')
     const [showAddress, setShowAddress] = useState(false)
+
+    useEffect(() => {
+        const callDetail = async() => {
+            await user.callInfo(user.token);
+            await hotel.callInfo({id: user.hotelid}, user.token);
+            console.log(user.info.data, hotel.info.data[0])
+            setPartner(user.info.data.nickname)
+            setPw(user.info.data.pw)
+            setName(user.info.data.name)
+            setPhone(user.info.data.phone)
+            setEmail(user.info.data.email)
+            setTel(user.info.data.phone)
+            if (hotel.info.data[0]) {
+                setAddress(hotel.info.data[0].address.slice(0, hotel.info.data[0].address.length - 5))
+                setZonecode(hotel.info.data[0].address.slice(hotel.info.data[0].address.length - 5))
+                setHotelName(hotel.info.data[0].name)
+            }
+        }
+        callDetail();
+    }, [])
 
     useEffect(() => {
         console.log(router.query.type)
@@ -59,16 +65,15 @@ const PartnerDetail = () => {
         if (val == 'pw2') setPw2(e.target.value);
         if (val == 'name') setName(e.target.value);
         if (val == 'phone') setPhone(e.target.value);
-        if (val == 'email') setEmail(e.target.value);
+        // if (val == 'email') setEmail(e.target.value);
         if (val == 'address') setAddress(e.target.value);
         if (val == 'address2') setAddress2(e.target.value);
         if (val == 'tel') setTel(e.target.value);
-        if (val == 'memo') setMemo(e.target.value);
     }
     
     const onModi = () => {
         const pwRegExp = /^[a-z0-9]{8,20}$/;
-        if (!router.query.type) router.push('/user/partner/1?type=modi');
+        if (!router.query.type) router.push('/user/partner/detail?type=modi');
         else {
             if (!partner) {
                 return message.warning('파트너명을 입력해 주세요')
@@ -76,9 +81,9 @@ const PartnerDetail = () => {
             if (!name) {
                 return message.warning('담당자명을 입력해 주세요')
             }
-            if (!email) {
-                return message.warning('이메일주소를 입력해 주세요')
-            }
+            // if (!email) {
+            //     return message.warning('이메일주소를 입력해 주세요')
+            // }
             if (!phone) {
                 return message.warning('담당자 연락처를 입력해 주세요')
             }
@@ -95,7 +100,16 @@ const PartnerDetail = () => {
                 return message.warning('비밀번호와 비밀번호 확인을 동일하게 입력해 주세요')
             }
 
+            let total_address;
+            if (address2) total_address = address +' '+ address2 +' '+ zonecode;
+            if (address2 == '') total_address = address +' '+ zonecode;
+
             // success
+            const data = {
+                name: name,
+                address: total_address,
+            }
+
         }
     }
 
@@ -139,11 +153,11 @@ const PartnerDetail = () => {
                         onChange={(e) => onDataChange(e, 'partner')}
                         bordered={modiStatus} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="아이디">
+                    <Descriptions.Item label="이메일 주소">
                         <InputValue
-                        value={data.user_id} 
+                        value={email} 
                         onChange={() => {}}
-                        bordered={false} />
+                        bordered={modiStatus} />
                     </Descriptions.Item>
                     <Descriptions.Item label="비밀번호">
                     {
@@ -174,12 +188,6 @@ const PartnerDetail = () => {
                         <InputValue
                         value={phone} 
                         onChange={(e) => onDataChange(e, 'phone')}
-                        bordered={modiStatus} />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="이메일 주소">
-                        <InputValue
-                        value={email} 
-                        onChange={(e) => onDataChange(e, 'email')}
                         bordered={modiStatus} />
                     </Descriptions.Item>
                     <Descriptions.Item label="주소">
@@ -232,18 +240,13 @@ const PartnerDetail = () => {
                         }
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 정보">
-                        <HotelBtn onClick={() => router.push('/hotel/1')}>{data.hotel}</HotelBtn>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="관리자 메모">
-                        <Input.TextArea
-                        value={memo} 
-                        onChange={(e) => onDataChange(e, 'memo')} />
+                        <HotelBtn onClick={() => router.push(`/hotel/${user.hotelid}`)}>{hotelName}</HotelBtn>
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>
                     <Button type="primary" onClick={onModi}>{modiStatus ? '수정완료' : '수정'}</Button>
                     {modiStatus ?
-                    <Button onClick={() => router.replace('/user/partner/1', undefined, {shallow: true}).then(() => window.scrollTo(0,0))}>취소</Button>
+                    <Button onClick={() => router.replace('/user/partner/detail', undefined, {shallow: true}).then(() => window.scrollTo(0,0))}>취소</Button>
                     : <Button onClick={() => router.push('/user/partner/list')}>목록</Button>
                     }
                 </ButtonWrap>
@@ -260,7 +263,7 @@ const PartnerDetail = () => {
             </Modal>
         </Wrapper>
     )
-}
+})
 
 const Wrapper = styled.div`
     width: 100%;

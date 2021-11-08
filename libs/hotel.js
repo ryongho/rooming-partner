@@ -3,6 +3,17 @@ import baseUrl from './base.json'
 
 const env = process.env.API_ENV || 'development';
 
+export function getHotelDetail(params, token) {
+    return axios({
+        method: 'get',
+        url: '/hotel/detail',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
 
 export function postHotelRegist(data, token) {
     return axios({

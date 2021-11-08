@@ -21,8 +21,8 @@ const Header = observer(({ title }) => {
     const menu = (
         <Menu>
             <Menu.Item>
-                <List>내 정보</List>
-                {/* <List onClick={()=>{router.push(`/user/partner/${user.userid}`)}}>내 정보</List> */}
+                {/* <List>내 정보</List> */}
+                <List onClick={()=>{router.push(`/user/partner/detail`)}}>내 정보</List>
             </Menu.Item>
         </Menu>
     )

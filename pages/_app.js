@@ -73,12 +73,12 @@ const MyApp = ({ Component, pageProps }) => {
     const { SubMenu } = Menu
 
     const onMenuSelect = ({ item, key }) => {
-        console.log(item, key)
-        if(key == '/reserved/list' ||
-        key == '/review/list' ||
-        key == '/stats/list' ||
-        key == '/user/partner/list' ||
-        key == '/user/customer/list') return;
+        // console.log(item, key)
+        // if(key == '/reserved/list' ||
+        // key == '/review/list' ||
+        // key == '/stats/list' ||
+        // key == '/user/partner/list' ||
+        // key == '/user/customer/list') return;
         setGroup(item.props.group);
         setTitle(item.props.title);
         router.push(key).then(() => window.scrollTo(0,0));
@@ -86,13 +86,22 @@ const MyApp = ({ Component, pageProps }) => {
 
     useEffect(() => {
         setIsAdmin(localStorage.getItem('rmaauth') == 1 ? false : true)
+        // setIsAdmin(localStorage.getItem('rmaauth') == 1 ? true : false)
         if(isAdmin) {
             setGroup('회원 관리')
             setTitle('파트너 목록')
         }
+    }, [])
 
+    useEffect(() => {
         if (router.pathname == '/user/partner/[pid]') setTitle('파트너 상세')
+        if (router.pathname == '/user/partner/detail') {
+            setGroup('회원 관리')
+            setTitle('파트너 상세')
+        }
         if (router.pathname == '/user/partner/list') setTitle('파트너 목록')
+        if (router.pathname == '/user/customer/list') setTitle('고객 목록')
+        if (router.pathname == '/user/customer/[pid]') setTitle('고객 상세')
         
         if (router.pathname == '/hotel/write') setTitle('숙소 등록')
         if (router.pathname == '/hotel/list') setTitle('숙소 목록')
@@ -101,6 +110,16 @@ const MyApp = ({ Component, pageProps }) => {
         if (router.pathname == '/goods/write') setTitle('상품 등록')
         if (router.pathname == '/goods/list') setTitle('상품 목록')
         if (router.pathname == '/goods/[pid]') setTitle('상품 상세')
+
+        if (router.pathname == '/rooms/write') setTitle('객실 등록')
+        if (router.pathname == '/rooms/list') setTitle('객실 목록')
+        if (router.pathname == '/rooms/[pid]') setTitle('객실 상세')
+
+        if (router.pathname == '/reserved/list') setTitle('예약 목록')
+        if (router.pathname == '/reserved/[pid]') setTitle('예약 상세')
+
+        if (router.pathname == '/review/list') setTitle('리뷰 목록')
+        if (router.pathname == '/stats/list') setTitle('통계 목록')
     }, [router])
 
     
@@ -122,18 +141,16 @@ const MyApp = ({ Component, pageProps }) => {
                     :
                     (
                         <Layout style={{minHeight: '100vh'}}>
-                            <Sider theme={'light'} collapsible collapsed={collapsed} onCollapse={e => setCollapsed(e)}>
+                            <Sider theme={'light'} collapsible collapsed={collapsed} onCollapse={e => setCollapsed(e)} style={{height: '100vh', overflowY: 'auto'}}>
                                 <LogoArea>
                                     <HeaderLogo src={'/image/logo.png'} />
                                 </LogoArea>
-                                {/* <Menu defaultOpenKeys={['/user', '/reserved', '/goods', '/hotel', '/review', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline"> */}
-                                <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={router.pathname} mode="inline">
-                                    {isAdmin &&
+                                <Menu defaultOpenKeys={['/user', '/reserved', '/goods', '/hotel', '/review', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
+                                {/* <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={router.pathname} mode="inline"> */}
                                     <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
                                         <Menu.Item key="/user/partner/list" group="회원 관리" title="파트너 목록">파트너 목록</Menu.Item>
-                                        <Menu.Item key="/user/customer/list" group="회원 관리" title="고객 목록">고객 목록</Menu.Item>
+                                        {isAdmin && <Menu.Item key="/user/customer/list" group="회원 관리" title="고객 목록">고객 목록</Menu.Item>}
                                     </SubMenu>
-                                    }
                                     <SubMenu key="/hotel" icon={<ShopOutlined />} title="숙소 관리">
                                         <Menu.Item key="/hotel/list" group="숙소 관리" title="숙소 목록">숙소 목록</Menu.Item>
                                     </SubMenu>
@@ -151,9 +168,9 @@ const MyApp = ({ Component, pageProps }) => {
                                     </SubMenu>
                                     {isAdmin &&
                                     <SubMenu key="/board" icon={<SettingOutlined />} title="게시판 관리">
-                                        <Menu.Item key="/board/notice" group="게시판 관리" title="공지사항 목록">공지사항 목록</Menu.Item>
-                                        <Menu.Item key="/board/faq" group="게시판 관리" title="FAQ 목록">FAQ 목록</Menu.Item>
-                                        <Menu.Item key="/board/policy" group="게시판 관리" title="약관 및 정책 목록">약관 및 정책 목록</Menu.Item>
+                                        <Menu.Item key="/board/notice/list" group="게시판 관리" title="공지사항 목록">공지사항 목록</Menu.Item>
+                                        <Menu.Item key="/board/faq/list" group="게시판 관리" title="FAQ 목록">FAQ 목록</Menu.Item>
+                                        <Menu.Item key="/board/policy/list" group="게시판 관리" title="약관 및 정책 목록">약관 및 정책 목록</Menu.Item>
                                     </SubMenu>
                                     }
                                     <SubMenu key="/stats" icon={<BarChartOutlined />} title="통계 관리">
@@ -161,7 +178,7 @@ const MyApp = ({ Component, pageProps }) => {
                                     </SubMenu>
                                 </Menu>
                             </Sider>
-                            <Layout>
+                            <Layout style={{height: '100vh', overflowY: 'auto'}}>
                                 <StoreProvider {...pageProps}>
                                     <Header title={group} />
                                     <Content>

@@ -24,7 +24,8 @@ export default class UserStore {
             join: action,
             callInfo: action,
             checkEmailDuplicate: action,
-            checkNickDuplicate: action
+            checkNickDuplicate: action,
+            info: observable
         })
     }
 
@@ -49,11 +50,13 @@ export default class UserStore {
         }
     }
     
+    info = null
     callInfo = async (token) => {
         try {
             const result = await getUserInfo(token)
             if (result.status === 200) {
                 console.log(result.data)
+                this.info = result.data
                 this.name = result.data.data.name
                 this.email = result.data.data.email
                 this.auth = result.data.data.user_type
@@ -76,7 +79,7 @@ export default class UserStore {
         this.name = null
         this.email = null
         this.auth = null
-        // this.nickname = null
+        this.nickname = null
         this.hotelid = null
     }
 

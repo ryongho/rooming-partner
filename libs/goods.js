@@ -33,11 +33,24 @@ export function postImagesUpload(file, token) {
 }
 
 
-export function getGoodsListByPartners(token) {
+export function getGoodsListByPartners(params, token) {
     return axios({
         method: 'get',
         url: '/goods/list_by_partner',
         baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function getGoodsDetail(params, token) {
+    return axios({
+        method: 'get',
+        url: '/goods/detail',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
         headers: {
             'Authorization': 'Bearer '+token
         }
