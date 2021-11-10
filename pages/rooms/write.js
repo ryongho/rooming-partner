@@ -61,7 +61,8 @@ const GoodsWrite = observer(() => {
             if (success) {
                 // message.success('게시 완료')
                 // console.log(result)
-                message.success('게시 완료').then(() => router.push('/rooms/list').then(() => window.scrollTo(0,0)))
+                message.success('게시 완료')
+                window.location.href='/rooms/list'
             }
         })
     }
@@ -76,26 +77,41 @@ const GoodsWrite = observer(() => {
     
 
     const onUploadChange = async (e) => {
-        if (e.file.status === 'uploading') {
-            setLoading(true);
-            console.log(e)
+        // if (e.file.status === 'uploading') {
+        //     setLoading(true);
+        //     console.log(e)
 
-            await room.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
+        //     await room.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
+        //         if (success) {
+        //             setFileList(fileList.concat(e.file.originFileObj))
+        //             setLoading(false)
+        //             setImgList(imgList.concat(data.images))
+        //             // https://rooming-img.s3.ap-northeast-2.amazonaws.com/
+        //         }
+        //     })
+        // }
+
+        setLoading(true)
+        let file = e.target.files[0];
+        let reader = new FileReader();
+
+        reader.onloadend = async(e) => {
+            await room.imagesUpload(file, user.token, (success, data) => {
                 if (success) {
-                    setFileList(fileList.concat(e.file.originFileObj))
-                    setLoading(false)
                     setImgList(imgList.concat(data.images))
-                    // https://rooming-img.s3.ap-northeast-2.amazonaws.com/
+                    setLoading(false)
                 }
             })
         }
+        if (file) reader.readAsDataURL(file);
     }
 
-    const onRemoveImgs = async(file) => {
-        let idx = fileList.indexOf(file);
-        imgList.splice(idx, 1);
-        await setImgList(imgList)
-        await setFileList(fileList.filter(e => e !== file))
+    const onRemoveImgs = async(key) => {
+        // let idx = fileList.indexOf(file);
+        // imgList.splice(idx, 1);
+        // await setImgList(imgList)
+        // await setFileList(fileList.filter(e => e !== file))
+        await setImgList(imgList.filter((e, idx) => idx !== key))
     }
 
     return (
@@ -145,7 +161,7 @@ const GoodsWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 이미지">
                         <UploadImgs 
-                            fileList={fileList}
+                            imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
                             onRemoveImgs={onRemoveImgs} />

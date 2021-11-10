@@ -5,7 +5,8 @@ import {
     postHotelRegist,
     getHotelList,
     postImagesUpload,
-    getHotelListByPartners
+    getHotelListByPartners,
+    putHotelUpdate
 } from '../libs/hotel'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -93,4 +94,17 @@ export default class HotelStore {
             console.log(err)
         }
     }
+
+    updateInfo = async (params, token, callback) => {
+        try {
+            const result = await putHotelUpdate(params, token)
+            if (result.status === 200) {
+                callback(true, result)
+            }
+        } catch (err) {
+            callback(false, err)
+            console.lor(err)
+        }
+    }
+    
 }

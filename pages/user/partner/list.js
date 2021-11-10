@@ -90,8 +90,8 @@ const PartnerList = observer(() => {
         render: (joinAt) => {
             return moment(joinAt).format('YYYY-MM-DD')
         },
-        sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
+        // sortDirections: ['descend', 'ascend'],
+        // sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
     }];
 
     const onCategory = (e) => {
@@ -168,16 +168,18 @@ const Filter = styled.div`
     display: flex;
     align-items: center;
     padding-right: 35px;
+    margin-bottom: 5px;
 `
 
 const FilterLabel = styled.div`
+    min-width: 77px;
     padding-right: 8px;
     font-weight: bold;
     color: #666;
 `
 
 const SearchWrap = styled(Filter)`
-    margin-top: 15px;
+    margin-top: 10px;
 `
 
 const SearchBar = styled(Input.Search)`

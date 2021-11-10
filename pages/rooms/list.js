@@ -14,9 +14,15 @@ const RoomsList = observer(() => {
 
     const { room, user } = useStore();
 
+    const [isAdmin, setIsAdmin] = useState(true);
+    const [data, setData] = useState(null)
+
     useEffect(() => {
+        setIsAdmin(user.auth == 1 ? false : true)
+
         const callList = async () => {
             await room.callListPartner(user.token)
+            setData(room.partnerList.data[0])
             console.log(user.token, room.partnerList.data)
         }
 
@@ -98,19 +104,29 @@ const RoomsList = observer(() => {
         console.log(e)
     }
 
-    const onSearch = () => {
-
+    const onSearch = (word) => {
+        if (word) {
+            setData(data.filter(e => e.name.indexOf(word) !== -1))
+        } else message.warning('검색어를 입력해 주세요.')
     }
 
     const onExcelDown = () => {
 
     }
 
+    const onListDate = (e) => {
+        // console.log(moment(e._d).format('YYYY-MM-DD'))
+        if (e) {
+            let selectDate = moment(e._d).format('YYYY-MM-DD');
+            setData(data.filter(e => moment(e.created_at).format('YYYY-MM-DD') == selectDate))
+        } else setData(room.partnerList.data[0])
+    }
 
     return (
         <Wrapper>
             <TopBox>
                 <FilterWrap>
+                    {isAdmin &&
                     <Filter>
                         <FilterLabel>카테고리</FilterLabel>
                         <SelectBar defaultValue={"total"} onChange={onCategory}>
@@ -118,11 +134,11 @@ const RoomsList = observer(() => {
                             <Select.Option value={"hotel"}>호텔</Select.Option>
                             <Select.Option value={"resort"}>리조트</Select.Option>
                         </SelectBar>
-                    </Filter>
+                    </Filter>}
                     
                     <Filter>
                         <FilterLabel>객실 등록일</FilterLabel>
-                        <DatePicker />
+                        <DatePicker onChange={onListDate} />
                     </Filter>
                     
                     <Filter>
@@ -137,7 +153,7 @@ const RoomsList = observer(() => {
                 </FilterWrap>
                 <SearchWrap>
                     <FilterLabel>검색</FilterLabel>
-                    <SearchBar placeholder="객실명 또는 숙소명을 입력해주세요" onSearch={onSearch} />
+                    <SearchBar placeholder="객실명을 입력해주세요" onSearch={onSearch} />
                 </SearchWrap>
             </TopBox>
 
@@ -149,7 +165,7 @@ const RoomsList = observer(() => {
                 </Space>
             </TableTop>
             {room.partnerList.data &&
-                <Table columns={columns} dataSource={room.partnerList.data[0]} pagination={{ position: ['bottomCenter'] }}/>
+                <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
             }
         </Wrapper>
     )
@@ -158,6 +174,7 @@ const RoomsList = observer(() => {
 
 const Wrapper = styled.div`
     width: 100%;
+    padding-bottom: 80px;
 `
 
 const TopBox = styled.div`
@@ -176,20 +193,22 @@ const Filter = styled.div`
     display: flex;
     align-items: center;
     padding-right: 35px;
+    margin-bottom: 5px;
 `
 
 const FilterLabel = styled.div`
+    min-width: 77px;
     padding-right: 8px;
     font-weight: bold;
     color: #666;
 `
 
 const SearchWrap = styled(Filter)`
-    margin-top: 15px;
+    margin-top: 10px;
 `
 
 const SearchBar = styled(Input.Search)`
-    width: 45%;
+    width: 80%;
 `
 
 const SelectBar = styled(Select)`

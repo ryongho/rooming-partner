@@ -88,25 +88,41 @@ const GoodsWrite = observer(() => {
     }
     
     const onUploadChange = async (e) => {
-        if (e.file.status === 'uploading') {
-            setLoading(true);
+        // if (e.file.status === 'uploading') {
+        //     setLoading(true);
 
-            await goods.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
+        //     await goods.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
+        //         if (success) {
+        //             setFileList(fileList.concat(e.file.originFileObj))
+        //             setLoading(false);
+        //             setImgList(imgList.concat(data.images))
+        //             console.log(fileList, imgList)
+        //         }
+        //     })
+        // }
+
+        setLoading(true)
+        let file = e.target.files[0];
+        let reader = new FileReader();
+
+        reader.onloadend = async(e) => {
+            await goods.imagesUpload(file, user.token, (success, data) => {
                 if (success) {
-                    setFileList(fileList.concat(e.file.originFileObj))
-                    setLoading(false);
                     setImgList(imgList.concat(data.images))
-                    console.log(fileList, imgList)
+                    setLoading(false)
                 }
             })
         }
+        if (file) reader.readAsDataURL(file);
     }
     
-    const onRemoveImgs = async(file) => {
-        let idx = fileList.indexOf(file);
-        imgList.splice(idx, 1);
-        await setImgList(imgList)
-        await setFileList(fileList.filter(e => e !== file))
+    const onRemoveImgs = async(key) => {
+        // let idx = fileList.indexOf(file);
+        // imgList.splice(idx, 1);
+        // await setImgList(imgList)
+        // await setFileList(fileList.filter(e => e !== file))
+
+        await setImgList(imgList.filter((e, idx) => idx !== key))
     }
 
 
@@ -125,7 +141,8 @@ const GoodsWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 판매 종료일">
                         <DatePicker
-                        onChange={e => setEnd(moment(e).format('YYYY-MM-DD'))} />
+                        onChange={e => setEnd(moment(e).format('YYYY-MM-DD'))} 
+                        disabledDate={(e) => e < start} />
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
@@ -164,7 +181,7 @@ const GoodsWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <UploadImgs 
-                            fileList={fileList}
+                            imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
                             onRemoveImgs={onRemoveImgs} />

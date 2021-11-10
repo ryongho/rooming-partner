@@ -5,43 +5,9 @@ import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
 import UploadImgs from '../../components/atom/UploadImgs'
 import { useStore } from '../../store/StoreProvider'
+import moment from 'moment'
 
 const HotelDetail = () => {
-    // const data = {
-    //     key: '1',
-    //     category: '호텔',
-    //     hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-    //     facility: ['주차가능', '무료 wifi'],
-    //     zonecode: '1234',
-    //     address: '주소',
-    //     address2: '',
-    //     tel: '0212341234',
-    //     imgList: [{
-    //         uid: "-1",
-    //         name: "image.png",
-    //         status: "done",
-    //         url:
-    //           "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-    //       },
-    //       {
-    //         uid: "-2",
-    //         name: "image.png",
-    //         status: "done",
-    //         url:
-    //           "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-    //       }],
-    //     breakfast: '제공되는 조식 없음',
-    //     parking: '300대 주차 가능',
-    //     cancel: '예약 당일 취소 가능',
-    //     partner: '파트너1234',
-    //     goods: [{
-    //         idx: 0,
-    //         name: '여름날 치맥 파티',
-    //     }, {
-    //         idx: 1,
-    //         name: '겨울날 군고구마 파티'
-    //     }]
-    // }
     const { user, hotel, goods } = useStore();
 
     const router = useRouter();
@@ -55,7 +21,6 @@ const HotelDetail = () => {
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
-    const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     // const [breakfast, setBreakfast] = useState()
@@ -82,15 +47,16 @@ const HotelDetail = () => {
 
             await hotel.callInfo({id: user.hotelid}, user.token)
             await goods.callListPartner({id: user.hotelid}, user.token)
-            console.log(hotel.info, goods.partnerList.data)
+            await user.callInfo(user.token);
+
+            console.log(hotel.info, goods.partnerList.data, user.info)
             if (hotel.info.data[0]) {
                 setCategory(hotel.info.data[0].type)
                 setName(hotel.info.data[0].name)
-                setFacility(hotel.info.data[0].options)
+                setFacility(hotel.info.data[0].options.split(","))
                 setAddress(hotel.info.data[0].address.slice(0, hotel.info.data[0].address.length - 5))
                 setZonecode(hotel.info.data[0].address.slice(hotel.info.data[0].address.length - 5))
                 setTel(hotel.info.data[0].tel)
-                setFileList(hotel.info.images)
                 setImgList(hotel.info.images)
                 setCancel(hotel.info.data[0].refund_rule)
                 setContent(hotel.info.data[0].content)
@@ -133,29 +99,28 @@ const HotelDetail = () => {
     }
 
     const onUploadChange = async (e) => {
-        if (e.file.status === 'uploading') {
-            setLoading(true);
-            await hotel.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
+        setLoading(true)
+        let file = e.target.files[0];
+        let reader = new FileReader();
+
+        reader.onloadend = async(e) => {
+            await hotel.imagesUpload(file, user.token, (success, data) => {
                 if (success) {
-                    setFileList(fileList.concat(e.file.originFileObj))
-                    setLoading(false);
                     setImgList(imgList.concat(data.images))
-                    console.log(imgList)
+                    setLoading(false)
                 }
             })
         }
-        
+        if (file) reader.readAsDataURL(file);
+
+    }
+
+    const onRemoveImgs = async(key) => {
+        await setImgList(imgList.filter((e, idx) => idx !== key))
     }
     
-    const onRemoveImgs = async(item, key) => {
-        // let idx = fileList.indexOf(file);
-        imgList.splice(key, 1);
-        await setImgList(imgList)
-        await setFileList(fileList.filter(e => e !== item))
-    }
-    
-    const onModi = () => {
-        if (!router.query.type) router.push('/hotel/1?type=modi');
+    const onModi = async () => {
+        if (!router.query.type) router.push(`/hotel/${user.hotelid}?type=modi`);
         else {
             if (!name) {
                 return message.warning('숙소명을 입력해 주세요')
@@ -174,7 +139,7 @@ const HotelDetail = () => {
             }
 
             // success
-            const images = imgList.join();
+            // const images = imgList.join();
             const option = facility.join();
 
             let total_address;
@@ -182,23 +147,30 @@ const HotelDetail = () => {
             if (address2 == '') total_address = address +' '+ zonecode;
 
             const data = {
+                id: user.hotelid,
                 name: name,
                 content: content,
-                owner: owner,
                 open_date: moment(openDate).format('YYYY-MM-DD'),
-                reg_no: reg,
                 address: total_address,
                 tel: tel,
                 fax: fax,
                 level: level,
                 traffic: traffic,
-                images: images,
                 latitude: latitude,
                 longtitude: longtitude,
                 type: category,
                 options: option,
-                refund_rule: cancel
+                refund_rule: cancel,
             }
+            
+            console.log(data)
+
+            await hotel.updateInfo(data, user.token, (success, result) => {
+                if (success) {
+                    message.success('수정 완료')
+                    window.location.href='/hotel/list'
+                }
+            })
         }
     }
 
@@ -208,112 +180,150 @@ const HotelDetail = () => {
                 <Descriptions title={<Title>숙소 상세 정보</Title>} bordered column={1} extra={<Button onClick={() => router.push('/hotel/list')}>목록으로 돌아가기</Button>}>
                     <Descriptions.Item label="숙소 카테고리">
                         {hotel?.info?.data[0].type &&
-                        <SelectBar defaultValue={hotel?.info?.data[0].type} onChange={(e) => onDataChange(e, 'category')}>
-                            <Select.Option value={"호텔"}>호텔</Select.Option>
-                            <Select.Option value={"모텔"}>모텔</Select.Option>
-                            <Select.Option value={"펜션"}>펜션</Select.Option>
-                            <Select.Option value={"콘도"}>콘도</Select.Option>
-                        </SelectBar>}
+                            modiStatus ?
+                            <SelectBar defaultValue={hotel?.info?.data[0].type} onChange={(e) => onDataChange(e, 'category')}>
+                                <Select.Option value={"호텔"}>호텔</Select.Option>
+                                <Select.Option value={"모텔"}>모텔</Select.Option>
+                                <Select.Option value={"펜션"}>펜션</Select.Option>
+                                <Select.Option value={"콘도"}>콘도</Select.Option>
+                            </SelectBar>
+                            : hotel?.info?.data[0].type
+                        }
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소명">
-                        <InputValue 
-                        value={name} 
-                        onChange={(e) => onDataChange(e, 'name')}
-                        bordered={modiStatus} />
+                        {modiStatus ?
+                            <InputValue 
+                            value={name} 
+                            onChange={(e) => onDataChange(e, 'name')}
+                            bordered={modiStatus} />
+                            : name
+                        }
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 주소">
-                        <Input 
-                        placeholder={modiStatus ? "우편번호" : null}
-                        disabled={modiStatus}
-                        bordered={modiStatus}
-                        value={zonecode}
-                        style={{width:100}} />
-                        {modiStatus &&
+                        {modiStatus ?
+                            <>
+                            <Input 
+                            placeholder={modiStatus ? "우편번호" : null}
+                            disabled={modiStatus}
+                            bordered={modiStatus}
+                            value={zonecode}
+                            style={{width:100}} />
                             <Button onClick={()=> setShowAddress(true)} style={{marginLeft:5}}>주소검색</Button>
+                            <Input 
+                            placeholder={modiStatus ? "기본주소" : null}
+                            disabled={modiStatus}
+                            bordered={modiStatus}
+                            value={address}
+                            style={{marginTop:5, marginBottom:5, display:'block'}} />
+                            <Input 
+                            placeholder={modiStatus ? "상세주소를 입력해주세요" : null}
+                            value={address2} 
+                            bordered={modiStatus}
+                            onChange={(e) => onDataChange(e, 'address2')} />
+                            </>
+                            : <>{zonecode} {address}</>
                         }
-                        <Input 
-                        placeholder={modiStatus ? "기본주소" : null}
-                        disabled={modiStatus}
-                        bordered={modiStatus}
-                        value={address}
-                        style={{marginTop:5, marginBottom:5, display:'block'}} />
-                        <Input 
-                        placeholder={modiStatus ? "상세주소를 입력해주세요" : null}
-                        value={address2} 
-                        bordered={modiStatus}
-                        onChange={(e) => onDataChange(e, 'address2')} />
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 상세 위치">
-                        <Input 
-                        placeholder={"경도"}
-                        value={longtitude}
-                        style={{width:100}}
-                        onChange={(e) => onDataChange(e, 'longtitude')} />
-                        <Input 
-                        placeholder={"위도"}
-                        value={latitude}
-                        style={{width:100, marginRight: '20px', marginLeft: '5px'}}
-                        onChange={(e) => onDataChange(e, 'latitude')} />
-                        <a href="https://www.google.com/maps/search/" target='_blank'>
-                            <Button>주소로 경도/위도 찾기</Button>
-                        </a>
+                        {modiStatus ?
+                        <>
+                            <span>위도 : </span>
+                            <Input 
+                            placeholder={"위도"}
+                            value={latitude}
+                            style={{width:160, marginRight: '10px', marginLeft: '5px'}}
+                            onChange={(e) => onDataChange(e, 'latitude')} />
+                            <span>경도 : </span>
+                            <Input 
+                            placeholder={"경도"}
+                            value={longtitude}
+                            style={{width:160}}
+                            onChange={(e) => onDataChange(e, 'longtitude')} />
+                            <a href="https://www.google.com/maps/search/" target='_blank' style={{marginLeft: '15px'}}>
+                                <Button>주소로 경도/위도 찾기</Button>
+                            </a>
+                        </>
+                        : 
+                        <>
+                            <span>위도 : </span>
+                            {latitude}
+                            <span style={{marginLeft: '20px'}}>경도 : </span>
+                            {longtitude}
+                        </>
+                        }
+                        
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 연락처">
+                        {modiStatus ?
                         <InputValue
                         placeholder={"'-'없이 번호만 입력해 주세요"}
                         value={tel} 
                         onChange={(e) => onDataChange(e, 'tel')}
                         bordered={modiStatus} />
+                        : tel}
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 팩스">
+                        {modiStatus ?
                         <InputValue
                         placeholder={"'-'없이 번호만 입력해 주세요"}
                         value={fax} 
                         onChange={(e) => onDataChange(e, 'fax')}
                         bordered={modiStatus} />
+                        : fax}
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 등급">
+                        {modiStatus ?
                         <InputValue
                         placeholder={"숫자로 입력해 주세요"}
                         value={level} 
                         onChange={(e) => onDataChange(e, 'level')}
                         bordered={modiStatus} />
+                        : level}
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 이미지">
-                        {modiStatus ?
+                        {/* {modiStatus ? */}
                         <UploadImgs 
-                        fileList={imgList}
+                        imgList={imgList}
                         loading={loading}
                         onUploadChange={onUploadChange}
-                        onRemoveImgs={onRemoveImgs} />
-                        :
+                        onRemoveImgs={onRemoveImgs}
+                        modiStatus={modiStatus} />
+                        {/* :
                         <ImgWrap>
                             {imgList.map(item => {
                                 return (
-                                    <img src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name}`} alt="avatar" />
+                                    <ImgBox>
+                                        <img src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name}`} alt="image preview" />
+                                    </ImgBox>
                                 )
                             })}
+                            <UploadLength>({imgList.length} / 10)</UploadLength>
                         </ImgWrap>
-                        }
-                        <UploadLength>({imgList.length} / 10)</UploadLength>
+                        } */}
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                         <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="대표자">
+                    {/* <Descriptions.Item label="대표자">
+                        {modiStatus ?
                         <InputValue
                         value={owner} 
                         onChange={e => onDataChange(e, 'owner')}
                         bordered={modiStatus} />
+                        : owner }
                     </Descriptions.Item>
                     <Descriptions.Item label="사업자 번호">
+                        {modiStatus ? 
                         <InputValue
                         value={reg} 
                         onChange={e => onDataChange(e, 'reg')}
                         bordered={modiStatus} />
-                    </Descriptions.Item>
+                        : reg }
+                    </Descriptions.Item> */}
                     <Descriptions.Item label="개업일">
-                        <DatePicker onChange={(e) => onDataChange(e, 'opendate')} />
+                        {modiStatus ?
+                        <DatePicker defaultValue={moment(openDate, 'YYYY-MM-DD')} onChange={(e) => onDataChange(e, 'opendate')} />
+                        : openDate }
                     </Descriptions.Item>
                     <Descriptions.Item label="호텔 소개">
                         <Input.TextArea
@@ -334,17 +344,19 @@ const HotelDetail = () => {
                         onChange={(e) => onDataChange(e, 'cancel')} />
                     </Descriptions.Item>
 
-                    <Descriptions.Item label="파트너">
-                        <HotelBtn onClick={() => router.push('/user/partner/1')}>{name}</HotelBtn>
+                    <Descriptions.Item label="파트너 정보">
+                        <HotelBtn onClick={() => router.push('/user/partner/detail')}>{user.info?.data?.nickname}</HotelBtn>
                     </Descriptions.Item>
                     <Descriptions.Item label="등록된 상품">
-                        {goods.partnerList?.data?.map(item => {
-                            return (
-                                <GoodsWrap>
-                                    <GoodsBtn onClick={() => router.push(`/goods/${item.goods_id}`)}>{item.goods_name}</GoodsBtn>
-                                </GoodsWrap>
-                            )
-                        })}
+                        {goods.partnerList?.data != '' ?
+                            goods.partnerList?.data?.map(item => {
+                                return (
+                                    <GoodsWrap>
+                                        <GoodsBtn onClick={() => router.push(`/goods/${item.goods_id}`)}>{item.goods_name}</GoodsBtn>
+                                    </GoodsWrap>
+                                )
+                            }) : <>등록된 상품이 없습니다.</>
+                        }
                         <GoodsInfo>※ 비활성화된 상품은 앱에서 비공개 처리 됩니다.</GoodsInfo>
                     </Descriptions.Item>
                 </Descriptions>
@@ -375,11 +387,11 @@ const HotelDetail = () => {
 const Wrapper = styled.div`
     width: 100%;
     max-width: 1100px;
+    padding-bottom: 80px;
 `
 
 const Detail = styled.div`
     padding: 18px;
-    margin-bottom: 80px;
     background-color: #fff;
 `
 
@@ -396,18 +408,8 @@ const SelectBar = styled(Select)`
     width: 150px;
 `
 
-const ImgWrap = styled.div`
-    img {
-        width: 100px;
-        margin-right: 8px;
-    }
-`
-
-const UploadBtn = styled.div`
-    margin-top: 8px;
-`
-
 const UploadLength = styled.div`
+    margin-top: 5px;
     font-size: 12px;
     color: #999
 `

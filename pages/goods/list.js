@@ -11,43 +11,6 @@ import { observer } from 'mobx-react-lite'
 
 
 const GoodsList = observer(() => {
-    const data = [{
-        key: '1',
-        category: '호텔',
-        goods: '여름날 치맥 파티',
-        rooms: '스탠다드 트윈 시티뷰',
-        hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-        price: '40000',
-        sale_price: '34000',
-        active: true,
-    }, {
-        key: '2',
-        category: '호텔',
-        goods: '여름날 치맥 파티',
-        rooms: '스탠다드 트윈 시티뷰',
-        hotel: '호텔1111',
-        price: '60000',
-        sale_price: '54000',
-        active: true,
-    }, {
-        key: '3',
-        category: '호텔',
-        goods: '봄날 파전 파티',
-        rooms: '스탠다드 트윈 시티뷰',
-        hotel: '호텔2222',
-        price: '55000',
-        sale_price: '40000',
-        active: false,
-    }, {
-        key: '4',
-        category: '호텔',
-        goods: '겨울날 군고구마 파티',
-        rooms: '스탠다드 트윈 시티뷰',
-        hotel: '호텔3333',
-        price: '73000',
-        sale_price: '24000',
-        active: true,
-    }];
 
     const columns = [{
         title: '상품명',
@@ -115,6 +78,8 @@ const GoodsList = observer(() => {
     const [isAdmin, setIsAdmin] = useState(true);
 
     useEffect(() => {
+        setIsAdmin(user.auth == 1 ? false : true)
+
         const callList = async () => {
             await goods.callListPartner({id: user.hotelid}, user.token)
             console.log(user.token, goods.partnerList.data)
@@ -139,6 +104,7 @@ const GoodsList = observer(() => {
         <Wrapper>
             <TopBox>
                 <FilterWrap>
+                    {isAdmin &&
                     <Filter>
                         <FilterLabel>카테고리</FilterLabel>
                         <SelectBar defaultValue={"total"} onChange={onCategory}>
@@ -146,26 +112,25 @@ const GoodsList = observer(() => {
                             <Select.Option value={"hotel"}>호텔</Select.Option>
                             <Select.Option value={"resort"}>리조트</Select.Option>
                         </SelectBar>
-                    </Filter>
+                    </Filter>}
                     
-                    <Filter>
+                    {/* <Filter>
                         <FilterLabel>상태값</FilterLabel>
                         <Radio.Group defaultValue={"total"}>
                             <Radio.Button value="total" buttonStyle="solid">전체</Radio.Button>
                             <Radio.Button value="">활성화</Radio.Button>
                             <Radio.Button value="">비활성화</Radio.Button>
                         </Radio.Group>
-                    </Filter>
-                    
+                    </Filter> */}
                 </FilterWrap>
                 <SearchWrap>
                     <FilterLabel>검색</FilterLabel>
-                    <SearchBar placeholder="상품명 또는 숙소명을 입력해주세요" onSearch={onSearch} />
+                    <SearchBar placeholder="상품명을 입력해주세요" onSearch={onSearch} />
                 </SearchWrap>
             </TopBox>
 
             <TableTop>
-                <TotalNum>총 {data.length}건</TotalNum>
+                <TotalNum>총 {goods.partnerList.data.length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={() => router.push('/goods/write')}><PlusSquareOutlined /> 상품 등록</Button>
                     {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
@@ -185,6 +150,7 @@ const GoodsList = observer(() => {
 
 const Wrapper = styled.div`
     width: 100%;
+    padding-bottom: 80px;
 `
 
 const TopBox = styled.div`
@@ -203,20 +169,22 @@ const Filter = styled.div`
     display: flex;
     align-items: center;
     padding-right: 35px;
+    margin-bottom: 5px;
 `
 
 const FilterLabel = styled.div`
+    min-width: 77px;
     padding-right: 8px;
     font-weight: bold;
     color: #666;
 `
 
 const SearchWrap = styled(Filter)`
-    margin-top: 15px;
+    margin-top: 10px;
 `
 
 const SearchBar = styled(Input.Search)`
-    width: 45%;
+    width: 80%;
 `
 
 const SelectBar = styled(Select)`

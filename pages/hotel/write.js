@@ -21,11 +21,9 @@ const HotelWrite = observer(() => {
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
-    const [fileList, setFileList] = useState([])
+    // const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
-    // const [breakfast, setBreakfast] = useState()
-    // const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
 
     const [content, setContent] = useState('')
@@ -84,13 +82,11 @@ const HotelWrite = observer(() => {
             refund_rule: cancel
         }
 
-        console.log(data)
+        // console.log(data)
 
         await hotel.addInfo(data, user.token, (success, result) => {
             if (success) {
-                // message.success('게시 완료')
-                // console.log(result)
-                message.success('게시 완료').then(() => router.push('/hotel/list').then(() => window.scrollTo(0,0)))
+                message.success('게시 완료').then(() => window.location.href='/hotel/list')
             }
         })
         
@@ -98,25 +94,40 @@ const HotelWrite = observer(() => {
 
 
     const onUploadChange = async (e) => {
-        if (e.file.status === 'uploading') {
-            setLoading(true);
-            await hotel.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
+        // if (e.file.status === 'uploading') {
+        //     setLoading(true);
+        //     await hotel.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
+        //         if (success) {
+        //             setFileList(fileList.concat(e.file.originFileObj))
+        //             setLoading(false);
+        //             setImgList(imgList.concat(data.images))
+        //             console.log(fileList, imgList)
+        //         }
+        //     })
+        // }
+        
+        setLoading(true)
+        let file = e.target.files[0];
+        let reader = new FileReader();
+
+        reader.onloadend = async(e) => {
+            await hotel.imagesUpload(file, user.token, (success, data) => {
                 if (success) {
-                    setFileList(fileList.concat(e.file.originFileObj))
-                    setLoading(false);
                     setImgList(imgList.concat(data.images))
-                    console.log(fileList, imgList)
+                    setLoading(false)
                 }
             })
         }
-        
+        if (file) reader.readAsDataURL(file);
     }
     
-    const onRemoveImgs = async(file) => {
-        let idx = fileList.indexOf(file);
-        imgList.splice(idx, 1);
-        await setImgList(imgList)
-        await setFileList(fileList.filter(e => e !== file))
+    const onRemoveImgs = async(key) => {
+        // let idx = fileList.indexOf(file);
+        // imgList.splice(idx, 1);
+        // await setImgList(imgList)
+        // await setFileList(fileList.filter(e => e !== file))
+
+        await setImgList(imgList.filter((e, idx) => idx !== key))
     }
 
     return (
@@ -124,7 +135,7 @@ const HotelWrite = observer(() => {
             <Detail>
                 <Descriptions title={<Title>숙소 정보 입력</Title>} bordered column={1} extra={<Button onClick={() => router.push('/hotel/list')}>목록으로 돌아가기</Button>}>
                     <Descriptions.Item label="숙소 카테고리">
-                        <SelectBar defaultValue={"호텔"} onChange={(e) => setCategory(e)}>
+                        <SelectBar placeholder={"선택하세요"} onChange={(e) => setCategory(e)}>
                             <Select.Option value={"호텔"}>호텔</Select.Option>
                             <Select.Option value={"모텔"}>모텔</Select.Option>
                             <Select.Option value={"펜션"}>펜션</Select.Option>
@@ -152,16 +163,19 @@ const HotelWrite = observer(() => {
                         onChange={(e) => setAddress2(e.target.value)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 상세 위치">
-                        <Input 
-                        placeholder={"경도"}
-                        value={longtitude}
-                        style={{width:100}}
-                        onChange={(e) => setLongtitude(e.target.value)} />
+                        <InputLabel>위도 : </InputLabel>
                         <Input 
                         placeholder={"위도"}
                         value={latitude}
-                        style={{width:100, marginRight: '20px', marginLeft: '5px'}}
+                        style={{width:100, marginRight: '10px'}}
                         onChange={(e) => setLatitude(e.target.value)} />
+                        <InputLabel>경도 : </InputLabel>
+                        <Input 
+                        placeholder={"경도"}
+                        value={longtitude}
+                        style={{width:100, marginRight: '20px'}}
+                        onChange={(e) => setLongtitude(e.target.value)} />
+                        
                         <a href="https://www.google.com/maps/search/" target='_blank'>
                             <Button>주소로 경도/위도 찾기</Button>
                         </a>
@@ -195,7 +209,7 @@ const HotelWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 이미지">
                         <UploadImgs 
-                            fileList={fileList}
+                            imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
                             onRemoveImgs={onRemoveImgs} />
@@ -270,11 +284,11 @@ const HotelWrite = observer(() => {
 const Wrapper = styled.div`
     width: 100%;
     max-width: 1100px;
+    padding-bottom: 80px;
 `
 
 const Detail = styled.div`
     padding: 18px;
-    margin-bottom: 80px;
     background-color: #fff;
 `
 
@@ -285,6 +299,9 @@ const Title = styled.div`
 
 const InputValue = styled(Input)`
     width: 400px;
+`
+
+const InputLabel = styled.span`
 `
 
 const SelectBar = styled(Select)`

@@ -85,7 +85,7 @@ const Join = observer(() => {
         await user.checkNickDuplicate({nickname: nick}, (success, result) => {
             if (success) {
                 // console.log(result)
-                alert(`${result.msg}입니다.`)
+                alert('사용가능한 파트너명입니다.')
 
                 if (result.usable == 'N') {
                     setNick('')

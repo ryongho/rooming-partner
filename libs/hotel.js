@@ -67,3 +67,15 @@ export function getHotelListByPartners(token) {
         }
     })
 }
+
+export function putHotelUpdate(params, token) {
+    return axios ({
+        method: 'put',
+        url: '/hotel/update',
+        params: params,
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

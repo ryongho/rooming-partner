@@ -18,6 +18,7 @@ const HotelList = observer(() => {
     useEffect(() => {
         setIsAdmin(user.auth == 1 ? false : true)
         const callList = async () => {
+            await user.callInfo(user.token)
             await hotel.callListPartner(user.token)
             // console.log(user.token, hotel.partnerList)
         }
@@ -38,8 +39,8 @@ const HotelList = observer(() => {
                 <Link href={`/hotel/${user.hotelid}`}>{name}</Link>
             )
         },
-        sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
+        // sortDirections: ['descend', 'ascend'],
+        // sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
     }, {
         title: '파트너명',
         dataIndex: 'owner',
@@ -48,8 +49,8 @@ const HotelList = observer(() => {
         title: '등록일',
         dataIndex: 'created_at',
         key: 'created_at',
-        sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
+        // sortDirections: ['descend', 'ascend'],
+        // sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
         render: (created_at) => {
             return (
                 moment(created_at).format('YYYY-MM-DD')
@@ -58,7 +59,7 @@ const HotelList = observer(() => {
     }];
 
     const onCategory = (e) => {
-        console.log(e)
+        // console.log(e)
     }
 
     const onSearch = () => {
@@ -136,20 +137,22 @@ const Filter = styled.div`
     display: flex;
     align-items: center;
     padding-right: 35px;
+    margin-bottom: 5px;
 `
 
 const FilterLabel = styled.div`
+    min-width: 77px;
     padding-right: 8px;
     font-weight: bold;
     color: #666;
 `
 
 const SearchWrap = styled(Filter)`
-    margin-top: 15px;
+    margin-top: 10px;
 `
 
 const SearchBar = styled(Input.Search)`
-    width: 45%;
+    width: 80%;
 `
 
 const SelectBar = styled(Select)`

@@ -57,7 +57,6 @@ const RoomsDetail = () => {
     const [showAddBed, setShowAddBed] = useState(0)
 
     useEffect(() => {
-        console.log(router.query.type)
         if (router.query.type) setModiStatus(true)
         else setModiStatus(false)
     }, [router])
@@ -124,16 +123,20 @@ const RoomsDetail = () => {
                     </>
                 }>
                     <Descriptions.Item label="객실명">
+                        {modiStatus ?
                         <InputValue
                         value={name} 
                         onChange={(e) => onDataChange(e, 'name')}
                         bordered={modiStatus} />
+                        : name}
                     </Descriptions.Item>
                     <Descriptions.Item label="기준 인원수">
+                        {modiStatus ?
                         <InputValue
                         value={people} 
                         onChange={e => onDataChange(e, 'people')}
                         bordered={modiStatus} />
+                        : people}
                     </Descriptions.Item>
                     <Descriptions.Item label="체크인 시간">
                         {modiStatus ?
@@ -156,7 +159,9 @@ const RoomsDetail = () => {
                         }
                     </Descriptions.Item>
                     <Descriptions.Item label="침대 사이즈">
-                    <InputValue
+                    {modiStatus ?
+                        <>
+                        <InputValue
                         style={{width: '190px', marginRight: '5px'}}
                         placeholder={"침대 종류를 입력하세요"}
                         value={bed} 
@@ -168,43 +173,8 @@ const RoomsDetail = () => {
                         value={bedNum} 
                         bordered={modiStatus}
                         onChange={e => onDataChange(e, 'bedNum')} />개
-                        {(showAddBed == 1 || showAddBed == 2) &&
-                        <>
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 종류를 입력하세요"}
-                            value={bed2} 
-                            bordered={modiStatus}
-                            onChange={e => onDataChange(e, 'bed2')} />
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 개수를 입력하세요"}
-                            value={bedNum2}
-                            bordered={modiStatus} 
-                            onChange={e => onDataChange(e, 'bedNum2')} />
                         </>
-                        }
-                        {showAddBed == 2 &&
-                        <>
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 종류를 입력하세요"}
-                            value={bed3} 
-                            bordered={modiStatus}
-                            onChange={e => onDataChange(e, 'bed3')} />
-                            <InputValue
-                            style={{width: '190px', marginRight: '5px'}}
-                            placeholder={"침대 개수를 입력하세요"}
-                            value={bedNum3} 
-                            bordered={modiStatus}
-                            onChange={e => onDataChange(e, 'bedNum3')} />
-                        </>
-                        }
-                        {
-                            (showAddBed == 0 || showAddBed == 1) ?
-                            <AddBtn onClick={() => showAddBed == 0 ? setShowAddBed(1) : setShowAddBed(2)}><PlusSquareOutlined /></AddBtn>
-                            : <DeleteBtn onClick={() => setShowAddBed(0)}><MinusSquareOutlined /></DeleteBtn>
-                        }
+                        : <>{bed} {bedNum}개</> }
                     </Descriptions.Item>
                 </Descriptions>
 
@@ -258,11 +228,11 @@ const RoomsDetail = () => {
 const Wrapper = styled.div`
     width: 100%;
     max-width: 1100px;
+    padding-bottom: 80px;
 `
 
 const Detail = styled.div`
     padding: 18px;
-    margin-bottom: 80px;
     background-color: #fff;
 `
 

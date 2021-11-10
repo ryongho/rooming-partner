@@ -117,9 +117,26 @@ const GoodsDetail = () => {
     }
 
     const onUploadChange = async(e) => {
-        setImgList(e.fileList)
+        setLoading(true)
+        let file = e.target.files[0];
+        let reader = new FileReader();
+
+        reader.onloadend = async(e) => {
+            await goods.imagesUpload(file, user.token, (success, data) => {
+                if (success) {
+                    setImgList(imgList.concat(data.images))
+                    setLoading(false)
+                }
+            })
+        }
+        if (file) reader.readAsDataURL(file);
+
     }
-    
+
+    const onRemoveImgs = async(key) => {
+        await setImgList(imgList.filter((e, idx) => idx !== key))
+    }
+
     const onModi = () => {
         if (!router.query.type) router.push('/goods/1?type=modi');
         else {
@@ -236,23 +253,12 @@ const GoodsDetail = () => {
                         }
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 사진">
-                        {modiStatus ?
-                            <>
-                                <UploadImgs 
-                                fileList={imgList}
-                                loading={loading}
-                                onUploadChange={onUploadChange} />
-                                <UploadLength style={imgList.length == 10 ? {color:'red'} : null}>({imgList.length} / 10)</UploadLength>
-                            </>
-                            :
-                            <ImgWrap>
-                                {imgList.map(img => {
-                                    return (
-                                        <img src={img.thumbUrl} style={{ width: '300px' }} />
-                                    )
-                                })}
-                            </ImgWrap>
-                        }
+                        <UploadImgs 
+                        imgList={imgList}
+                        loading={loading}
+                        onUploadChange={onUploadChange}
+                        onRemoveImgs={onRemoveImgs}
+                        modiStatus={modiStatus} />
                     </Descriptions.Item>
                 </Descriptions>
 
