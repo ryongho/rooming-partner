@@ -130,7 +130,7 @@ const GoodsList = observer(() => {
             </TopBox>
 
             <TableTop>
-                <TotalNum>총 {goods.partnerList.data.length}건</TotalNum>
+                <TotalNum>총 {goods.partnerList?.data?.length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={() => router.push('/goods/write')}><PlusSquareOutlined /> 상품 등록</Button>
                     {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
