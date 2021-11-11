@@ -6,7 +6,9 @@ import {
     getHotelList,
     postImagesUpload,
     getHotelListByPartners,
-    putHotelUpdate
+    putHotelUpdate,
+    putHotelImageUpdate,
+    delHotelImageDelete
 } from '../libs/hotel'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -21,7 +23,10 @@ export default class HotelStore {
             imagesUpload: action,
             callListPartner: action,
             partnerList: observable,
-            info: observable
+            info: observable,
+            imagesUpdate: action,
+            updateInfo: action,
+            imagesDel: action
         })
     }
 
@@ -59,6 +64,37 @@ export default class HotelStore {
         } catch (err) {
             // authFail(err)
             callback(false, err)
+            console.log(err)
+        }
+    }
+
+    imagesUpdate = async (hotelid, idx, file, token, callback) => {
+        try {
+            const params = {
+                hotel_id: hotelid,
+                order_no: idx,
+                file_name: file
+            }
+            const result = await putHotelImageUpdate(params, token)
+            if (result.status === 200) {
+                callback(true, result.data)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    imagesDel = async (hotelid, idx, token) => {
+        try {
+            const params = {
+                hotel_id: hotelid,
+                order_no: idx
+            }
+            const result = await delHotelImageDelete(params, token)
+            if (result.status === 200) {
+                console.log(result)
+            }
+        } catch (err) {
             console.log(err)
         }
     }
@@ -103,8 +139,9 @@ export default class HotelStore {
             }
         } catch (err) {
             callback(false, err)
-            console.lor(err)
+            console.log(err)
         }
     }
+
     
 }

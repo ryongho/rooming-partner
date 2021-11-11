@@ -55,7 +55,7 @@ export default class UserStore {
         try {
             const result = await getUserInfo(token)
             if (result.status === 200) {
-                console.log(result.data)
+                // console.log(result.data)
                 this.info = result.data
                 this.name = result.data.data.name
                 this.email = result.data.data.email
@@ -87,7 +87,7 @@ export default class UserStore {
         try {
             const result = await putRegistPartner(data)
             if (result.status === 200) {
-                console.log(result)
+                // console.log(result)
                 callback(true, result.data)
             }
         } catch (error) {

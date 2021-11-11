@@ -24,6 +24,8 @@ const GoodsWrite = observer(() => {
     const [minNight, setMinNight] = useState()
     const [maxNight, setMaxNight] = useState()
     const [option, setOption] = useState(false)
+    const [breakfast, setBreakfast] = useState()
+    const [parking, setParking] = useState()
     const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
@@ -74,8 +76,8 @@ const GoodsWrite = observer(() => {
             max_nights: maxNight,
             options: optionList,
             images: images,
-            parking: "",
-            breakfast: ""
+            parking: parking,
+            breakfast: breakfast
         }
 
         console.log(data)
@@ -184,7 +186,8 @@ const GoodsWrite = observer(() => {
                             imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            onRemoveImgs={onRemoveImgs} />
+                            onRemoveImgs={onRemoveImgs}
+                            modiStatus={true} />
                     </Descriptions.Item>
                     
                     <Descriptions.Item label="최소 박 수">
@@ -204,6 +207,18 @@ const GoodsWrite = observer(() => {
                         if (!numRegExp.test(e.target.value)) return;
                         setMaxNight(e.target.value)}}
                         style={{width:50}} /> 일
+                    </Descriptions.Item>
+                    <Descriptions.Item label="조식 정보">
+                        <Input.TextArea
+                        value={breakfast} 
+                        rows={4}
+                        onChange={(e) => setBreakfast(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="주차 정보">
+                        <Input.TextArea
+                        value={parking} 
+                        rows={4}
+                        onChange={(e) => setParking(e.target.value)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="옵션">
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} />

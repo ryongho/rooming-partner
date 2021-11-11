@@ -2,86 +2,81 @@ import styled from 'styled-components'
 import { Descriptions, Input, Button, message, Space, Select, Modal } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { PlusSquareOutlined , MinusSquareOutlined } from '@ant-design/icons';
+import { useStore } from '../../store/StoreProvider'
+import ModiImgs from '../../components/atom/ModiImgs'
+import { observer } from 'mobx-react-lite'
 
-const RoomsDetail = () => {
-    const data = {
-        key: '1',
-        name: '스탠다드 더블',
-        people: 2,
-        bed: '더블베드',
-        bedNum: 1,
-        bed2: '',
-        bedNum2: '',
-        bed3: '',
-        bedNum3: '',
-        roomDetail: '',
-        goods: '여름날 치맥 파티',
-        active: true,
-        category: '호텔',
-        hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-        facility: ['주차가능', '무료 wifi'],
-        zonecode: '1234',
-        address: '주소',
-        address2: '',
-        tel: '0212341234',
-        thumb: '',
-        imgList: [],
-        breakfast: '제공되는 조식 없음',
-        parking: '300대 주차 가능',
-        cancel: '예약 당일 취소 가능',
-        partner: '파트너1234',
-        checkIn: '11:00',
-        checkOut: '11:00'
-    }
+const RoomsDetail = observer(() => {
 
     const router = useRouter();
+
+    const { hotel, user, room, goods } = useStore();
 
     const options = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
     const [isAdmin, setIsAdmin] = useState(true);
     const [modiStatus, setModiStatus] = useState(false)
 
-    const [name, setName] = useState(data.name)
-    const [people, setPeople] = useState(data.people)
-    const [checkIn, setCheckIn] = useState(data.checkIn)
-    const [checkOut, setCheckOut] = useState(data.checkOut)
-    const [bed, setBed] = useState(data.bed)
-    const [bed2, setBed2] = useState(data.bed2)
-    const [bed3, setBed3] = useState(data.bed3)
-    const [bedNum, setBedNum] = useState(data.bedNum)
-    const [bedNum2, setBedNum2] = useState(data.bedNum2)
-    const [bedNum3, setBedNum3] = useState(data.bedNum3)
-    const [desc, setDesc] = useState(data.desc)
-    const [goods, setGoods] = useState(data.goods)
+    const [name, setName] = useState()
+    const [people, setPeople] = useState()
+    const [checkIn, setCheckIn] = useState()
+    const [checkOut, setCheckOut] = useState()
+    const [bed, setBed] = useState()
+    const [bedNum, setBedNum] = useState()
+    const [imgList, setImgList] = useState()
+    const [fileList, setFileList] = useState()
     const [showDelete, setShowDelete] = useState(false)
-    const [showAddBed, setShowAddBed] = useState(0)
+
 
     useEffect(() => {
-        if (router.query.type) setModiStatus(true)
-        else setModiStatus(false)
+
+        const callDetail = async() => {
+
+            if (router.query.type) setModiStatus(true)
+            else setModiStatus(false)
+
+            await room.callInfo({id: router.query.pid}, user.token)
+            await goods.callListPartner({id: user.hotelid}, user.token)
+            await hotel.callListPartner(user.token)
+            await user.callInfo(user.token)
+
+            if (room.info.data[0]) {
+                setName(room.info.data[0].name)
+                setPeople(room.info.data[0].peoples)
+                setCheckIn(room.info.data[0].checkin.substring(0, 5))
+                setCheckOut(room.info.data[0].checkout.substring(0, 5))
+                setBed(room.info.data[0].bed)
+                setBedNum(room.info.data[0].amount)
+                setImgList(room.info.images)
+
+                let list = Array.from(Array(10).keys());
+                for (let i = 0; i <= list.length; i++) {
+                    if (room.info.images[i] && (room.info.images[i].order_no == list[i] + 1)) {
+                        let removed = list.splice(i, 1, room.info.images[i]);
+                    }
+                }
+                console.log(list)
+                setFileList(list)
+            }
+        }
+        callDetail();
+        
     }, [router])
 
     const onDataChange = (e, val) => {
         const numRegExp = /^[0-9]*$/;
         if (!router.query.type) return;
 
-        if (val == 'people' || val == 'bedNum' || val == 'bedNum2' || val == 'bedNum3') {
+        if (val == 'people' || val == 'bedNum') {
             if (!numRegExp.test(e.target.value)) return;
         }
         if (val == 'name') setName(e.target.value);
         if (val == 'people') setPeople(e.target.value);
         if (val == 'bed') setBed(e);
-        if (val == 'bed2') setBed2(e);
-        if (val == 'bed3') setBed3(e);
         if (val == 'bedNum') setBedNum(e);
-        if (val == 'bedNum2') setBedNum2(e);
-        if (val == 'bedNum3') setBedNum3(e);
-        if (val == 'goods') setGoods(e.target.value);
-        if (val == 'desc') setDesc(e.target.value);
     }
     
-    const onModi = () => {
-        if (!router.query.type) router.push('/rooms/1?type=modi');
+    const onModi = async () => {
+        if (!router.query.type) router.push(`/rooms/${router.query.pid}?type=modi`);
         else {
             if (!name) {
                 message.warning('객실명을 입력해 주세요')
@@ -92,9 +87,6 @@ const RoomsDetail = () => {
             if (!bed || !bedNum) {
                 message.warning('침대 사이즈를 입력해 주세요')
             }
-            if (!desc) {
-                message.warning('객실 기본정보를 입력해 주세요')
-            }
             if (!checkIn) {
                 message.warning('체크인 시간을 입력해 주세요')
             }
@@ -103,6 +95,19 @@ const RoomsDetail = () => {
             }
 
             // success
+
+            const data = {
+                id: router.query.pid,
+            }
+            
+            console.log(data)
+
+            await room.updateInfo(data, user.token, (success, result) => {
+                if (success) {
+                    message.success('수정 완료')
+                    window.location.href='/rooms/list'
+                }
+            })
         }
     }
 
@@ -112,10 +117,49 @@ const RoomsDetail = () => {
         router.push('/rooms/list');
     }
 
+
+    const onUploadChange = async (e, item) => {
+        // setLoading(true)
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        
+        reader.onloadend = async (e) => {
+
+            await room.imagesUpload(file, user.token, (success, data) => {
+                if (success) {
+                    console.log(data.images)
+                    setImgList(imgList.concat(data.images))
+                    // setLoading(false)
+
+                    room.imagesUpdate(router.query.pid, item, data.images, user.token, (success, data) => {
+                        if (success) {
+                            room.callInfo({id: router.query.pid}, user.token)
+                            console.log('!!!!!!!!!!!!!imgs:', room.info.images)
+                            // setImgList(imgList.concat(data.images))
+                            // setLoading(false)
+                            // console.log(imgList)
+                        }
+                    })
+                }
+            })
+        }
+        if (file) reader.readAsDataURL(file);
+
+    }
+
+    const onRemoveImgs = async(key) => {
+        setImgList(imgList.filter((e, idx) => idx !== key))
+        await room.imagesDel(router.query.pid, key, user.token)
+    }
+
     return (
         <Wrapper>
             <Detail>
-                <Descriptions title={<Title>상품 상세 정보</Title>} bordered column={1} 
+                <Descriptions 
+                title={<Title>상품 상세 정보</Title>} 
+                bordered 
+                column={1} 
+                labelStyle={{width: '280px', minWidth: '200px'}}
                 extra={
                     <>
                         <Button type="danger" onClick={() => setShowDelete(true)} style={{marginRight: '8px'}}>삭제</Button>
@@ -140,7 +184,7 @@ const RoomsDetail = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="체크인 시간">
                         {modiStatus ?
-                            <SelectBar onChange={(e) => onDataChange(e, 'checkIn')}>
+                            <SelectBar defaultValue={checkIn} onChange={(e) => onDataChange(e, 'checkIn')}>
                                 {options.map(time => {
                                 return <Select.Option value={time}>{time}</Select.Option>})}
                             </SelectBar>
@@ -150,7 +194,7 @@ const RoomsDetail = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="체크아웃 시간">
                         {modiStatus ?
-                            <SelectBar onChange={(e) => onDataChange(e, 'checkOut')}>
+                            <SelectBar defaultValue={checkOut} onChange={(e) => onDataChange(e, 'checkOut')}>
                                 {options.map(time => {
                                 return <Select.Option value={time}>{time}</Select.Option>})}
                             </SelectBar>
@@ -162,13 +206,13 @@ const RoomsDetail = () => {
                     {modiStatus ?
                         <>
                         <InputValue
-                        style={{width: '190px', marginRight: '5px'}}
+                        style={{width: '150px', marginRight: '8px'}}
                         placeholder={"침대 종류를 입력하세요"}
                         value={bed} 
                         onChange={e => onDataChange(e, 'bed')}
                         bordered={modiStatus} />
                         <InputValue
-                        style={{width: '190px'}}
+                        style={{width: '40px'}}
                         placeholder={"침대 개수를 입력하세요"}
                         value={bedNum} 
                         bordered={modiStatus}
@@ -176,36 +220,55 @@ const RoomsDetail = () => {
                         </>
                         : <>{bed} {bedNum}개</> }
                     </Descriptions.Item>
+                    <Descriptions.Item label="객실 이미지">
+                        <ModiImgs 
+                        imgList={imgList}
+                        fileList={fileList}
+                        // loading={loading}
+                        onUploadChange={onUploadChange}
+                        onRemoveImgs={onRemoveImgs}
+                        modiStatus={modiStatus} />
+                    </Descriptions.Item>
                 </Descriptions>
 
                 <Empty />
 
-                <Descriptions title={<Title>객실 외 관련 정보</Title>} bordered column={1} extra={
+                <Descriptions 
+                title={<Title>객실 외 관련 정보</Title>} 
+                bordered 
+                column={1} 
+                labelStyle={{width: '280px', minWidth: '200px'}}
+                extra={
                     <>
-                        <Button type="primary" size="small" onClick={() => router.push('/hotel/1?type="modi"')} style={{fontSize: '12px'}}>숙소 정보 수정</Button>
+                        <Button type="primary" size="small" onClick={() => router.push(`/hotel/${user.hotelid}?type="modi"`)} style={{fontSize: '12px'}}>숙소 정보 수정</Button>
                         <span style={{paddingRight: '5px'}}></span>
-                        {data.goods && <Button type="primary" size="small" onClick={() => router.push('/goods/1?type="modi"')} style={{fontSize: '12px'}}>상품 정보 수정</Button>}
+                        {goods.partnerList?.data && <Button type="primary" size="small" onClick={() => router.push('/goods/list')} style={{fontSize: '12px'}}>상품 정보 수정</Button>}
                     </>
                 }>
                     <Descriptions.Item label="숙소명">
-                        <HotelBtn onClick={() => router.push('/hotel/1')}>{data.hotel}</HotelBtn>
+                        <HotelBtn onClick={() => router.push(`/hotel/${user.hotelid}`)}>{hotel.partnerList?.data && hotel.partnerList.data[0]?.name}</HotelBtn>
                     </Descriptions.Item>
                     
                     <Descriptions.Item label="등록된 상품">
-                        {data.goods ?
-                        <HotelBtn onClick={() => router.push('/goods/1')}>{data.goods}</HotelBtn>
-                        : <Space>등록된 상품이 없습니다.</Space>
+                        {goods.partnerList?.data != '' ?
+                            goods.partnerList?.data?.map(item => {
+                                return (
+                                    <RoomWrap>
+                                        <HotelBtn onClick={() => router.push(`/goods/${item.goods_id}`)}>{item.goods_name}</HotelBtn>
+                                    </RoomWrap>
+                                )
+                            }) : <Space>등록된 상품이 없습니다.</Space>
                         }
                     </Descriptions.Item>
 
                     <Descriptions.Item label="파트너">
-                        <HotelBtn onClick={() => router.push('/user/partner/1')}>{data.partner}</HotelBtn>
+                        <HotelBtn onClick={() => router.push(`/user/partner/detail`)}>{user.info?.data.nickname}</HotelBtn>
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>
                     <Button type="primary" onClick={onModi}>{modiStatus ? '수정완료' : '수정'}</Button>
                     {modiStatus ?
-                    <Button onClick={() => router.replace('/rooms/1', undefined, {shallow: true}).then(() => window.scrollTo(0,0))}>취소</Button>
+                    <Button onClick={() => router.replace(`/rooms/${router.query.pid}`, undefined, {shallow: true}).then(() => window.scrollTo(0,0))}>취소</Button>
                     : <Button onClick={() => router.push('/rooms/list')}>목록</Button>
                     }
                 </ButtonWrap>
@@ -222,7 +285,7 @@ const RoomsDetail = () => {
             </Modal>
         </Wrapper>
     )
-}
+})
 
 
 const Wrapper = styled.div`
@@ -260,6 +323,10 @@ const HotelBtn = styled.div`
         color: blue;
         border-color: blue;
     }
+`
+
+const RoomWrap = styled.div`
+    display: flex;
 `
 
 const ButtonWrap = styled.div`

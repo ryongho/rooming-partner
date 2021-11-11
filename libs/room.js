@@ -57,3 +57,39 @@ export function getRoomListByPartners(token) {
         }
     })
 }
+
+export function getRoomDetail(params, token) {
+    return axios({
+        method: 'get',
+        url: '/room/detail',
+        params: params,
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function putRoomImageUpdate(params, token) {
+    return axios ({
+        method: 'put',
+        url: '/room/image_update',
+        params: params,
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function delRoomImageDelete(params, token) {
+    return axios ({
+        method: 'del',
+        url: '/room/image_delete',
+        params: params,
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

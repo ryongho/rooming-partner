@@ -37,11 +37,11 @@ const RoomsList = observer(() => {
     // }, 
     {
         title: '객실명',
-        dataIndex: 'name',
+        dataIndex: ['name', 'id'],
         key: 'name',
-        render: (name) => {
+        render: (text, record) => {
             return (
-                <Link href={`/rooms/1`}>{name}</Link>
+                <Link href={`/rooms/${record.id}`}>{record.name}</Link>
             )
         },
         sortDirections: ['descend', 'ascend'],

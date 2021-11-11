@@ -79,3 +79,27 @@ export function putHotelUpdate(params, token) {
         }
     })
 }
+
+export function putHotelImageUpdate(params, token) {
+    return axios ({
+        method: 'put',
+        url: '/hotel/image_update',
+        params: params,
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function delHotelImageDelete(params, token) {
+    return axios ({
+        method: 'del',
+        url: '/hotel/image_delete',
+        params: params,
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

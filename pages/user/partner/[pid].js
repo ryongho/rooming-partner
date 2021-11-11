@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { useStore } from '../../../store/StoreProvider'
 
 const PartnerDetail = () => {
     const data = {
@@ -24,7 +25,6 @@ const PartnerDetail = () => {
     }
 
     const router = useRouter();
-
     const [modiStatus, setModiStatus] = useState(false)
 
     const [partner, setPartner] = useState(data.partner)
@@ -43,7 +43,6 @@ const PartnerDetail = () => {
     const [showAddress, setShowAddress] = useState(false)
 
     useEffect(() => {
-        console.log(router.query.type)
         if (router.query.type) setModiStatus(true)
         else setModiStatus(false)
     }, [router])

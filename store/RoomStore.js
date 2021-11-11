@@ -4,7 +4,10 @@ import {
     postRoomRegist,
     postImagesUpload,
     getRoomListByHotel,
-    getRoomListByPartners
+    getRoomListByPartners,
+    getRoomDetail,
+    putRoomImageUpdate,
+    delRoomImageDelete
 } from '../libs/room'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -17,7 +20,11 @@ export default class RoomStore {
             callRoomList: action,
             rooms: observable,
             callListPartner: action,
-            partnerList: observable
+            partnerList: observable,
+            imagesUpdate: action,
+            imagesDel: action,
+            info: observable,
+            callInfo: action
         })
     }
 
@@ -46,6 +53,37 @@ export default class RoomStore {
         }
     }
 
+    imagesUpdate = async (id, idx, file, token, callback) => {
+        try {
+            const params = {
+                room_id: id,
+                order_no: idx,
+                file_name: file
+            }
+            const result = await putRoomImageUpdate(params, token)
+            if (result.status === 200) {
+                callback(true, result.data)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    imagesDel = async (roomid, key, token) => {
+        try {
+            const params = {
+                room_id: roomid,
+                order_no: key
+            }
+            const result = await delRoomImageDelete(params, token)
+            if (result.status === 200) {
+                console.log(result)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     rooms = null
     callRoomList = async(params, token) => {
         try {
@@ -66,6 +104,18 @@ export default class RoomStore {
             const result = await getRoomListByPartners(token)
             if (result.status === 200) {
                 this.partnerList = result.data
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    info = null
+    callInfo = async (params, token) => {
+        try {
+            const result = await getRoomDetail(params, token)
+            if (result.status === 200) {
+                this.info = result.data
             }
         } catch (err) {
             console.log(err)

@@ -14,11 +14,11 @@ const GoodsList = observer(() => {
 
     const columns = [{
         title: '상품명',
-        dataIndex: 'goods_name',
+        dataIndex: ['goods_name', 'goods_id'],
         key: 'goods_name',
-        render: (goods_name) => {
+        render: (text, record) => {
             return (
-                <Link href={`/goods/1`}>{goods_name}</Link>
+                <Link href={`/goods/${record.goods_id}`}>{record.goods_name}</Link>
             )
         },
         sortDirections: ['descend', 'ascend'],

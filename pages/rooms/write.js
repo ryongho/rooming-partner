@@ -164,7 +164,8 @@ const GoodsWrite = observer(() => {
                             imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            onRemoveImgs={onRemoveImgs} />
+                            onRemoveImgs={onRemoveImgs}
+                            modiStatus={true} />
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>

@@ -59,9 +59,7 @@ const HotelWrite = observer(() => {
         const images = imgList.join();
         const option = facility.join();
 
-        let total_address;
-        if (address2) total_address = address +' '+ address2 +' '+ zonecode;
-        if (address2 == '') total_address = address +' '+ zonecode;
+        let total_address = zonecode + ' ' + address
 
         const data = {
             name: name,
@@ -70,6 +68,7 @@ const HotelWrite = observer(() => {
             open_date: moment(openDate).format('YYYY-MM-DD'),
             reg_no: reg,
             address: total_address,
+            address_detail: address2,
             tel: tel,
             fax: fax,
             level: level,
@@ -212,7 +211,8 @@ const HotelWrite = observer(() => {
                             imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            onRemoveImgs={onRemoveImgs} />
+                            onRemoveImgs={onRemoveImgs}
+                            modiStatus={true} />
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                         <Checkbox.Group options={options} value={facility} onChange={e => setFacility(e)} />
@@ -247,8 +247,8 @@ const HotelWrite = observer(() => {
                         value={breakfast} 
                         rows={4}
                         onChange={(e) => setBreakfast(e.target.value)} />
-                    </Descriptions.Item> */}
-                    {/* <Descriptions.Item label="주차 정보">
+                    </Descriptions.Item>
+                    <Descriptions.Item label="주차 정보">
                         <Input.TextArea
                         value={parking} 
                         rows={4}

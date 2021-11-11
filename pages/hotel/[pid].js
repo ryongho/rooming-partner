@@ -3,7 +3,7 @@ import { Descriptions, Input, Button, message, DatePicker, Modal, Select, Checkb
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
-import UploadImgs from '../../components/atom/UploadImgs'
+import ModiImgs from '../../components/atom/ModiImgs'
 import { useStore } from '../../store/StoreProvider'
 import moment from 'moment'
 
@@ -22,6 +22,7 @@ const HotelDetail = () => {
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
     const [imgList, setImgList] = useState([])
+    const [fileList, setFileList] = useState(Array.from(Array(10).keys()))
     const [loading, setLoading] = useState(false)
     // const [breakfast, setBreakfast] = useState()
     // const [parking, setParking] = useState()
@@ -49,15 +50,18 @@ const HotelDetail = () => {
             await goods.callListPartner({id: user.hotelid}, user.token)
             await user.callInfo(user.token);
 
-            console.log(hotel.info, goods.partnerList.data, user.info)
+            // console.log(hotel.info, goods.partnerList.data)
             if (hotel.info.data[0]) {
                 setCategory(hotel.info.data[0].type)
                 setName(hotel.info.data[0].name)
                 setFacility(hotel.info.data[0].options.split(","))
                 setAddress(hotel.info.data[0].address.slice(0, hotel.info.data[0].address.length - 5))
+                setAddress2(hotel.info.data[0].address_detail)
                 setZonecode(hotel.info.data[0].address.slice(hotel.info.data[0].address.length - 5))
                 setTel(hotel.info.data[0].tel)
                 setImgList(hotel.info.images)
+
+                setFileList(hotel.info.images)
                 setCancel(hotel.info.data[0].refund_rule)
                 setContent(hotel.info.data[0].content)
                 setOwner(hotel.info.data[0].owner)
@@ -98,16 +102,19 @@ const HotelDetail = () => {
         if (val == 'latitude') setLatitude(e.target.value);
     }
 
-    const onUploadChange = async (e) => {
+    const onUploadChange = async (e, item) => {
         setLoading(true)
         let file = e.target.files[0];
         let reader = new FileReader();
 
         reader.onloadend = async(e) => {
-            await hotel.imagesUpload(file, user.token, (success, data) => {
+            await hotel.imagesUpdate(user.hotelid, item, file, user.token, async (success, data) => {
                 if (success) {
-                    setImgList(imgList.concat(data.images))
+                    await hotel.callInfo({id: user.hotelid}, user.token)
+                    console.log('!!!!!!!!!!!!!imgs:', hotel.info.images)
+                    // setImgList(imgList.concat(data.images))
                     setLoading(false)
+                    // console.log(imgList)
                 }
             })
         }
@@ -116,7 +123,9 @@ const HotelDetail = () => {
     }
 
     const onRemoveImgs = async(key) => {
-        await setImgList(imgList.filter((e, idx) => idx !== key))
+        setImgList(imgList.filter((e, idx) => idx !== key))
+        
+        await hotel.imagesDel(user.hotelid, key, user.token)
     }
     
     const onModi = async () => {
@@ -140,11 +149,10 @@ const HotelDetail = () => {
 
             // success
             // const images = imgList.join();
+
             const option = facility.join();
 
-            let total_address;
-            if (address2) total_address = address +' '+ address2 +' '+ zonecode;
-            if (address2 == '') total_address = address +' '+ zonecode;
+            let total_address = zonecode + ' ' + address
 
             const data = {
                 id: user.hotelid,
@@ -152,9 +160,12 @@ const HotelDetail = () => {
                 content: content,
                 open_date: moment(openDate).format('YYYY-MM-DD'),
                 address: total_address,
+                address_detail: address2,
                 tel: tel,
                 fax: fax,
                 level: level,
+                owner: owner,
+                reg_no: reg,
                 traffic: traffic,
                 latitude: latitude,
                 longtitude: longtitude,
@@ -177,8 +188,13 @@ const HotelDetail = () => {
     return (
         <Wrapper>
             <Detail>
-                <Descriptions title={<Title>숙소 상세 정보</Title>} bordered column={1} extra={<Button onClick={() => router.push('/hotel/list')}>목록으로 돌아가기</Button>}>
-                    <Descriptions.Item label="숙소 카테고리">
+                <Descriptions 
+                title={<Title>숙소 상세 정보</Title>} 
+                bordered 
+                column={1} 
+                extra={<Button onClick={() => router.push('/hotel/list')}>목록으로 돌아가기</Button>}
+                labelStyle={{width: '220px', minWidth: '180px'}}>
+                    <Descriptions.Item label="숙소 카테고리" >
                         {hotel?.info?.data[0].type &&
                             modiStatus ?
                             <SelectBar defaultValue={hotel?.info?.data[0].type} onChange={(e) => onDataChange(e, 'category')}>
@@ -281,30 +297,17 @@ const HotelDetail = () => {
                         : level}
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 이미지">
-                        {/* {modiStatus ? */}
-                        <UploadImgs 
+                        <ModiImgs 
                         imgList={imgList}
                         loading={loading}
                         onUploadChange={onUploadChange}
                         onRemoveImgs={onRemoveImgs}
                         modiStatus={modiStatus} />
-                        {/* :
-                        <ImgWrap>
-                            {imgList.map(item => {
-                                return (
-                                    <ImgBox>
-                                        <img src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name}`} alt="image preview" />
-                                    </ImgBox>
-                                )
-                            })}
-                            <UploadLength>({imgList.length} / 10)</UploadLength>
-                        </ImgWrap>
-                        } */}
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                         <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} />
                     </Descriptions.Item>
-                    {/* <Descriptions.Item label="대표자">
+                    <Descriptions.Item label="대표자">
                         {modiStatus ?
                         <InputValue
                         value={owner} 
@@ -319,7 +322,7 @@ const HotelDetail = () => {
                         onChange={e => onDataChange(e, 'reg')}
                         bordered={modiStatus} />
                         : reg }
-                    </Descriptions.Item> */}
+                    </Descriptions.Item>
                     <Descriptions.Item label="개업일">
                         {modiStatus ?
                         <DatePicker defaultValue={moment(openDate, 'YYYY-MM-DD')} onChange={(e) => onDataChange(e, 'opendate')} />
@@ -357,7 +360,7 @@ const HotelDetail = () => {
                                 )
                             }) : <>등록된 상품이 없습니다.</>
                         }
-                        <GoodsInfo>※ 비활성화된 상품은 앱에서 비공개 처리 됩니다.</GoodsInfo>
+                        {/* <GoodsInfo>※ 비활성화된 상품은 앱에서 비공개 처리 됩니다.</GoodsInfo> */}
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>

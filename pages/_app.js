@@ -94,27 +94,30 @@ const MyApp = ({ Component, pageProps }) => {
     }, [])
 
     useEffect(() => {
-        if (router.pathname == '/user/partner/[pid]') setTitle('파트너 상세')
-        if (router.pathname == '/user/partner/detail') {
-            setGroup('회원 관리')
+        if (router.pathname.indexOf('/user/') !== -1) {
             setTitle('파트너 상세')
+            setGroup('회원 관리')
         }
         if (router.pathname == '/user/partner/list') setTitle('파트너 목록')
         if (router.pathname == '/user/customer/list') setTitle('고객 목록')
         if (router.pathname == '/user/customer/[pid]') setTitle('고객 상세')
         
+        if (router.pathname.indexOf('/hotel/') !== -1) setGroup('숙소 관리')
         if (router.pathname == '/hotel/write') setTitle('숙소 등록')
         if (router.pathname == '/hotel/list') setTitle('숙소 목록')
         if (router.pathname == '/hotel/[pid]') setTitle('숙소 상세')
 
-        if (router.pathname == '/goods/write') setTitle('상품 등록')
-        if (router.pathname == '/goods/list') setTitle('상품 목록')
-        if (router.pathname == '/goods/[pid]') setTitle('상품 상세')
-
+        if (router.pathname.indexOf('/rooms/') !== -1) setGroup('객실 관리')
         if (router.pathname == '/rooms/write') setTitle('객실 등록')
         if (router.pathname == '/rooms/list') setTitle('객실 목록')
         if (router.pathname == '/rooms/[pid]') setTitle('객실 상세')
 
+        if (router.pathname.indexOf('/goods/') !== -1) setGroup('상품 관리')
+        if (router.pathname == '/goods/write') setTitle('상품 등록')
+        if (router.pathname == '/goods/list') setTitle('상품 목록')
+        if (router.pathname == '/goods/[pid]') setTitle('상품 상세')
+
+        if (router.pathname.indexOf('/reserved/') !== -1) setGroup('예약 관리')
         if (router.pathname == '/reserved/list') setTitle('예약 목록')
         if (router.pathname == '/reserved/[pid]') setTitle('예약 상세')
 
