@@ -7,7 +7,8 @@ import {
     getGoodsDetail,
     putGoodsUpdate,
     delGoodsImageDelete,
-    putGoodsImageUpdate
+    putGoodsImageUpdate,
+    getGoodsListByHotel
 } from '../libs/goods'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -24,7 +25,9 @@ export default class GoodsStore {
             info: observable,
             updateInfo: action,
             imagesUpdate: action,
-            imagesDel: action
+            imagesDel: action,
+            callListByHotel: action,
+            list: observable
         })
     }
 
@@ -65,6 +68,7 @@ export default class GoodsStore {
             }
         } catch (err) {
             console.log(err)
+            callback(false, err)
         }
     }
 
@@ -82,11 +86,23 @@ export default class GoodsStore {
             console.log(err)
         }
     }
+
+    list = []
+    callListByHotel = async (params, token) => {
+        try {
+            const result = await getGoodsListByHotel(params, token)
+            if (result.status === 200) {
+                this.list = result.data
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
     
     partnerList = []
-    callListPartner = async (params, token) => {
+    callListPartner = async (token) => {
         try {
-            const result = await getGoodsListByPartners(params, token)
+            const result = await getGoodsListByPartners(token)
             if (result.status === 200) {
                 this.partnerList = result.data
             }

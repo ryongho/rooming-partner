@@ -33,6 +33,7 @@ const HotelWrite = observer(() => {
     const [traffic, setTraffic] = useState('')
     const [level, setLevel] = useState('')
     const [fax, setFax] = useState('')
+    const [parking, setParking] = useState()
     const [longtitude, setLongtitude] = useState()
     const [latitude, setLatitude] = useState()
 
@@ -50,7 +51,7 @@ const HotelWrite = observer(() => {
             return message.warning('숙소 연락처를 입력해 주세요')
         }
         if (imgList.length < 1) {
-            return message.warning('상품 사진을 입력해 주세요')
+            return message.warning('숙소 이미지를 입력해 주세요')
         }
         if (!cancel) {
             return message.warning('취소 및 환불 규정을 입력해 주세요')
@@ -78,7 +79,8 @@ const HotelWrite = observer(() => {
             longtitude: longtitude,
             type: category,
             options: option,
-            refund_rule: cancel
+            refund_rule: cancel,
+            parking: parking,
         }
 
         // console.log(data)
@@ -247,13 +249,21 @@ const HotelWrite = observer(() => {
                         value={breakfast} 
                         rows={4}
                         onChange={(e) => setBreakfast(e.target.value)} />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="주차 정보">
-                        <Input.TextArea
-                        value={parking} 
-                        rows={4}
-                        onChange={(e) => setParking(e.target.value)} />
                     </Descriptions.Item> */}
+                    <Descriptions.Item label="주차 정보">
+                        <Radio.Group 
+                        value={parking}
+                        onChange={e => setParking(e.target.value)}
+                        buttonStyle="solid"
+                        optionType="button"
+                        options={[{
+                            label: '주차 가능',
+                            value: 'Y'
+                        }, {
+                            label: '주차 불가',
+                            value: 'N'
+                        }]} />
+                    </Descriptions.Item>
                     <Descriptions.Item label="취소 및 환불 규정">
                         <Input.TextArea
                         value={cancel} 

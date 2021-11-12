@@ -15,36 +15,7 @@ const UploadImgs = ({ modiStatus, imgList, loading, onUploadChange, maxLength = 
     
     return (
         <Wrapper>
-            {/* <Upload 
-            fileList={fileList}
-            beforeUpload={beforeUpload}
-            onChange={onUploadChange}>
-                <UpBtnWrap>
-                    {fileList.length >= maxLength ? null :
-                    <UploadBtn>
-                        {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                        이미지 업로드
-                    </UploadBtn>
-                    }
-                    
-                    <UploadLength style={fileList.length == 10 ? {color:'red'} : null}>({fileList.length} / 10)</UploadLength>
-                </UpBtnWrap>
-            </Upload> 
-
-            <FileListWrap>
-            {fileList?.map((item, key) => {
-                return (
-                    <ImgWrap>
-                        <FilListImg src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name ? item.file_name : item}`} />
-                        <DelBtnWrap className={'fileDel'} onClick={onRemoveImgs(item, key)}>
-                            <DeleteOutlined />
-                        </DelBtnWrap>
-                    </ImgWrap>
-                )})
-            }
-            </FileListWrap> */}
-            {modiStatus &&
-            <>
+            
             <UploadInput type="file" accept="image/*" name="file" ref={fileInputBtn} onChange={onUploadChange} />
             <UpBtnWrap>
                 {imgList.length >= maxLength ? null :
@@ -56,12 +27,11 @@ const UploadImgs = ({ modiStatus, imgList, loading, onUploadChange, maxLength = 
                 
                 <UploadLength style={imgList.length == 10 ? {color:'red'} : null}>({imgList.length} / 10)</UploadLength>
             </UpBtnWrap>
-            </>
-            }
+            
             <FileListWrap>
-            {imgList?.map((item, key) => {
+            {imgList?.map((item, idx) => {
                 return (
-                    <ImgWrap key={key}>
+                    <ImgWrap key={`imgList_${idx}`}>
                         <FilListImg src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name ? item.file_name : item}`} />
                         {/* <DelBtnWrap className={'fileDel'} onClick={() => onRemoveImgs(key)}>
                             <DeleteOutlinedIco />

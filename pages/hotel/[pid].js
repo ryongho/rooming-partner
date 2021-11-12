@@ -24,7 +24,7 @@ const HotelDetail = () => {
     const [imgList, setImgList] = useState()
     const [fileList, setFileList] = useState()
     // const [breakfast, setBreakfast] = useState()
-    // const [parking, setParking] = useState()
+    const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
 
     const [content, setContent] = useState('')
@@ -46,7 +46,7 @@ const HotelDetail = () => {
             else setModiStatus(false)
 
             await hotel.callInfo({id: user.hotelid}, user.token)
-            await goods.callListPartner({id: user.hotelid}, user.token)
+            await goods.callListPartner(user.token)
             await user.callInfo(user.token);
 
             // console.log(hotel.info, goods.partnerList.data)
@@ -79,6 +79,7 @@ const HotelDetail = () => {
                 setFax(hotel.info.data[0].fax)
                 setLongtitude(hotel.info.data[0].longtitude)
                 setLatitude(hotel.info.data[0].latitude)
+                setParking(goods.info.data[0].parking)
             }
         }
         callDetail();
@@ -316,6 +317,22 @@ const HotelDetail = () => {
                     <Descriptions.Item label="편의시설">
                         <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} />
                     </Descriptions.Item>
+                    <Descriptions.Item>
+                    {modiStatus ?
+                        <Radio.Group 
+                        value={parking}
+                        onChange={e => setParking(e.target.value)}
+                        buttonStyle="solid"
+                        optionType="button"
+                        options={[{
+                            label: '주차 가능',
+                            value: 'Y'
+                        }, {
+                            label: '주차 불가',
+                            value: 'N'
+                        }]} />
+                        : parking == 'Y' ? '주차 가능' : parking == 'N' ? '주차 불가' : null}
+                    </Descriptions.Item>
                     <Descriptions.Item label="대표자">
                         {modiStatus ?
                         <InputValue
@@ -363,7 +380,7 @@ const HotelDetail = () => {
                         {goods.partnerList?.data != '' ?
                             goods.partnerList?.data?.map(item => {
                                 return (
-                                    <GoodsWrap>
+                                    <GoodsWrap key={`goods_${item.goods_id}`}>
                                         <GoodsBtn onClick={() => router.push(`/goods/${item.goods_id}`)}>{item.goods_name}</GoodsBtn>
                                     </GoodsWrap>
                                 )

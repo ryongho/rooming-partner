@@ -33,12 +33,11 @@ export function postImagesUpload(file, token) {
 }
 
 
-export function getGoodsListByPartners(params, token) {
+export function getGoodsListByPartners(token) {
     return axios({
         method: 'get',
         url: '/goods/list_by_partner',
         baseURL: baseUrl[env].baseUrl,
-        params: params,
         headers: {
             'Authorization': 'Bearer '+token
         }
@@ -85,6 +84,18 @@ export function delGoodsImageDelete(params, token) {
     return axios({
         method: 'delete',
         url: '/goods/image_delete',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function getGoodsListByHotel(params, token) {
+    return axios({
+        method: 'get',
+        url: '/goods/list_by_hotel',
         baseURL: baseUrl[env].baseUrl,
         params: params,
         headers: {

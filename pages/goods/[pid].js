@@ -47,12 +47,12 @@ const GoodsDetail = observer(() => {
                 setEnd(goods.info.data[0].end_date)
                 setPrice(goods.info.data[0].price)
                 setSalePrice(goods.info.data[0].sale_price)
-                setRate(goods.info.data[0].grade)
+                setRate((goods.info.data[0].price - goods.info.data[0].sale_price) / goods.info.data[0].price * 100)
                 setMinNight(goods.info.data[0].min_nights)
                 setMaxNight(goods.info.data[0].max_nights)
                 setOption(goods.info.data[0].options.split(","))
                 setBreakfast(goods.info.data[0].breakfast)
-                setParking(goods.info.data[0].parking)
+                // setParking(goods.info.data[0].parking)
                 setImgList(goods.info.images)
                 let list = Array.from(Array(10).keys());
                 for (let i = 0; i <= list.length; i++) {
@@ -68,27 +68,31 @@ const GoodsDetail = observer(() => {
         callDetail();
     }, [router])
 
+    useEffect(() => {
+        setRate((price - salePrice) / salePrice * 100);
+    }, [salePrice, price])
+
     const onDataChange = (e, val) => {
         const numRegExp = /^[0-9]*$/;
-        const rateRegExp = /^[0-9.]*$/;
         if (!router.query.type) return;
 
         if (val == 'bedNum' || val == 'price' || val == 'salePrice' || val == 'minNight' || val == 'maxNight') {
             if (!numRegExp.test(e.target.value)) return;
         }
+        if (val == 'name') setName(e.target.value);
         if (val == 'active') setActive(e);
         if (val == 'price') setPrice(e.target.value);
         if (val == 'salePrice') setSalePrice(e.target.value);
-        if (val == 'rate') {
-            if (!rateRegExp.test(e.target.value)) return;
-            setRate(e.target.value);
-        }
+        // if (val == 'rate') {
+        //     if (!rateRegExp.test(e.target.value)) return;
+        //     setRate(e.target.value);
+        // }
         if (val == 'minNight') setMinNight(e.target.value);
         if (val == 'maxNight') setMaxNight(e.target.value);
         if (val == 'parking') setParking(e);
     }
 
-    const onUploadChange = async(e) => {
+    const onUploadChange = async(e, item) => {
         let file = e.target.files[0];
         let reader = new FileReader();
         
@@ -127,44 +131,44 @@ const GoodsDetail = observer(() => {
                 return message.warning('상품명을 입력해 주세요')
             }
             if (!roomId) {
-                message.warning('객실을 선택해 주세요')
+                return message.warning('객실을 선택해 주세요')
             }
             if (!start) {
-                message.warning('상품 판매 개시일을 입력해 주세요')
+                return message.warning('상품 판매 개시일을 입력해 주세요')
             }
             if (!end) {
-                message.warning('상품 판매 종료일을 입력해 주세요')
+                return message.warning('상품 판매 종료일을 입력해 주세요')
             }
             if (!price) {
-                message.warning('상품 원가를 입력해 주세요')
+                return message.warning('상품 원가를 입력해 주세요')
             }
 
             // success
             const optionList = option.join();
 
             const data = {
-                id: router.query.pid,
+                hotel_id: user.hotelid,
+                room_id: roomId,
+                goods_id: router.query.pid,
                 goods_name: name,
                 start_date: start,
                 end_date: end,
                 price: price,
                 sale_price: salePrice,
-                amount: rate,
                 min_nights: minNight,
                 max_nights: maxNight,
                 options: optionList,
                 breakfast: breakfast,
                 parking: parking,
-                hotel_id: user.hotelid
             }
             
             console.log(data)
 
             await goods.updateInfo(data, user.token, (success, result) => {
+                console.log(result)
                 if (success) {
-                    console.log(result)
                     message.success('수정 완료')
-                    // window.location.href=`/goods/${router.query.pid}`
+                    window.location.href=`/goods/${router.query.pid}`
                 }
             })
         }
@@ -203,14 +207,14 @@ const GoodsDetail = observer(() => {
                         <DatePicker
                         defaultValue={moment(start)}
                         onChange={e => setStart(moment(e).format('YYYY-MM-DD'))} />
-                        : start}
+                        : start?.substring(0, 10)}
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 판매 종료일">
                     {modiStatus ?
                         <DatePicker
                         defaultValue={moment(end)}
                         onChange={e => setEnd(moment(e).format('YYYY-MM-DD'))} />
-                        : end}
+                        : end?.substring(0, 10)}
                     </Descriptions.Item>
                     {/* <Descriptions.Item label="상품 상태값">
                         <GoodsWrap>
@@ -224,15 +228,18 @@ const GoodsDetail = observer(() => {
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
                         {modiStatus ?
-                            <SelectBar defaultValue={roomId} onChange={(e) => setRoomId(e)}>
-                                {room.rooms && 
-                                room.rooms.slice().map(item => {
+                            <SelectBar 
+                            defaultValue={roomId} 
+                            onChange={(e) => setRoomId(e)}
+                            style={{width:'230px'}}>
+                                {room.list && 
+                                room.list.slice().map(item => {
                                     return (
-                                        <Select.Option key={item.id} value={item.id}>{item.name}</Select.Option>
+                                        <Select.Option key={`rooms_${item.id}`} value={item.id}>{item.name}</Select.Option>
                                     )
                                 })}
                             </SelectBar>
-                            : goods.info?.data[0]?.room_name }
+                            : <a href={`/rooms/${roomId}`}>{goods.info?.data[0]?.room_name}</a>}
                             <Button type="primary" size="small" onClick={() => router.push('/rooms/list')} style={{fontSize: '12px'}}>객실 추가 및 수정</Button>
                         </RoomsWrap>
                     </Descriptions.Item>
@@ -257,11 +264,10 @@ const GoodsDetail = observer(() => {
                     <Descriptions.Item label="상품 할인율">
                     {modiStatus ?
                         <InputValue
-                        value={rate} 
+                        value={rate.toFixed(1)} 
                         style={{width:'200px', textAlign:'right'}}
-                        onChange={(e) => onDataChange(e, 'rate')}
                         bordered={modiStatus} />
-                        : rate} %
+                        : rate?.toFixed(1)} %
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <ModiImgs 
@@ -299,9 +305,9 @@ const GoodsDetail = observer(() => {
                             label: '조식 불포함',
                             value: 'N'
                         }]} />
-                        : breakfast }
+                        : breakfast == 'Y' ? '조식 포함' : breakfast == 'N' ? '조식 불포함' : null}
                     </Descriptions.Item>
-                    <Descriptions.Item label="주차 정보">
+                    {/* <Descriptions.Item label="주차 정보">
                     {modiStatus ?
                         <Radio.Group 
                         value={parking}
@@ -315,8 +321,8 @@ const GoodsDetail = observer(() => {
                             label: '주차 불가',
                             value: 'N'
                         }]} />
-                        : parking}
-                    </Descriptions.Item>
+                        : parking == 'Y' ? '주차 가능' : parking == 'N' ? '주차 불가' : null}
+                    </Descriptions.Item> */}
                     <Descriptions.Item label="옵션">
                     {modiStatus ?
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} /> : goods.info?.data[0]?.options }

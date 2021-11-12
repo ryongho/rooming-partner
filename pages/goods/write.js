@@ -25,8 +25,7 @@ const GoodsWrite = observer(() => {
     const [maxNight, setMaxNight] = useState()
     const [option, setOption] = useState(false)
     const [breakfast, setBreakfast] = useState()
-    const [parking, setParking] = useState()
-    const [fileList, setFileList] = useState([])
+    // const [parking, setParking] = useState()
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
 
@@ -35,28 +34,31 @@ const GoodsWrite = observer(() => {
     
         const callRoomList = async() => {
             await room.callRoomList({hotel_id: user.hotelid}, user.token)
-            // await console.log('rooms', room.rooms)
+            // await console.log('rooms', room.list)
         }
         callRoomList()
         
     }, [])
 
     const onWrite = async() => {
+        if (!roomId) {
+            return message.warning('객실을 선택해 주세요')
+        }
         if (!name) {
             return message.warning('상품명을 입력해 주세요')
+        }
+        if (!start) {
+            return message.warning('상품 판매 개시일을 입력해 주세요')
+        }
+        if (!end) {
+            return message.warning('상품 판매 종료일을 입력해 주세요')
         }
         if (!price) {
             return message.warning('상품 원가를 입력해 주세요')
         }
-        // if (!salePrice) {
-        //     return message.warning('할인가를 입력해 주세요')
+        // if (imgList.length < 1) {
+        //     return message.warning('상품 사진을 입력해 주세요')
         // }
-        // if (!rate) {
-        //     return message.warning('할인율을 입력해 주세요')
-        // }
-        if (imgList.length < 1) {
-            return message.warning('상품 사진을 입력해 주세요')
-        }
 
         const images = imgList.join();
         const optionList = option.join();
@@ -76,7 +78,6 @@ const GoodsWrite = observer(() => {
             max_nights: maxNight,
             options: optionList,
             images: images,
-            parking: parking,
             breakfast: breakfast
         }
 
@@ -132,10 +133,10 @@ const GoodsWrite = observer(() => {
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
                             <SelectBar placeholder={'객실을 선택해 주세요'} onChange={(e) => setRoomId(e)}>
-                                {room.rooms && 
-                                room.rooms.slice().map(item => {
+                                {room.list && 
+                                room.list.slice().map(item => {
                                     return (
-                                        <Select.Option key={item.id} value={item.id}>{item.name}</Select.Option>
+                                        <Select.Option key={`rooms_${item.id}`} value={item.id}>{item.name}</Select.Option>
                                     )
                                 })}
                             </SelectBar>
@@ -205,7 +206,7 @@ const GoodsWrite = observer(() => {
                             value: 'N'
                         }]} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="주차 정보">
+                    {/* <Descriptions.Item label="주차 정보">
                         <Radio.Group 
                         value={parking}
                         onChange={e => setParking(e.target.value)}
@@ -218,7 +219,7 @@ const GoodsWrite = observer(() => {
                             label: '주차 불가',
                             value: 'N'
                         }]} />
-                    </Descriptions.Item>
+                    </Descriptions.Item> */}
                     <Descriptions.Item label="옵션">
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} />
                     </Descriptions.Item>
@@ -239,11 +240,11 @@ const GoodsWrite = observer(() => {
 const Wrapper = styled.div`
     width: 100%;
     max-width: 1100px;
+    padding-bottom: 80px;
 `
 
 const Detail = styled.div`
     padding: 18px;
-    margin-bottom: 80px;
     background-color: #fff;
 `
 

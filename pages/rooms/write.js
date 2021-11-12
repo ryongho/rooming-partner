@@ -40,6 +40,9 @@ const GoodsWrite = observer(() => {
         if (!checkOut) {
             return message.warning('체크아웃 시간을 입력해 주세요')
         }
+        if (imgList.length < 1) {
+            return message.warning('객실 이미지를 입력해 주세요')
+        }
         
         const images = imgList.join();
 
@@ -59,8 +62,6 @@ const GoodsWrite = observer(() => {
 
         await room.addInfo(data, user.token, (success, result) => {
             if (success) {
-                // message.success('게시 완료')
-                // console.log(result)
                 message.success('게시 완료')
                 window.location.href='/rooms/list'
             }
@@ -149,14 +150,14 @@ const GoodsWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="체크인 시간">
                         <SelectBar placeholder={'체크인 가능 시간을 선택하세요'} onChange={(e) => setCheckIn(e)} style={{width:250}}>
-                            {times.map(time => {
-                            return <Select.Option value={time}>{time}</Select.Option>})}
+                            {times.map((time, idx) => {
+                            return <Select.Option key={`in_${idx}`} value={time}>{time}</Select.Option>})}
                         </SelectBar>
                     </Descriptions.Item>
                     <Descriptions.Item label="체크아웃 시간">
                         <SelectBar placeholder={'체크아웃 가능 시간을 선택하세요'} onChange={(e) => setCheckOut(e)} style={{width:250}}>
-                            {times.map(time => {
-                            return <Select.Option value={time}>{time}</Select.Option>})}
+                            {times.map((time, idx) => {
+                            return <Select.Option key={`out_${idx}`} value={time}>{time}</Select.Option>})}
                         </SelectBar>
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 이미지">
@@ -164,8 +165,7 @@ const GoodsWrite = observer(() => {
                             imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            onRemoveImgs={onRemoveImgs}
-                            modiStatus={true} />
+                            onRemoveImgs={onRemoveImgs} />
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>

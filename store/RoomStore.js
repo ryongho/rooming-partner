@@ -19,7 +19,7 @@ export default class RoomStore {
             addInfo: action,
             imagesUpload: action,
             callRoomList: action,
-            rooms: observable,
+            list: observable,
             callListPartner: action,
             partnerList: observable,
             imagesUpdate: action,
@@ -86,12 +86,12 @@ export default class RoomStore {
         }
     }
 
-    rooms = null
+    list = []
     callRoomList = async(params, token) => {
         try {
             const result = await getRoomListByHotel(params, token)
             if (result.status === 200) {
-                this.rooms = result.data.data
+                this.list = result.data.data
                 // callback(true, result)
             }
         } catch (err) {

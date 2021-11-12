@@ -48,7 +48,7 @@ const UploadImgs = ({ modiStatus, imgList, fileList, onUploadChange, onRemoveImg
                     <ModiWrap>
                     {fileList !== '' && fileList?.map((item, idx) => {
                         return (
-                            <ImgBox item={item} idx={idx} fileInputBtn={fileInputBtn} onUploadChange={onUploadChange} onRemoveImgs={onRemoveImgs} />
+                            <ImgBox key={`imgupload_${idx}`} item={item} idx={idx} fileInputBtn={fileInputBtn} onUploadChange={onUploadChange} onRemoveImgs={onRemoveImgs} />
                         )
                     })}
                     </ModiWrap>
@@ -59,9 +59,12 @@ const UploadImgs = ({ modiStatus, imgList, fileList, onUploadChange, onRemoveImg
                 <FileListWrap>
                 {imgList?.map((item, key) => {
                     return (
+                        <>
+                        {item.file_name ? 
                         <ImgWrap key={key}>
-                            <FileListImg src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name}`} />
-                        </ImgWrap>
+                            <FileListImg src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name}`} /> 
+                        </ImgWrap> : null }
+                        </>
                     )})
                 }
                 </FileListWrap>

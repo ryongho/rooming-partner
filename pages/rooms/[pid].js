@@ -25,6 +25,7 @@ const RoomsDetail = observer(() => {
     const [imgList, setImgList] = useState()
     const [fileList, setFileList] = useState()
     const [showDelete, setShowDelete] = useState(false)
+    const [roomList, setRoomList] = useState([])
 
 
     useEffect(() => {
@@ -35,7 +36,7 @@ const RoomsDetail = observer(() => {
             else setModiStatus(false)
 
             await room.callInfo({id: router.query.pid}, user.token)
-            await goods.callListPartner({id: user.hotelid}, user.token)
+            await goods.callListByHotel({hotel_id: user.hotelid}, user.token)
             await hotel.callListPartner(user.token)
             await user.callInfo(user.token)
 
@@ -57,6 +58,13 @@ const RoomsDetail = observer(() => {
                     })
                 }
                 setFileList(list)
+            }
+
+            if (goods.list.data) {
+                console.log(goods.list.data)
+                let rooms = goods.list.data.slice().filter(el => el.room_id == router.query.pid)
+                console.log(rooms)
+                setRoomList(rooms)
             }
         }
         callDetail();
@@ -194,8 +202,8 @@ const RoomsDetail = observer(() => {
                     <Descriptions.Item label="체크인 시간">
                         {modiStatus ?
                             <SelectBar defaultValue={checkIn} onChange={(e) => onDataChange(e, 'checkIn')}>
-                                {options.map(time => {
-                                return <Select.Option value={time}>{time}</Select.Option>})}
+                                {options.map((time, idx) => {
+                                return <Select.Option key={`in_${idx}`} value={time}>{time}</Select.Option>})}
                             </SelectBar>
                             :
                             <div>{checkIn}시 이후</div>
@@ -204,8 +212,8 @@ const RoomsDetail = observer(() => {
                     <Descriptions.Item label="체크아웃 시간">
                         {modiStatus ?
                             <SelectBar defaultValue={checkOut} onChange={(e) => onDataChange(e, 'checkOut')}>
-                                {options.map(time => {
-                                return <Select.Option value={time}>{time}</Select.Option>})}
+                                {options.map((time, idx) => {
+                                return <Select.Option key={`out_${idx}`}value={time}>{time}</Select.Option>})}
                             </SelectBar>
                             :
                             <div>{checkOut}시 이전</div>
@@ -250,7 +258,7 @@ const RoomsDetail = observer(() => {
                     <>
                         <Button type="primary" size="small" onClick={() => router.push(`/hotel/${user.hotelid}?type="modi"`)} style={{fontSize: '12px'}}>숙소 정보 수정</Button>
                         <span style={{paddingRight: '5px'}}></span>
-                        {goods.partnerList?.data && <Button type="primary" size="small" onClick={() => router.push('/goods/list')} style={{fontSize: '12px'}}>상품 정보 수정</Button>}
+                        {goods.list?.data && <Button type="primary" size="small" onClick={() => router.push('/goods/list')} style={{fontSize: '12px'}}>상품 정보 수정</Button>}
                     </>
                 }>
                     <Descriptions.Item label="숙소 정보">
@@ -260,10 +268,10 @@ const RoomsDetail = observer(() => {
                     </Descriptions.Item>
                     
                     <Descriptions.Item label="상품 정보">
-                        {goods.partnerList?.data != '' ?
-                            goods.partnerList?.data?.map(item => {
+                        {roomList.length > 0 ?
+                            roomList.map(item => {
                                 return (
-                                    <RoomWrap>
+                                    <RoomWrap key={`goods_${item.goods_id}`}>
                                         <HotelBtn onClick={() => router.push(`/goods/${item.goods_id}`)}>{item.goods_name}</HotelBtn>
                                     </RoomWrap>
                                 )

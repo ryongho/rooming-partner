@@ -82,7 +82,7 @@ const GoodsList = observer(() => {
         setIsAdmin(user.auth == 1 ? false : true)
 
         const callList = async () => {
-            await goods.callListPartner({id: user.hotelid}, user.token)
+            await goods.callListPartner(user.token)
             setData(goods.partnerList.data)
             // console.log(user.token, goods.partnerList.data)
         }
