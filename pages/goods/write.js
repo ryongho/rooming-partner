@@ -48,12 +48,12 @@ const GoodsWrite = observer(() => {
         if (!price) {
             return message.warning('상품 원가를 입력해 주세요')
         }
-        if (!salePrice) {
-            return message.warning('할인가를 입력해 주세요')
-        }
-        if (!rate) {
-            return message.warning('할인율을 입력해 주세요')
-        }
+        // if (!salePrice) {
+        //     return message.warning('할인가를 입력해 주세요')
+        // }
+        // if (!rate) {
+        //     return message.warning('할인율을 입력해 주세요')
+        // }
         if (imgList.length < 1) {
             return message.warning('상품 사진을 입력해 주세요')
         }
@@ -194,7 +194,7 @@ const GoodsWrite = observer(() => {
                     <Descriptions.Item label="조식 정보">
                         <Radio.Group 
                         value={breakfast}
-                        onChange={e => setBreakfast(e)}
+                        onChange={e => setBreakfast(e.target.value)}
                         buttonStyle="solid"
                         optionType="button"
                         options={[{
@@ -208,7 +208,7 @@ const GoodsWrite = observer(() => {
                     <Descriptions.Item label="주차 정보">
                         <Radio.Group 
                         value={parking}
-                        onChange={e => setParking(e)}
+                        onChange={e => setParking(e.target.value)}
                         buttonStyle="solid"
                         optionType="button"
                         options={[{
