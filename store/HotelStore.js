@@ -53,8 +53,6 @@ export default class HotelStore {
         }
     }
     
-    
-    
     imagesUpload = async (file, token, callback) => {
         try {
             const result = await postImagesUpload(file, token)

@@ -1,10 +1,41 @@
 import styled from 'styled-components'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from 'antd'
 import { LoadingOutlined, PlusOutlined, DeleteOutlined, ScissorOutlined } from '@ant-design/icons';
 
+export const ImgBox = ({ item, idx, fileInputBtn, onRemoveImgs, onUploadChange }) => {
 
-const UploadImgs = ({ modiStatus, imgList, fileList, loading, onUploadChange, onRemoveImgs }) => {
+    const [loading, setLoading] = useState(false)
+
+    return (
+        <UploadBox key={idx + 1}>
+            <UploadInput type="file" accept="image/*" name="file" ref={el => fileInputBtn.current[idx + 1] = el} onChange={(e) => {
+                setLoading(true);
+                onUploadChange(e, idx + 1)}} />
+            {item < 11 || item > 0 ?
+            <UploadBtn onClick={() => fileInputBtn.current[idx + 1].click()}>
+                {loading ? <LoadingOutlined /> : <PlusOutlined />}
+                이미지 업로드
+            </UploadBtn> :
+            <ModiImgBox>
+                <ModiListImg src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name ? item.file_name : item}`} />
+                <HoverBtnWrap className={'fileEdit'}>
+                    <EditBtnWrap onClick={() => fileInputBtn.current[idx + 1].click()}>
+                        <ScissorOutlinedIco />
+                    </EditBtnWrap>
+                    <DelBtnWrap onClick={() => {
+                        setLoading(false);
+                        onRemoveImgs(idx + 1)}}>
+                        <DeleteOutlinedIco />
+                    </DelBtnWrap>
+                </HoverBtnWrap>
+            </ModiImgBox>}
+
+        </UploadBox>
+    )
+}
+
+const UploadImgs = ({ modiStatus, imgList, fileList, onUploadChange, onRemoveImgs, loading }) => {
 
     const fileInputBtn = useRef([])
 
@@ -12,33 +43,16 @@ const UploadImgs = ({ modiStatus, imgList, fileList, loading, onUploadChange, on
     return (
         <Wrapper>
             {modiStatus &&
-                <ModiWrap>
-                {fileList?.map((item, idx) => {
-                    return (
-                        <UploadBox key={idx + 1}>
-                            <UploadInput type="file" accept="image/*" name="file" ref={el => fileInputBtn.current[idx + 1] = el} onChange={(e) => onUploadChange(e, idx + 1)} />
-                            {item.file_name ?
-                                <ModiImgBox>
-                                    <ModiListImg src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name}`} />
-                                    <HoverBtnWrap className={'fileEdit'}>
-                                        <EditBtnWrap onClick={() => fileInputBtn.current[idx + 1].click()}>
-                                            <ScissorOutlinedIco />
-                                        </EditBtnWrap>
-                                        <DelBtnWrap onClick={() => onRemoveImgs(idx + 1)}>
-                                            <DeleteOutlinedIco />
-                                        </DelBtnWrap>
-                                    </HoverBtnWrap>
-                                </ModiImgBox>
-                                :
-                                <UploadBtn onClick={() => fileInputBtn.current[idx + 1].click()}>
-                                    {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                                    이미지 업로드
-                                </UploadBtn>
-                            }
-                        </UploadBox>
-                    )
-                })}
-                </ModiWrap>
+                <>
+                    <InfoText>※ 이미지 수정 및 삭제는 변경 즉시 어플에 반영되므로 주의하시길 바랍니다.</InfoText>
+                    <ModiWrap>
+                    {fileList !== '' && fileList?.map((item, idx) => {
+                        return (
+                            <ImgBox item={item} idx={idx} fileInputBtn={fileInputBtn} onUploadChange={onUploadChange} onRemoveImgs={onRemoveImgs} />
+                        )
+                    })}
+                    </ModiWrap>
+                </>
             }
 
             {!modiStatus &&
@@ -52,7 +66,7 @@ const UploadImgs = ({ modiStatus, imgList, fileList, loading, onUploadChange, on
                 }
                 </FileListWrap>
             }
-            <UploadLength style={imgList?.length == 10 ? {color:'red'} : null}>({imgList?.length} / 10)</UploadLength>
+            <UploadLength>({imgList?.length} / 10)</UploadLength>
         </Wrapper>
     )
 }
@@ -64,6 +78,13 @@ const Wrapper = styled.div`
 const ModiWrap = styled.div`
     display: flex;
     flex-wrap: wrap;
+`
+
+const InfoText = styled.div`
+    padding-bottom: 8px;
+    font-size: 14px;
+    color: red;
+    font-weight: bold;
 `
 
 const UploadBox = styled.div`

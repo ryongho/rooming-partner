@@ -23,7 +23,7 @@ const RoomsList = observer(() => {
         const callList = async () => {
             await room.callListPartner(user.token)
             setData(room.partnerList.data[0])
-            console.log(user.token, room.partnerList.data)
+            // console.log(user.token, room.partnerList.data)
         }
 
         callList()
@@ -53,23 +53,30 @@ const RoomsList = observer(() => {
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
     }, {
+        title: '침대 개수',
+        dataIndex: 'amount',
+        key: 'amount',
+        sortDirections: ['descend', 'ascend'],
+        sorter: (a, b) => a.amount - b.amount,
+    }, {
         title: '최대 인원수',
         dataIndex: 'peoples',
         key: 'peoples',
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => a.peoples - b.peoples,
-    }, {
-        title: '객실 생성일',
-        dataIndex: 'created_at',
-        key: 'created_at',
-        sortDirections: ['descend', 'ascend'],
-        sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
-        render: (created_at) => {
-            return (
-                moment(created_at).format('YYYY-MM-DD')
-            )
-        }
     }, 
+    // {
+    //     title: '객실 생성일',
+    //     dataIndex: 'created_at',
+    //     key: 'created_at',
+    //     sortDirections: ['descend', 'ascend'],
+    //     sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
+    //     render: (created_at) => {
+    //         return (
+    //             moment(created_at).format('YYYY-MM-DD')
+    //         )
+    //     }
+    // }, 
     // {
     //     title: '상품 상태값',
     //     dataIndex: 'active',
@@ -136,19 +143,19 @@ const RoomsList = observer(() => {
                         </SelectBar>
                     </Filter>}
                     
-                    <Filter>
+                    {/* <Filter>
                         <FilterLabel>객실 등록일</FilterLabel>
                         <DatePicker onChange={onListDate} />
-                    </Filter>
+                    </Filter> */}
                     
-                    <Filter>
+                    {/* <Filter>
                         <FilterLabel>상품 상태값</FilterLabel>
                         <Radio.Group defaultValue={"total"}>
                             <Radio.Button value="total" buttonStyle="solid">전체</Radio.Button>
                             <Radio.Button value="">활성화</Radio.Button>
                             <Radio.Button value="">비활성화</Radio.Button>
                         </Radio.Group>
-                    </Filter>
+                    </Filter> */}
                     
                 </FilterWrap>
                 <SearchWrap>

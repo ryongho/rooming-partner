@@ -2,32 +2,12 @@ import styled from 'styled-components'
 import { Descriptions, Input, Button, message, Select, DatePicker, Checkbox, Radio, Modal } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import { LoadingOutlined, PlusOutlined, PlusSquareOutlined, MinusSquareOutlined } from '@ant-design/icons';
-import UploadImgs from '../../components/atom/UploadImgs'
+import ModiImgs from '../../components/atom/ModiImgs'
 import { useStore } from '../../store/StoreProvider'
 import moment from 'moment';
+import { observer } from 'mobx-react-lite'
 
-const GoodsDetail = () => {
-    const data = {
-        key: '1',
-        goods: '여름날 치맥 파티',
-        active: true,
-        rooms: '스탠다드 트윈',
-        roomDetail: '',
-        category: '호텔',
-        hotel: '라마다 프라자 바이 윈덤 여수 호텔',
-        facility: ['주차가능', '무료 wifi'],
-        zonecode: '1234',
-        address: '주소',
-        address2: '',
-        tel: '0212341234',
-        thumb: '',
-        imgList: [],
-        breakfast: '제공되는 조식 없음',
-        parking: '300대 주차 가능',
-        cancel: '예약 당일 취소 가능',
-        partner: '파트너1234',
-    }
+const GoodsDetail = observer(() => {
 
     const router = useRouter();
     const { user, goods, room } = useStore();
@@ -45,11 +25,11 @@ const GoodsDetail = () => {
     const [rate, setRate] = useState()
     const [minNight, setMinNight] = useState()
     const [maxNight, setMaxNight] = useState()
-    const [option, setOption] = useState(false)
+    const [option, setOption] = useState()
     const [breakfast, setBreakfast] = useState()
     const [parking, setParking] = useState()
-    const [fileList, setFileList] = useState([])
-    const [imgList, setImgList] = useState([])
+    const [fileList, setFileList] = useState()
+    const [imgList, setImgList] = useState()
     const [loading, setLoading] = useState(false)
     const [showDelete, setShowDelete] = useState(false)
 
@@ -60,9 +40,6 @@ const GoodsDetail = () => {
 
             await goods.callInfo({id: router.query.pid}, user.token)
             await room.callRoomList({hotel_id: user.hotelid}, user.token)
-            
-            console.log(goods.info)
-
             if (goods.info.data[0]) {
                 setRoomId(goods.info.data[0].room_id)
                 setName(goods.info.data[0].goods_name)
@@ -77,6 +54,15 @@ const GoodsDetail = () => {
                 setBreakfast(goods.info.data[0].breakfast)
                 setParking(goods.info.data[0].parking)
                 setImgList(goods.info.images)
+                let list = Array.from(Array(10).keys());
+                for (let i = 0; i <= list.length; i++) {
+                    goods.info.images.map(el => {
+                        if (el.order_no == list[i] + 1) {
+                            let removed = list.splice(i, 1, el);
+                        }
+                    })
+                }
+                setFileList(list)
             }
         }
         callDetail();
@@ -84,39 +70,41 @@ const GoodsDetail = () => {
 
     const onDataChange = (e, val) => {
         const numRegExp = /^[0-9]*$/;
+        const rateRegExp = /^[0-9.]*$/;
         if (!router.query.type) return;
-        if (val == 'bedNum' || val == 'bedNum2' || val == 'bedNum3') {
+
+        if (val == 'bedNum' || val == 'price' || val == 'salePrice' || val == 'minNight' || val == 'maxNight') {
             if (!numRegExp.test(e.target.value)) return;
         }
-        if (val == 'goods') setGoods(e.target.value);
         if (val == 'active') setActive(e);
-        if (val == 'rooms') setRooms(e);
         if (val == 'price') setPrice(e.target.value);
         if (val == 'salePrice') setSalePrice(e.target.value);
-        if (val == 'rate') setRate(e.target.value);
-        if (val == 'people') setDesc(e.target.value);
-        if (val == 'desc') setPeople(e.target.value);
-        if (val == 'checkIn') setCheckIn(e.target.value);
-        if (val == 'checkOut') setCheckOut(e.target.value);
-        if (val == 'bed') setBed(e.target.value);
-        if (val == 'bed2') setBed2(e.target.value);
-        if (val == 'bed3') setBed3(e.target.value);
-        if (val == 'bedNum') setBedNum(e.target.value);
-        if (val == 'bedNum2') setBedNum2(e.target.value);
-        if (val == 'bedNum3') setBedNum3(e.target.value);
-        if (val == 'roomsDesc') setRoomsDesc(e.target.value);
+        if (val == 'rate') {
+            if (!rateRegExp.test(e.target.value)) return;
+            setRate(e.target.value);
+        }
+        if (val == 'minNight') setMinNight(e.target.value);
+        if (val == 'maxNight') setMaxNight(e.target.value);
+        if (val == 'parking') setParking(e);
     }
 
     const onUploadChange = async(e) => {
-        setLoading(true)
         let file = e.target.files[0];
         let reader = new FileReader();
+        
+        reader.onloadend = async (e) => {
 
-        reader.onloadend = async(e) => {
             await goods.imagesUpload(file, user.token, (success, data) => {
                 if (success) {
-                    setImgList(imgList.concat(data.images))
-                    setLoading(false)
+                    let img_file = data.images.toString();
+                    goods.imagesUpdate(router.query.pid, item, img_file, user.token, (success, data) => {
+                        if (success) {
+                            setImgList(imgList.concat(img_file))
+                            let copy = fileList.slice()
+                            let removed = copy.splice(item - 1, 1, img_file)
+                            setFileList(copy)
+                        }
+                    })
                 }
             })
         }
@@ -125,32 +113,60 @@ const GoodsDetail = () => {
     }
 
     const onRemoveImgs = async(key) => {
-        await setImgList(imgList.filter((e, idx) => idx !== key))
+        setImgList(imgList.filter((e, idx) => idx !== key))
+        let copy = fileList.slice()
+        let removed = copy.splice(key - 1, 1, key - 1)
+        setFileList(copy)
+        await goods.imagesDel(router.query.pid, key, user.token)
     }
 
-    const onModi = () => {
-        if (!router.query.type) router.push('/goods/1?type=modi');
+    const onModi = async() => {
+        if (!router.query.type) router.push(`/goods/${router.query.pid}?type=modi`);
         else {
-            if (!goods) {
+            if (!name) {
                 return message.warning('상품명을 입력해 주세요')
+            }
+            if (!roomId) {
+                message.warning('객실을 선택해 주세요')
+            }
+            if (!start) {
+                message.warning('상품 판매 개시일을 입력해 주세요')
+            }
+            if (!end) {
+                message.warning('상품 판매 종료일을 입력해 주세요')
             }
             if (!price) {
                 message.warning('상품 원가를 입력해 주세요')
             }
-            if (!salePrice) {
-                message.warning('할인가를 입력해 주세요')
-            }
-            if (!rate) {
-                message.warning('할인율을 입력해 주세요')
-            }
-            if (!desc) {
-                message.warning('상품 정보를 입력해 주세요')
-            }
-            if (imgList.length < 1) {
-                message.warning('상품 사진을 입력해 주세요')
-            }
 
             // success
+            const optionList = option.join();
+
+            const data = {
+                id: router.query.pid,
+                goods_name: name,
+                start_date: start,
+                end_date: end,
+                price: price,
+                sale_price: salePrice,
+                amount: rate,
+                min_nights: minNight,
+                max_nights: maxNight,
+                options: optionList,
+                breakfast: breakfast,
+                parking: parking,
+                hotel_id: user.hotelid
+            }
+            
+            console.log(data)
+
+            await goods.updateInfo(data, user.token, (success, result) => {
+                if (success) {
+                    console.log(result)
+                    message.success('수정 완료')
+                    // window.location.href=`/goods/${router.query.pid}`
+                }
+            })
         }
     }
 
@@ -163,7 +179,11 @@ const GoodsDetail = () => {
     return (
         <Wrapper>
             <Detail>
-                <Descriptions title={<Title>상품 상세 정보</Title>} bordered column={1} 
+                <Descriptions 
+                title={<Title>상품 상세 정보</Title>} 
+                bordered 
+                column={1} 
+                labelStyle={{width: '200px', minWidth: '180px'}}
                 extra={
                     <>
                         <Button type="danger" onClick={() => setShowDelete(true)} style={{marginRight: '8px'}}>삭제</Button>
@@ -190,7 +210,7 @@ const GoodsDetail = () => {
                         <DatePicker
                         defaultValue={moment(end)}
                         onChange={e => setEnd(moment(e).format('YYYY-MM-DD'))} />
-                        :end}
+                        : end}
                     </Descriptions.Item>
                     {/* <Descriptions.Item label="상품 상태값">
                         <GoodsWrap>
@@ -204,7 +224,7 @@ const GoodsDetail = () => {
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
                         {modiStatus ?
-                            <SelectBar defaultValue={goods.info?.data[0]?.room_name} onChange={(e) => setRooms(e)}>
+                            <SelectBar defaultValue={roomId} onChange={(e) => setRoomId(e)}>
                                 {room.rooms && 
                                 room.rooms.slice().map(item => {
                                     return (
@@ -220,30 +240,33 @@ const GoodsDetail = () => {
                     {modiStatus ?
                         <InputValue
                         value={price}
+                        style={{width:'200px', textAlign:'right'}}
                         onChange={(e) => onDataChange(e, 'price')}
                         bordered={modiStatus} />
-                        : <>{price}원</> } 
+                        : price } 원
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 할인가">
                     {modiStatus ?
                         <InputValue
                         value={salePrice} 
+                        style={{width:'200px', textAlign:'right'}}
                         onChange={(e) => onDataChange(e, 'salePrice')}
                         bordered={modiStatus} />
-                        : <>{salePrice}원</> }
+                        : salePrice } 원
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 할인율">
                     {modiStatus ?
                         <InputValue
                         value={rate} 
+                        style={{width:'200px', textAlign:'right'}}
                         onChange={(e) => onDataChange(e, 'rate')}
                         bordered={modiStatus} />
                         : rate} %
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
-                        <UploadImgs 
+                        <ModiImgs 
                         imgList={imgList}
-                        loading={loading}
+                        fileList={fileList}
                         onUploadChange={onUploadChange}
                         onRemoveImgs={onRemoveImgs}
                         modiStatus={modiStatus} />
@@ -252,36 +275,46 @@ const GoodsDetail = () => {
                     {modiStatus ?
                         <Input
                         value={minNight} 
-                        onChange={e => {
-                        const numRegExp = /^[0-9]*$/;
-                        if (!numRegExp.test(e.target.value)) return;
-                        setMinNight(e.target.value)}}
-                        style={{width:50}} /> : minNight }일
+                        onChange={e => onDataChange(e, 'minNight')}
+                        style={{width:50}} /> : minNight } 일
                     </Descriptions.Item>
                     <Descriptions.Item label="최대 박 수">
                     {modiStatus ?
                         <Input
                         value={maxNight} 
-                        onChange={e => {
-                        const numRegExp = /^[0-9]*$/;
-                        if (!numRegExp.test(e.target.value)) return;
-                        setMaxNight(e.target.value)}}
-                        style={{width:50}} /> : maxNight }일
+                        onChange={e => onDataChange(e, 'maxNight')}
+                        style={{width:50}} /> : maxNight } 일
                     </Descriptions.Item>
                     <Descriptions.Item label="조식 정보">
                     {modiStatus ?
-                        <Input.TextArea
-                        value={breakfast} 
-                        rows={4}
-                        onChange={null} />
-                        :breakfast }
+                        <Radio.Group 
+                        value={breakfast}
+                        onChange={e => setBreakfast(e.target.value)}
+                        buttonStyle="solid"
+                        optionType="button"
+                        options={[{
+                            label: '조식 포함',
+                            value: 'Y'
+                        }, {
+                            label: '조식 불포함',
+                            value: 'N'
+                        }]} />
+                        : breakfast }
                     </Descriptions.Item>
                     <Descriptions.Item label="주차 정보">
                     {modiStatus ?
-                        <Input.TextArea
-                        value={parking} 
-                        rows={4}
-                        onChange={null} />
+                        <Radio.Group 
+                        value={parking}
+                        onChange={e => setParking(e.target.value)}
+                        buttonStyle="solid"
+                        optionType="button"
+                        options={[{
+                            label: '주차 가능',
+                            value: 'Y'
+                        }, {
+                            label: '주차 불가',
+                            value: 'N'
+                        }]} />
                         : parking}
                     </Descriptions.Item>
                     <Descriptions.Item label="옵션">
@@ -310,7 +343,7 @@ const GoodsDetail = () => {
             </Modal>
         </Wrapper>
     )
-}
+})
 
 
 const Wrapper = styled.div`

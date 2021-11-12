@@ -50,11 +50,12 @@ const RoomsDetail = observer(() => {
 
                 let list = Array.from(Array(10).keys());
                 for (let i = 0; i <= list.length; i++) {
-                    if (room.info.images[i] && (room.info.images[i].order_no == list[i] + 1)) {
-                        let removed = list.splice(i, 1, room.info.images[i]);
-                    }
+                    room.info.images.map(el => {
+                        if (el.order_no == list[i] + 1) {
+                            let removed = list.splice(i, 1, el);
+                        }
+                    })
                 }
-                console.log(list)
                 setFileList(list)
             }
         }
@@ -71,8 +72,10 @@ const RoomsDetail = observer(() => {
         }
         if (val == 'name') setName(e.target.value);
         if (val == 'people') setPeople(e.target.value);
-        if (val == 'bed') setBed(e);
-        if (val == 'bedNum') setBedNum(e);
+        if (val == 'bed') setBed(e.target.value);
+        if (val == 'bedNum') setBedNum(e.target.value);
+        if (val == 'checkIn') setCheckIn(e);
+        if (val == 'checkOut') setCheckOut(e);
     }
     
     const onModi = async () => {
@@ -98,6 +101,12 @@ const RoomsDetail = observer(() => {
 
             const data = {
                 id: router.query.pid,
+                name: name,
+                peoples: people,
+                checkin: checkIn,
+                checkout: checkOut,
+                bed: bed,
+                amount: bedNum
             }
             
             console.log(data)
@@ -105,7 +114,7 @@ const RoomsDetail = observer(() => {
             await room.updateInfo(data, user.token, (success, result) => {
                 if (success) {
                     message.success('수정 완료')
-                    window.location.href='/rooms/list'
+                    window.location.href=`/rooms/${router.query.pid}`
                 }
             })
         }
@@ -119,7 +128,6 @@ const RoomsDetail = observer(() => {
 
 
     const onUploadChange = async (e, item) => {
-        // setLoading(true)
         let file = e.target.files[0];
         let reader = new FileReader();
         
@@ -127,17 +135,14 @@ const RoomsDetail = observer(() => {
 
             await room.imagesUpload(file, user.token, (success, data) => {
                 if (success) {
-                    console.log(data.images)
-                    setImgList(imgList.concat(data.images))
-                    // setLoading(false)
-
-                    room.imagesUpdate(router.query.pid, item, data.images, user.token, (success, data) => {
+                    let img_file = data.images.toString();
+                    room.imagesUpdate(router.query.pid, item, img_file, user.token, (success, data) => {
                         if (success) {
-                            room.callInfo({id: router.query.pid}, user.token)
-                            console.log('!!!!!!!!!!!!!imgs:', room.info.images)
-                            // setImgList(imgList.concat(data.images))
-                            // setLoading(false)
-                            // console.log(imgList)
+                            // console.log('!!!!!!!!!!!!!imgs:', item, room.info.images)
+                            setImgList(imgList.concat(img_file))
+                            let copy = fileList.slice()
+                            let removed = copy.splice(item - 1, 1, img_file)
+                            setFileList(copy)
                         }
                     })
                 }
@@ -149,7 +154,11 @@ const RoomsDetail = observer(() => {
 
     const onRemoveImgs = async(key) => {
         setImgList(imgList.filter((e, idx) => idx !== key))
+        let copy = fileList.slice()
+        let removed = copy.splice(key - 1, 1, key - 1)
+        setFileList(copy)
         await room.imagesDel(router.query.pid, key, user.token)
+        // console.log(key, fileList, room.info.images)
     }
 
     return (
@@ -159,7 +168,7 @@ const RoomsDetail = observer(() => {
                 title={<Title>상품 상세 정보</Title>} 
                 bordered 
                 column={1} 
-                labelStyle={{width: '280px', minWidth: '200px'}}
+                labelStyle={{width: '200px', minWidth: '180px'}}
                 extra={
                     <>
                         <Button type="danger" onClick={() => setShowDelete(true)} style={{marginRight: '8px'}}>삭제</Button>
@@ -206,14 +215,13 @@ const RoomsDetail = observer(() => {
                     {modiStatus ?
                         <>
                         <InputValue
-                        style={{width: '150px', marginRight: '8px'}}
+                        style={{width: '170px', marginRight: '10px'}}
                         placeholder={"침대 종류를 입력하세요"}
                         value={bed} 
                         onChange={e => onDataChange(e, 'bed')}
                         bordered={modiStatus} />
                         <InputValue
-                        style={{width: '40px'}}
-                        placeholder={"침대 개수를 입력하세요"}
+                        style={{width: '80px', marginRight: '5px'}}
                         value={bedNum} 
                         bordered={modiStatus}
                         onChange={e => onDataChange(e, 'bedNum')} />개
@@ -245,11 +253,13 @@ const RoomsDetail = observer(() => {
                         {goods.partnerList?.data && <Button type="primary" size="small" onClick={() => router.push('/goods/list')} style={{fontSize: '12px'}}>상품 정보 수정</Button>}
                     </>
                 }>
-                    <Descriptions.Item label="숙소명">
-                        <HotelBtn onClick={() => router.push(`/hotel/${user.hotelid}`)}>{hotel.partnerList?.data && hotel.partnerList.data[0]?.name}</HotelBtn>
+                    <Descriptions.Item label="숙소 정보">
+                        {hotel.partnerList?.data ?
+                        <HotelBtn onClick={() => router.push(`/hotel/${user.hotelid}`)}>{hotel.partnerList.data[0]?.name}</HotelBtn>
+                        : <Space>등록된 숙소가 없습니다.</Space>}
                     </Descriptions.Item>
                     
-                    <Descriptions.Item label="등록된 상품">
+                    <Descriptions.Item label="상품 정보">
                         {goods.partnerList?.data != '' ?
                             goods.partnerList?.data?.map(item => {
                                 return (
@@ -261,7 +271,7 @@ const RoomsDetail = observer(() => {
                         }
                     </Descriptions.Item>
 
-                    <Descriptions.Item label="파트너">
+                    <Descriptions.Item label="파트너 정보">
                         <HotelBtn onClick={() => router.push(`/user/partner/detail`)}>{user.info?.data.nickname}</HotelBtn>
                     </Descriptions.Item>
                 </Descriptions>

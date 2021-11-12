@@ -21,9 +21,8 @@ const HotelDetail = () => {
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
-    const [imgList, setImgList] = useState([])
-    const [fileList, setFileList] = useState(Array.from(Array(10).keys()))
-    const [loading, setLoading] = useState(false)
+    const [imgList, setImgList] = useState()
+    const [fileList, setFileList] = useState()
     // const [breakfast, setBreakfast] = useState()
     // const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
@@ -31,7 +30,7 @@ const HotelDetail = () => {
     const [content, setContent] = useState('')
     const [owner, setOwner] = useState('')
     const [reg, setReg] = useState('')
-    const [openDate, setOpenDate] = useState('')
+    const [openDate, setOpenDate] = useState()
     const [traffic, setTraffic] = useState('')
     const [level, setLevel] = useState('')
     const [fax, setFax] = useState('')
@@ -55,13 +54,21 @@ const HotelDetail = () => {
                 setCategory(hotel.info.data[0].type)
                 setName(hotel.info.data[0].name)
                 setFacility(hotel.info.data[0].options.split(","))
-                setAddress(hotel.info.data[0].address.slice(0, hotel.info.data[0].address.length - 5))
+                setAddress(hotel.info.data[0].address.slice(6, hotel.info.data[0].address.length))
                 setAddress2(hotel.info.data[0].address_detail)
-                setZonecode(hotel.info.data[0].address.slice(hotel.info.data[0].address.length - 5))
+                setZonecode(hotel.info.data[0].address.slice(0, 5))
                 setTel(hotel.info.data[0].tel)
                 setImgList(hotel.info.images)
 
-                setFileList(hotel.info.images)
+                let list = Array.from(Array(10).keys());
+                for (let i = 0; i <= list.length; i++) {
+                    hotel.info.images.map(el => {
+                        if (el.order_no == list[i] + 1) {
+                            let removed = list.splice(i, 1, el);
+                        }
+                    })
+                }
+                setFileList(list)
                 setCancel(hotel.info.data[0].refund_rule)
                 setContent(hotel.info.data[0].content)
                 setOwner(hotel.info.data[0].owner)
@@ -103,33 +110,38 @@ const HotelDetail = () => {
     }
 
     const onUploadChange = async (e, item) => {
-        setLoading(true)
         let file = e.target.files[0];
         let reader = new FileReader();
+        
+        reader.onloadend = async (e) => {
 
-        reader.onloadend = async(e) => {
-            await hotel.imagesUpdate(user.hotelid, item, file, user.token, async (success, data) => {
+            await hotel.imagesUpload(file, user.token, (success, data) => {
                 if (success) {
-                    await hotel.callInfo({id: user.hotelid}, user.token)
-                    console.log('!!!!!!!!!!!!!imgs:', hotel.info.images)
-                    // setImgList(imgList.concat(data.images))
-                    setLoading(false)
-                    // console.log(imgList)
+                    let img_file = data.images.toString();
+                    hotel.imagesUpdate(router.query.pid, item, img_file, user.token, (success, data) => {
+                        if (success) {
+                            setImgList(imgList.concat(img_file))
+                            let copy = fileList.slice()
+                            let removed = copy.splice(item - 1, 1, img_file)
+                            setFileList(copy)
+                        }
+                    })
                 }
             })
         }
         if (file) reader.readAsDataURL(file);
-
     }
 
     const onRemoveImgs = async(key) => {
         setImgList(imgList.filter((e, idx) => idx !== key))
-        
-        await hotel.imagesDel(user.hotelid, key, user.token)
+        let copy = fileList.slice()
+        let removed = copy.splice(key - 1, 1, key - 1)
+        setFileList(copy)
+        await hotel.imagesDel(router.query.pid, key, user.token)
     }
     
     const onModi = async () => {
-        if (!router.query.type) router.push(`/hotel/${user.hotelid}?type=modi`);
+        if (!router.query.type) window.location.href =`/hotel/${user.hotelid}?type=modi`;
         else {
             if (!name) {
                 return message.warning('숙소명을 입력해 주세요')
@@ -148,10 +160,7 @@ const HotelDetail = () => {
             }
 
             // success
-            // const images = imgList.join();
-
             const option = facility.join();
-
             let total_address = zonecode + ' ' + address
 
             const data = {
@@ -179,7 +188,7 @@ const HotelDetail = () => {
             await hotel.updateInfo(data, user.token, (success, result) => {
                 if (success) {
                     message.success('수정 완료')
-                    window.location.href='/hotel/list'
+                    window.location.href=`/hotel/${user.hotelid}`
                 }
             })
         }
@@ -237,7 +246,7 @@ const HotelDetail = () => {
                             bordered={modiStatus}
                             onChange={(e) => onDataChange(e, 'address2')} />
                             </>
-                            : <>{zonecode} {address}</>
+                            : <>{zonecode} {address} {address2}</>
                         }
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 상세 위치">
@@ -299,7 +308,7 @@ const HotelDetail = () => {
                     <Descriptions.Item label="숙소 이미지">
                         <ModiImgs 
                         imgList={imgList}
-                        loading={loading}
+                        fileList={fileList}
                         onUploadChange={onUploadChange}
                         onRemoveImgs={onRemoveImgs}
                         modiStatus={modiStatus} />
@@ -325,7 +334,7 @@ const HotelDetail = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="개업일">
                         {modiStatus ?
-                        <DatePicker defaultValue={moment(openDate, 'YYYY-MM-DD')} onChange={(e) => onDataChange(e, 'opendate')} />
+                        <DatePicker defaultValue={openDate} onChange={(e) => onDataChange(e, 'opendate')} />
                         : openDate }
                     </Descriptions.Item>
                     <Descriptions.Item label="호텔 소개">

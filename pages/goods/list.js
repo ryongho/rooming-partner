@@ -69,20 +69,22 @@ const GoodsList = observer(() => {
                     message.success('삭제 완료')
                 }}
                 cancelText='취소'>
-            <Button type="danger" size="small">삭제</Button>
+                <Button type="danger">삭제</Button>
             </Popconfirm>)
         }
     }];
 
     const { user, goods } = useStore()
     const [isAdmin, setIsAdmin] = useState(true);
+    const [data, setData] = useState(null)
 
     useEffect(() => {
         setIsAdmin(user.auth == 1 ? false : true)
 
         const callList = async () => {
             await goods.callListPartner({id: user.hotelid}, user.token)
-            console.log(user.token, goods.partnerList.data)
+            setData(goods.partnerList.data)
+            // console.log(user.token, goods.partnerList.data)
         }
 
         callList()
@@ -92,8 +94,10 @@ const GoodsList = observer(() => {
         console.log(e)
     }
 
-    const onSearch = () => {
-
+    const onSearch = (word) => {
+        if (word) {
+            setData(data.filter(e => e.goods_name.indexOf(word) !== -1))
+        } else message.warning('검색어를 입력해 주세요.')
     }
 
     const onExcelDown = () => {
@@ -142,7 +146,7 @@ const GoodsList = observer(() => {
             //     onChange: (e) => {setSelectedList(e)},
             //     selectedRowKeys: selectedList
             // }}
-            columns={columns} dataSource={goods.partnerList.data} pagination={{ position: ['bottomCenter'] }}/>
+            columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
 
         </Wrapper>
     )

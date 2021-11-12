@@ -84,8 +84,20 @@ export function putRoomImageUpdate(params, token) {
 
 export function delRoomImageDelete(params, token) {
     return axios ({
-        method: 'del',
+        method: 'delete',
         url: '/room/image_delete',
+        params: params,
+        baseURL: baseUrl[env].baseUrl,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function putRoomUpdate(params, token) {
+    return axios ({
+        method: 'put',
+        url: '/room/update',
         params: params,
         baseURL: baseUrl[env].baseUrl,
         headers: {

@@ -7,7 +7,8 @@ import {
     getRoomListByPartners,
     getRoomDetail,
     putRoomImageUpdate,
-    delRoomImageDelete
+    delRoomImageDelete,
+    putRoomUpdate
 } from '../libs/room'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -24,7 +25,8 @@ export default class RoomStore {
             imagesUpdate: action,
             imagesDel: action,
             info: observable,
-            callInfo: action
+            callInfo: action,
+            updateInfo: action
         })
     }
 
@@ -119,6 +121,19 @@ export default class RoomStore {
             }
         } catch (err) {
             console.log(err)
+        }
+    }
+
+    info = null
+    updateInfo = async (params, token, callback) => {
+        try {
+            const result = await putRoomUpdate(params, token)
+            if (result.status === 200) {
+                callback(true, result.data)
+            }
+        } catch (err) {
+            console.log(err)
+            callback(false, err)
         }
     }
 }

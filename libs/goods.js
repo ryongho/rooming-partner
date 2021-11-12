@@ -56,3 +56,39 @@ export function getGoodsDetail(params, token) {
         }
     })
 }
+
+export function putGoodsUpdate(params, token) {
+    return axios({
+        method: 'put',
+        url: '/goods/update',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function putGoodsImageUpdate(params, token) {
+    return axios({
+        method: 'put',
+        url: '/goods/image_update',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function delGoodsImageDelete(params, token) {
+    return axios({
+        method: 'delete',
+        url: '/goods/image_delete',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

@@ -94,7 +94,7 @@ export function putHotelImageUpdate(params, token) {
 
 export function delHotelImageDelete(params, token) {
     return axios ({
-        method: 'del',
+        method: 'delete',
         url: '/hotel/image_delete',
         params: params,
         baseURL: baseUrl[env].baseUrl,

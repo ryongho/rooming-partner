@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Descriptions, Select, Input, Button, message, DatePicker, Checkbox } from 'antd'
+import { Descriptions, Select, Input, Button, message, DatePicker, Checkbox, Radio } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import UploadImgs from '../../components/atom/UploadImgs'
@@ -90,18 +90,6 @@ const GoodsWrite = observer(() => {
     }
     
     const onUploadChange = async (e) => {
-        // if (e.file.status === 'uploading') {
-        //     setLoading(true);
-
-        //     await goods.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
-        //         if (success) {
-        //             setFileList(fileList.concat(e.file.originFileObj))
-        //             setLoading(false);
-        //             setImgList(imgList.concat(data.images))
-        //             console.log(fileList, imgList)
-        //         }
-        //     })
-        // }
 
         setLoading(true)
         let file = e.target.files[0];
@@ -119,11 +107,6 @@ const GoodsWrite = observer(() => {
     }
     
     const onRemoveImgs = async(key) => {
-        // let idx = fileList.indexOf(file);
-        // imgList.splice(idx, 1);
-        // await setImgList(imgList)
-        // await setFileList(fileList.filter(e => e !== file))
-
         await setImgList(imgList.filter((e, idx) => idx !== key))
     }
 
@@ -209,16 +192,32 @@ const GoodsWrite = observer(() => {
                         style={{width:50}} /> 일
                     </Descriptions.Item>
                     <Descriptions.Item label="조식 정보">
-                        <Input.TextArea
-                        value={breakfast} 
-                        rows={4}
-                        onChange={(e) => setBreakfast(e.target.value)} />
+                        <Radio.Group 
+                        value={breakfast}
+                        onChange={e => setBreakfast(e)}
+                        buttonStyle="solid"
+                        optionType="button"
+                        options={[{
+                            label: '조식 포함',
+                            value: 'Y'
+                        }, {
+                            label: '조식 불포함',
+                            value: 'N'
+                        }]} />
                     </Descriptions.Item>
                     <Descriptions.Item label="주차 정보">
-                        <Input.TextArea
-                        value={parking} 
-                        rows={4}
-                        onChange={(e) => setParking(e.target.value)} />
+                        <Radio.Group 
+                        value={parking}
+                        onChange={e => setParking(e)}
+                        buttonStyle="solid"
+                        optionType="button"
+                        options={[{
+                            label: '주차 가능',
+                            value: 'Y'
+                        }, {
+                            label: '주차 불가',
+                            value: 'N'
+                        }]} />
                     </Descriptions.Item>
                     <Descriptions.Item label="옵션">
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} />

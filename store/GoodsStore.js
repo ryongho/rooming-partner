@@ -4,7 +4,10 @@ import {
     postImagesUpload,
     postGoodsRegist,
     getGoodsListByPartners,
-    getGoodsDetail
+    getGoodsDetail,
+    putGoodsUpdate,
+    delGoodsImageDelete,
+    putGoodsImageUpdate
 } from '../libs/goods'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -18,7 +21,10 @@ export default class GoodsStore {
             callListPartner: action,
             partnerList: observable,
             callInfo: action,
-            info: observable
+            info: observable,
+            updateInfo: action,
+            imagesUpdate: action,
+            imagesDel: action
         })
     }
 
@@ -46,6 +52,36 @@ export default class GoodsStore {
         }
     }
 
+    imagesUpdate = async (goodsid, idx, file, token, callback) => {
+        try {
+            const params = {
+                goods_id: goodsid,
+                order_no: idx,
+                file_name: file
+            }
+            const result = await putGoodsImageUpdate(params, token)
+            if (result.status === 200) {
+                callback(true, result.data)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    imagesDel = async (goodsid, idx, token) => {
+        try {
+            const params = {
+                goods_id: goodsid,
+                order_no: idx
+            }
+            const result = await delGoodsImageDelete(params, token)
+            if (result.status === 200) {
+                console.log(result)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
     
     partnerList = []
     callListPartner = async (params, token) => {
@@ -67,6 +103,18 @@ export default class GoodsStore {
                 this.info = result.data
             }
         } catch (err) {
+            console.log(err)
+        }
+    }
+
+    updateInfo = async (params, token, callback) => {
+        try {
+            const result = await putGoodsUpdate(params, token)
+            if (result.status === 200) {
+                callback(true, result)
+            }
+        } catch (err) {
+            callback(false, err)
             console.log(err)
         }
     }
