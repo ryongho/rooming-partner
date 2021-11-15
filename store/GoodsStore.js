@@ -8,7 +8,8 @@ import {
     putGoodsUpdate,
     delGoodsImageDelete,
     putGoodsImageUpdate,
-    getGoodsListByHotel
+    getGoodsListByHotel,
+    delGoods
 } from '../libs/goods'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -27,7 +28,8 @@ export default class GoodsStore {
             imagesUpdate: action,
             imagesDel: action,
             callListByHotel: action,
-            list: observable
+            list: observable,
+            deleteGoods: action
         })
     }
 
@@ -126,6 +128,18 @@ export default class GoodsStore {
     updateInfo = async (params, token, callback) => {
         try {
             const result = await putGoodsUpdate(params, token)
+            if (result.status === 200) {
+                callback(true, result)
+            }
+        } catch (err) {
+            callback(false, err)
+            console.log(err)
+        }
+    }
+    
+    deleteGoods = async (params, token, callback) => {
+        try {
+            const result = await delGoods(params, token)
             if (result.status === 200) {
                 callback(true, result)
             }

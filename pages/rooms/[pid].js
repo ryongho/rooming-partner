@@ -128,10 +128,17 @@ const RoomsDetail = observer(() => {
         }
     }
 
-    const onDeleteLists = () => {
+    const onDeleteLists = async (_id) => {
+        const params = {
+            room_id: _id
+        }
 
-        // success
-        router.push('/rooms/list');
+        await room.deleteRoom(params, user.token, (status) => {
+            if(status){
+                // success
+                router.push('/rooms/list');
+            }
+        })
     }
 
 
@@ -296,7 +303,7 @@ const RoomsDetail = observer(() => {
             visible={showDelete}
             okText={'네'}
             cancelText={'아니오'}
-            onOk={onDeleteLists}
+            onOk={()=>onDeleteLists(router.query.pid)}
             onCancel={() => setShowDelete(false)}
             >
                 정말 삭제하시겠습니까?

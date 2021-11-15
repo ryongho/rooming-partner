@@ -23,7 +23,7 @@ const GoodsWrite = observer(() => {
     const [rate, setRate] = useState()
     const [minNight, setMinNight] = useState()
     const [maxNight, setMaxNight] = useState()
-    const [option, setOption] = useState(false)
+    const [option, setOption] = useState([])
     const [breakfast, setBreakfast] = useState()
     // const [parking, setParking] = useState()
     const [imgList, setImgList] = useState([])
@@ -62,6 +62,7 @@ const GoodsWrite = observer(() => {
 
         const images = imgList.join();
         const optionList = option.join();
+        
 
         // success
         const data = {

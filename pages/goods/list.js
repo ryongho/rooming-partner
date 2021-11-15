@@ -57,16 +57,24 @@ const GoodsList = observer(() => {
      {
         title: '삭제',
         dataIndex: 'delete',
-        render: (_, idx) => {
+        render: (text, record) => {
             return (<Popconfirm
                 title='정말 삭제하시겠습니까?'
                 okText='삭제'
                 okType='danger'
                 onConfirm={async () => {
-                    console.log(idx.key)
-
-                    // success
-                    message.success('삭제 완료')
+                    const params = {
+                        goods_id: record.goods_id
+                    }
+                    await goods.deleteGoods(params, user.token, async (status) => {
+                        if(status){
+                            // success
+                            message.success('삭제 완료')
+                            await goods.callListPartner(user.token)
+                            setData(goods.partnerList.data)
+                            router.push('/goods/list').then(()=> window.scrollTo(0,0));
+                        }
+                    })
                 }}
                 cancelText='취소'>
                 <Button type="danger">삭제</Button>

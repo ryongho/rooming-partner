@@ -8,6 +8,7 @@ import xlsx from 'xlsx'
 import router from 'next/router';
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../store/StoreProvider'
+import { toJS } from 'mobx';
 
 
 const RoomsList = observer(() => {
@@ -90,16 +91,26 @@ const RoomsList = observer(() => {
     {
         title: '삭제',
         dataIndex: 'delete',
-        render: (_, idx) => {
+        render: (_, record) => {
             return (<Popconfirm
                 title='정말 삭제하시겠습니까?'
                 okText='삭제'
                 okType='danger'
                 onConfirm={async () => {
-                    console.log(idx.key)
+                    const params = {
+                        room_id: record.id
+                    }
+                    
+                    await room.deleteRoom(params, user.token, (status) => {
+                        if(status){
+                            // success
+                            message.success('삭제 완료')
+                            await room.callListPartner(user.token)
+                            setData(room.partnerList.data[0])
+                            router.push('/rooms/list');
+                        }
+                    })
 
-                    // success
-                    message.success('삭제 완료')
                 }}
                 cancelText='취소'>
             <Button type="danger">삭제</Button>

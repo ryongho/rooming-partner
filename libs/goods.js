@@ -92,6 +92,18 @@ export function delGoodsImageDelete(params, token) {
     })
 }
 
+export function delGoods(params, token) {
+    return axios({
+        method: 'delete',
+        url: '/goods/delete',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
 export function getGoodsListByHotel(params, token) {
     return axios({
         method: 'get',
