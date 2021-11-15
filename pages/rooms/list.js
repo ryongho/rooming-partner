@@ -101,7 +101,7 @@ const RoomsList = observer(() => {
                         room_id: record.id
                     }
                     
-                    await room.deleteRoom(params, user.token, (status) => {
+                    await room.deleteRoom(params, user.token, async (status) => {
                         if(status){
                             // success
                             message.success('삭제 완료')
