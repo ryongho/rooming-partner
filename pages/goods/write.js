@@ -112,6 +112,9 @@ const GoodsWrite = observer(() => {
         await setImgList(imgList.filter((e, idx) => idx !== key))
     }
 
+    useEffect(() => {
+        setRate((price - salePrice) / price * 100);
+    }, [salePrice, price])
 
     return (
         <Wrapper>
@@ -141,30 +144,31 @@ const GoodsWrite = observer(() => {
                                     )
                                 })}
                             </SelectBar>
-                            <Button type="primary" size="small" onClick={() => router.push('/rooms/1?type="modi"')} style={{fontSize: '12px'}}>객실 추가 및 삭제</Button>
+                            <Button type="primary" size="small" onClick={() => router.push('/rooms/list')} style={{fontSize: '12px'}}>객실 추가 및 삭제</Button>
                         </RoomsWrap>
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 원가">
                         <InputValue
+                        style={{width:'200px', textAlign:'right'}}
                         value={price} 
                         onChange={e => {
                             const numRegExp = /^[0-9]*$/;
                             if (!numRegExp.test(e.target.value)) return;
-                            setPrice(e.target.value)}} />
+                            setPrice(e.target.value)}} /> 원
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 할인가">
                         <InputValue
+                        style={{width:'200px', textAlign:'right'}}
                         value={salePrice} 
                         onChange={e => {
                             const numRegExp = /^[0-9]*$/;
-                            if (!numRegExp.test(e.target.value)) return;setSalePrice(e.target.value)}} />
+                            if (!numRegExp.test(e.target.value)) return;setSalePrice(e.target.value)}} /> 원
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 할인율">
                         <InputValue
-                        value={rate} 
-                        onChange={e => {
-                            const numRegExp = /^[0-9]*$/;
-                            if (!numRegExp.test(e.target.value)) return;setRate(e.target.value)}} />
+                        style={{width:'200px', textAlign:'right'}}
+                        value={rate ? rate.toFixed(0) : null} 
+                        /> %
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <UploadImgs 

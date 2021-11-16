@@ -69,7 +69,7 @@ const GoodsDetail = observer(() => {
     }, [router])
 
     useEffect(() => {
-        setRate((price - salePrice) / salePrice * 100);
+        setRate((price - salePrice) / price * 100);
     }, [salePrice, price])
 
     const onDataChange = (e, val) => {
@@ -181,7 +181,7 @@ const GoodsDetail = observer(() => {
         await goods.deleteGoods(params, user.token, (status) => {
             if(status){
                 // success
-                router.push('/rooms/list');
+                router.push('/goods/list');
             }
         })
     }
@@ -270,10 +270,10 @@ const GoodsDetail = observer(() => {
                     <Descriptions.Item label="상품 할인율">
                     {modiStatus ?
                         <InputValue
-                        value={rate.toFixed(1)} 
+                        value={rate.toFixed(0)} 
                         style={{width:'200px', textAlign:'right'}}
                         bordered={modiStatus} />
-                        : rate?.toFixed(1)} %
+                        : rate?.toFixed(0)} %
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <ModiImgs 
