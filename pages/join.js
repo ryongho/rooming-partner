@@ -32,6 +32,9 @@ const Join = observer(() => {
         if (!phone) {
             return message.warning('담당자 연락처를 입력해 주세요')
         }
+        if (phone.length !== 11) {
+            return message.warning('담당자 연락처를 정확하게 입력해 주세요')
+        }
         if (!pw) {
             return message.warning('비밀번호를 입력해 주세요')
         }

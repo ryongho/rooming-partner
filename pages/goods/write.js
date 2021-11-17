@@ -175,8 +175,7 @@ const GoodsWrite = observer(() => {
                             imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            onRemoveImgs={onRemoveImgs}
-                            modiStatus={true} />
+                            onRemoveImgs={onRemoveImgs} />
                     </Descriptions.Item>
                     
                     <Descriptions.Item label="최소 박 수">

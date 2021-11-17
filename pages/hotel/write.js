@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Descriptions, Select, Input, Button, Checkbox, message, Modal, DatePicker, Upload, Space } from 'antd'
+import { Descriptions, Select, Input, Button, Checkbox, message, Modal, DatePicker, Radio, Space } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
@@ -39,8 +39,7 @@ const HotelWrite = observer(() => {
 
     const [showAddress, setShowAddress] = useState(false)
 
-    const onWrite = async () => {
-
+    const onWrite = async () => {        
         if (!name) {
             return message.warning('숙소명을 입력해 주세요')
         }
@@ -83,7 +82,7 @@ const HotelWrite = observer(() => {
             parking: parking,
         }
 
-        // console.log(data)
+        console.log(data)
 
         await hotel.addInfo(data, user.token, (success, result) => {
             if (success) {
@@ -95,18 +94,6 @@ const HotelWrite = observer(() => {
 
 
     const onUploadChange = async (e) => {
-        // if (e.file.status === 'uploading') {
-        //     setLoading(true);
-        //     await hotel.imagesUpload(e.file.originFileObj, user.token, (success, data) => {
-        //         if (success) {
-        //             setFileList(fileList.concat(e.file.originFileObj))
-        //             setLoading(false);
-        //             setImgList(imgList.concat(data.images))
-        //             console.log(fileList, imgList)
-        //         }
-        //     })
-        // }
-        
         setLoading(true)
         let file = e.target.files[0];
         let reader = new FileReader();
@@ -123,11 +110,6 @@ const HotelWrite = observer(() => {
     }
     
     const onRemoveImgs = async(key) => {
-        // let idx = fileList.indexOf(file);
-        // imgList.splice(idx, 1);
-        // await setImgList(imgList)
-        // await setFileList(fileList.filter(e => e !== file))
-
         await setImgList(imgList.filter((e, idx) => idx !== key))
     }
 
@@ -169,13 +151,20 @@ const HotelWrite = observer(() => {
                         placeholder={"위도"}
                         value={latitude}
                         style={{width:100, marginRight: '10px'}}
-                        onChange={(e) => setLatitude(e.target.value)} />
+                        onChange={(e) => {
+                            const rateRegExp = /^[0-9.]*$/;
+                            if(!rateRegExp.test(e.target.value)) return
+                            else setLatitude(e.target.value)
+                            }} />
                         <InputLabel>경도 : </InputLabel>
                         <Input 
                         placeholder={"경도"}
                         value={longtitude}
                         style={{width:100, marginRight: '20px'}}
-                        onChange={(e) => setLongtitude(e.target.value)} />
+                        onChange={(e) => {
+                            const rateRegExp = /^[0-9.]*$/;
+                            if(!rateRegExp.test(e.target.value)) return
+                            else setLongtitude(e.target.value)}} />
                         
                         <a href="https://www.google.com/maps/search/" target='_blank'>
                             <Button>주소로 경도/위도 찾기</Button>
@@ -213,8 +202,7 @@ const HotelWrite = observer(() => {
                             imgList={imgList}
                             loading={loading}
                             onUploadChange={onUploadChange}
-                            onRemoveImgs={onRemoveImgs}
-                            modiStatus={true} />
+                            onRemoveImgs={onRemoveImgs} />
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                         <Checkbox.Group options={options} value={facility} onChange={e => setFacility(e)} />

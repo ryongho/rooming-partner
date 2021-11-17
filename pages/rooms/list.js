@@ -176,7 +176,7 @@ const RoomsList = observer(() => {
             </TopBox>
 
             <TableTop>
-                <TotalNum>총 {room.partnerList.data && room.partnerList.data[0].length}건</TotalNum>
+                <TotalNum>총 {room.partnerList.data && room.partnerList.data[0]?.length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={() => router.push('/rooms/write')}><PlusSquareOutlined /> 객실 등록</Button>
                     {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}

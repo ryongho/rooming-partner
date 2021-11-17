@@ -33,9 +33,9 @@ const UploadImgs = ({ modiStatus, imgList, loading, onUploadChange, maxLength = 
                 return (
                     <ImgWrap key={`imgList_${idx}`}>
                         <FilListImg src={`https://rooming-img.s3.ap-northeast-2.amazonaws.com/${item.file_name ? item.file_name : item}`} />
-                        {/* <DelBtnWrap className={'fileDel'} onClick={() => onRemoveImgs(key)}>
+                        <DelBtnWrap className={'fileDel'} onClick={() => onRemoveImgs(idx)}>
                             <DeleteOutlinedIco />
-                        </DelBtnWrap> */}
+                        </DelBtnWrap>
                     </ImgWrap>
                 )})
             }
