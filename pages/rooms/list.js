@@ -60,7 +60,7 @@ const RoomsList = observer(() => {
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => a.amount - b.amount,
     }, {
-        title: '최대 인원수',
+        title: '기준 인원수',
         dataIndex: 'peoples',
         key: 'peoples',
         sortDirections: ['descend', 'ascend'],
@@ -122,10 +122,15 @@ const RoomsList = observer(() => {
         console.log(e)
     }
 
-    const onSearch = (word) => {
+    const onSearch = async (word) => {
         if (word) {
             setData(data.filter(e => e.name.indexOf(word) !== -1))
-        } else message.warning('검색어를 입력해 주세요.')
+        } else {
+            message.warning('검색어를 입력해 주세요.');
+            
+            await room.callListPartner(user.token)
+            setData(room.partnerList.data[0])
+        }
     }
 
     const onExcelDown = () => {

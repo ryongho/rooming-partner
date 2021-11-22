@@ -7,6 +7,7 @@ import { UserOutlined, ScheduleOutlined, ShoppingCartOutlined, FormOutlined, Sho
 import Header from '../components/organism/Header'
 import 'moment/locale/ko'
 import { StoreProvider } from '../store/StoreProvider'
+import Link from 'next/link'
 
 
 const GlobalStyle = createGlobalStyle`
@@ -148,36 +149,36 @@ const MyApp = ({ Component, pageProps }) => {
                                 <LogoArea>
                                     <HeaderLogo src={'/image/logo.png'} />
                                 </LogoArea>
-                                <Menu defaultOpenKeys={['/user', '/reserved', '/goods', '/hotel', '/review', '/rooms', '/board', '/stats']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
+                                <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
                                 {/* <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={router.pathname} mode="inline"> */}
                                     <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
-                                        <Menu.Item key="/user/partner/list" group="회원 관리" title="파트너 목록">파트너 목록</Menu.Item>
+                                        <Menu.Item key="/user/partner/list" group="회원 관리" title="파트너 목록"><Link href="/user/partner/list">파트너 목록</Link></Menu.Item>
                                         {isAdmin && <Menu.Item key="/user/customer/list" group="회원 관리" title="고객 목록">고객 목록</Menu.Item>}
                                     </SubMenu>
                                     <SubMenu key="/hotel" icon={<ShopOutlined />} title="숙소 관리">
-                                        <Menu.Item key="/hotel/list" group="숙소 관리" title="숙소 목록">숙소 목록</Menu.Item>
+                                        <Menu.Item key="/hotel/list" group="숙소 관리" title="숙소 목록"><Link href="/hotel/list">숙소 목록</Link></Menu.Item>
                                     </SubMenu>
                                     <SubMenu key="/rooms" icon={<ClearOutlined />} title="객실 관리">
-                                        <Menu.Item key="/rooms/list" group="객실 관리" title="객실 목록">객실 목록</Menu.Item>
+                                        <Menu.Item key="/rooms/list" group="객실 관리" title="객실 목록"><Link href="/rooms/list">객실 목록</Link></Menu.Item>
                                     </SubMenu>
                                     <SubMenu key="/goods" icon={<ShoppingCartOutlined />} title="상품 관리">
-                                        <Menu.Item key="/goods/list" group="상품 관리" title="상품 목록">상품 목록</Menu.Item>
+                                        <Menu.Item key="/goods/list" group="상품 관리" title="상품 목록"><Link href="/goods/list">상품 목록</Link></Menu.Item>
                                     </SubMenu>
                                     <SubMenu key="/reserved" icon={<ScheduleOutlined />} title="예약 관리">
-                                        <Menu.Item key="/reserved/list" group="예약 관리" title="예약 목록">예약 목록</Menu.Item>
+                                        <Menu.Item key="/reserved/list" group="예약 관리" title="예약 목록"><Link href="/reserved/list">예약 목록</Link></Menu.Item>
                                     </SubMenu>
                                     <SubMenu key="/review" icon={<FormOutlined />} title="리뷰 관리">
-                                        <Menu.Item key="/review/list" group="리뷰 관리" title="리뷰 목록">리뷰 목록</Menu.Item>
+                                        <Menu.Item key="/review/list" group="리뷰 관리" title="리뷰 목록"><Link href="/review/list">리뷰 목록</Link></Menu.Item>
                                     </SubMenu>
                                     {isAdmin &&
                                     <SubMenu key="/board" icon={<SettingOutlined />} title="게시판 관리">
-                                        <Menu.Item key="/board/notice/list" group="게시판 관리" title="공지사항 목록">공지사항 목록</Menu.Item>
-                                        <Menu.Item key="/board/faq/list" group="게시판 관리" title="FAQ 목록">FAQ 목록</Menu.Item>
-                                        <Menu.Item key="/board/policy/list" group="게시판 관리" title="약관 및 정책 목록">약관 및 정책 목록</Menu.Item>
+                                        <Menu.Item key="/board/notice/list" group="게시판 관리" title="공지사항 목록"><Link href="/board/notice/list">공지사항 목록</Link></Menu.Item>
+                                        <Menu.Item key="/board/faq/list" group="게시판 관리" title="FAQ 목록"><Link href="/board/faq/list">FAQ 목록</Link></Menu.Item>
+                                        <Menu.Item key="/board/policy/list" group="게시판 관리" title="약관 및 정책 목록"><Link href="/board/policy/list">약관 및 정책 목록</Link></Menu.Item>
                                     </SubMenu>
                                     }
                                     <SubMenu key="/stats" icon={<BarChartOutlined />} title="통계 관리">
-                                        <Menu.Item key="/stats/list" group="통계 관리" title="통계 목록">통계 목록</Menu.Item>
+                                        <Menu.Item key="/stats/list" group="통계 관리" title="통계 목록"><Link href="/stats/list">통계 목록</Link></Menu.Item>
                                     </SubMenu>
                                 </Menu>
                             </Sider>

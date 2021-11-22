@@ -5,7 +5,8 @@ import {
     putRegistPartner,
     getUserInfo,
     postUserCheckEmail,
-    postUserCheckNick
+    postUserCheckNick,
+    putUpdateMemberInfo
 } from '../libs/user'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -25,7 +26,8 @@ export default class UserStore {
             callInfo: action,
             checkEmailDuplicate: action,
             checkNickDuplicate: action,
-            info: observable
+            info: observable,
+            updateInfo: action
         })
     }
 
@@ -116,5 +118,17 @@ export default class UserStore {
     } catch (err) {
         callback(false, null)
     }
+  }
+
+  updateInfo = async (params, token, callback) => {
+      try {
+          const result = await putUpdateMemberInfo(params, token);
+          if (result.status === 200) {
+              callback(true, result.data)
+          }
+      } catch (err) {
+          callback(false, err)
+          console.log(err)
+      }
   }
 }

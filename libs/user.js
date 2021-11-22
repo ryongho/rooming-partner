@@ -50,3 +50,15 @@ export function postUserCheckNick(params) {
         params: params
     })
 }
+
+export function putUpdateMemberInfo(params, token) {
+    return axios({
+        method: 'put',
+        url: '/user/update_info',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

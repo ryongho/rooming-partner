@@ -56,13 +56,9 @@ const GoodsWrite = observer(() => {
         if (!price) {
             return message.warning('상품 원가를 입력해 주세요')
         }
-        // if (imgList.length < 1) {
-        //     return message.warning('상품 사진을 입력해 주세요')
-        // }
-
-        const images = imgList.join();
-        const optionList = option.join();
-        
+        if (imgList.length < 1) {
+            return message.warning('상품 이미지를 입력해 주세요')
+        }
 
         // success
         const data = {
@@ -77,16 +73,20 @@ const GoodsWrite = observer(() => {
             rate: rate,
             min_nights: minNight,
             max_nights: maxNight,
-            options: optionList,
-            images: images,
             breakfast: breakfast
         }
 
-        console.log(data)
+        if (imgList.length > 0) {
+            data.images = imgList.join();
+        }
+        if (option) {
+            data.options = option.join();
+        }
+
         await goods.addInfo(data, user.token, (success, result) => {
             if (success) {
-                // console.log(result)
-                message.success('게시 완료').then(() => router.push('/goods/list').then(() => window.scrollTo(0,0)))
+                message.success('게시 완료')
+                window.location.href = "/goods/list"
             }
         })
     }

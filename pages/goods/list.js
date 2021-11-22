@@ -102,10 +102,15 @@ const GoodsList = observer(() => {
         console.log(e)
     }
 
-    const onSearch = (word) => {
+    const onSearch = async (word) => {
         if (word) {
             setData(data.filter(e => e.goods_name.indexOf(word) !== -1))
-        } else message.warning('검색어를 입력해 주세요.')
+        } else {
+            message.warning('검색어를 입력해 주세요.')
+            
+            await goods.callListPartner(user.token)
+            setData(goods.partnerList.data)
+        }
     }
 
     const onExcelDown = () => {

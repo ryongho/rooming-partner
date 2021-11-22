@@ -20,7 +20,7 @@ const HotelList = observer(() => {
         const callList = async () => {
             await user.callInfo(user.token)
             await hotel.callListPartner(user.token)
-            // console.log(user.token, hotel.partnerList)
+            // console.log(user.token, user.info)
         }
 
         callList()
@@ -104,9 +104,10 @@ const HotelList = observer(() => {
             }
 
             <TableTop>
-                <TotalNum>총 {hotel.partnerList.data && hotel.partnerList.data.length}건</TotalNum>
+                {/* <TotalNum>총 {hotel.partnerList.data && hotel.partnerList.data.length}건</TotalNum> */}
                 <Space>
-                    <Button type="primary" onClick={onWriteHotel}><PlusSquareOutlined /> 숙소 등록</Button>
+                    {!user.hotelid &&
+                    <Button type="primary" onClick={onWriteHotel}><PlusSquareOutlined /> 숙소 등록</Button>}
                     {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
                 </Space>
             </TableTop>

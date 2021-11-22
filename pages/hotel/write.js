@@ -49,6 +49,9 @@ const HotelWrite = observer(() => {
         if (!tel) {
             return message.warning('숙소 연락처를 입력해 주세요')
         }
+        if (tel.length > 12) {
+            return message.warning('숙소 연락처를 정확히 입력해 주세요')
+        }
         if (imgList.length < 1) {
             return message.warning('숙소 이미지를 입력해 주세요')
         }
@@ -56,8 +59,6 @@ const HotelWrite = observer(() => {
             return message.warning('취소 및 환불 규정을 입력해 주세요')
         }
 
-        const images = imgList.join();
-        const option = facility.join();
 
         let total_address = zonecode + ' ' + address
 
@@ -65,7 +66,7 @@ const HotelWrite = observer(() => {
             name: name,
             content: content,
             owner: owner,
-            open_date: moment(openDate).format('YYYY-MM-DD'),
+            open_date: openDate ? moment(openDate).format('YYYY-MM-DD') : null,
             reg_no: reg,
             address: total_address,
             address_detail: address2,
@@ -73,18 +74,22 @@ const HotelWrite = observer(() => {
             fax: fax,
             level: level,
             traffic: traffic,
-            images: images,
             latitude: latitude,
             longtitude: longtitude,
             type: category,
-            options: option,
             refund_rule: cancel,
             parking: parking,
         }
-
+        if (imgList.length > 0) {
+            data.images = imgList.join();
+        }
+        if (facility) {
+            data.options = facility.join();
+        }
         console.log(data)
 
         await hotel.addInfo(data, user.token, (success, result) => {
+            console.log()
             if (success) {
                 message.success('게시 완료').then(() => window.location.href='/hotel/list')
             }

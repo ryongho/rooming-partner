@@ -30,7 +30,7 @@ const HotelDetail = () => {
     const [content, setContent] = useState('')
     const [owner, setOwner] = useState('')
     const [reg, setReg] = useState('')
-    const [openDate, setOpenDate] = useState()
+    const [openDate, setOpenDate] = useState('')
     const [traffic, setTraffic] = useState('')
     const [level, setLevel] = useState('')
     const [fax, setFax] = useState('')
@@ -49,11 +49,11 @@ const HotelDetail = () => {
             await goods.callListPartner(user.token)
             await user.callInfo(user.token);
 
-            // console.log(hotel.info, goods.partnerList.data)
+            console.log('str:', String(hotel.info.data[0].open_date), 'date:',new Date(hotel.info.data[0].open_date))
             if (hotel.info.data[0]) {
                 setCategory(hotel.info.data[0].type)
                 setName(hotel.info.data[0].name)
-                setFacility(hotel.info.data[0].options.split(","))
+                setFacility(hotel.info.data[0].options?.split(","))
                 setAddress(hotel.info.data[0].address.slice(6, hotel.info.data[0].address.length))
                 setAddress2(hotel.info.data[0].address_detail)
                 setZonecode(hotel.info.data[0].address.slice(0, 5))
@@ -73,13 +73,13 @@ const HotelDetail = () => {
                 setContent(hotel.info.data[0].content)
                 setOwner(hotel.info.data[0].owner)
                 setReg(hotel.info.data[0].reg_no)
-                setOpenDate(hotel.info.data[0].open_date)
+                setOpenDate(String(hotel.info.data[0].open_date))
                 setTraffic(hotel.info.data[0].traffic)
                 setLevel(hotel.info.data[0].level)
                 setFax(hotel.info.data[0].fax)
                 setLongtitude(hotel.info.data[0].longtitude)
                 setLatitude(hotel.info.data[0].latitude)
-                setParking(goods.info.data[0].parking)
+                setParking(hotel.info.data[0].parking)
             }
         }
         callDetail();
@@ -101,11 +101,14 @@ const HotelDetail = () => {
         if (val == 'content') setContent(e.target.value);
         if (val == 'owner') setOwner(e.target.value);
         if (val == 'cancel') setCancel(e.target.value);
-        if (val == 'reg') setReg(e.target.value);
-        if (val == 'openDate') setOpenDate(e.target.value);
+        if (val == 'reg') {
+            const regExp = /^[0-9-]*$/;
+            if (!regExp.test(e.target.value)) return;
+            setReg(e.target.value);
+        }
         if (val == 'traffic') setTraffic(e.target.value);
         if (val == 'level') setLevel(e.target.value);
-        if (val == 'fax') setTraffic(e.target.value);
+        if (val == 'fax') setFax(e.target.value);
         if (val == 'longtitude') setLongtitude(e.target.value);
         if (val == 'latitude') setLatitude(e.target.value);
     }
@@ -153,6 +156,9 @@ const HotelDetail = () => {
             if (!tel) {
                 return message.warning('숙소 연락처를 입력해 주세요')
             }
+            if (reg?.length > 12) {
+                message.warning('사업자 번호를 정확히 입력해 주세요')
+            }
             if (imgList.length < 1) {
                 message.warning('숙소 사진을 입력해 주세요')
             }
@@ -161,14 +167,13 @@ const HotelDetail = () => {
             }
 
             // success
-            const option = facility.join();
             let total_address = zonecode + ' ' + address
 
             const data = {
                 id: user.hotelid,
                 name: name,
                 content: content,
-                open_date: moment(openDate).format('YYYY-MM-DD'),
+                open_date: openDate,
                 address: total_address,
                 address_detail: address2,
                 tel: tel,
@@ -180,11 +185,15 @@ const HotelDetail = () => {
                 latitude: latitude,
                 longtitude: longtitude,
                 type: category,
-                options: option,
                 refund_rule: cancel,
+                parking: parking
+            }
+
+            if (facility) {
+                data.options = facility.join();
             }
             
-            console.log(data)
+            // console.log(data)
 
             await hotel.updateInfo(data, user.token, (success, result) => {
                 if (success) {
@@ -315,9 +324,10 @@ const HotelDetail = () => {
                         modiStatus={modiStatus} />
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
-                        <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} />
+                    {modiStatus ?
+                        <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} /> : facility.join(', ')}
                     </Descriptions.Item>
-                    <Descriptions.Item>
+                    <Descriptions.Item label="주차 정보">
                     {modiStatus ?
                         <Radio.Group 
                         value={parking}
@@ -351,7 +361,11 @@ const HotelDetail = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="개업일">
                         {modiStatus ?
-                        <DatePicker defaultValue={openDate} onChange={(e) => onDataChange(e, 'opendate')} />
+                        <DatePicker 
+                        defaultValue={moment(openDate)}
+                        format={'YYYY-MM-DD'} 
+                        value={moment(openDate)}
+                        onChange={(e, str) => {console.log(e, str); setOpenDate(str)}} />
                         : openDate }
                     </Descriptions.Item>
                     <Descriptions.Item label="호텔 소개">
@@ -392,7 +406,7 @@ const HotelDetail = () => {
                 <ButtonWrap>
                     <Button type="primary" onClick={onModi}>{modiStatus ? '수정완료' : '수정'}</Button>
                     {modiStatus ?
-                    <Button onClick={() => router.replace('/hotel/1', undefined, {shallow: true}).then(() => window.scrollTo(0,0))}>취소</Button>
+                    <Button onClick={() => router.replace(`/hotel/${user.hotelid}`, undefined, {shallow: true}).then(() => window.scrollTo(0,0))}>취소</Button>
                     : <Button onClick={() => router.push('/hotel/list')}>목록</Button>
                     }
                 </ButtonWrap>

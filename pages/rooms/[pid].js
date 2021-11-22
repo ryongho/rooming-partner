@@ -61,9 +61,7 @@ const RoomsDetail = observer(() => {
             }
 
             if (goods.list.data) {
-                console.log(goods.list.data)
                 let rooms = goods.list.data.slice().filter(el => el.room_id == router.query.pid)
-                console.log(rooms)
                 setRoomList(rooms)
             }
         }
@@ -108,6 +106,7 @@ const RoomsDetail = observer(() => {
             // success
 
             const data = {
+                hotel_id: user.hotelid,
                 id: router.query.pid,
                 name: name,
                 peoples: people,
@@ -116,9 +115,8 @@ const RoomsDetail = observer(() => {
                 bed: bed,
                 amount: bedNum
             }
-            
-            console.log(data)
 
+            // console.log(data, user.token)
             await room.updateInfo(data, user.token, (success, result) => {
                 if (success) {
                     message.success('수정 완료')

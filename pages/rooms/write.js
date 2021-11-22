@@ -44,7 +44,6 @@ const GoodsWrite = observer(() => {
             return message.warning('객실 이미지를 입력해 주세요')
         }
         
-        const images = imgList.join();
 
         // success
         const data = {
@@ -53,12 +52,14 @@ const GoodsWrite = observer(() => {
             bed: bed,
             amount: bedNum,
             peoples: people,
-            images: images,
             checkin: checkIn,
             checkout: checkOut,
         }
 
-        console.log(data)
+        if (imgList.length > 0) {
+            data.images = imgList.join();
+        }
+
 
         await room.addInfo(data, user.token, (success, result) => {
             if (success) {
@@ -122,7 +123,7 @@ const GoodsWrite = observer(() => {
                             if (!numRegExp.test(e.target.value)) return;setBedNum(e.target.value)
                         }} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="인원 제한수">
+                    <Descriptions.Item label="기준 인원수">
                         <Input
                         value={people} 
                         onChange={e => {

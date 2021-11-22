@@ -40,6 +40,7 @@ const GoodsDetail = observer(() => {
 
             await goods.callInfo({id: router.query.pid}, user.token)
             await room.callRoomList({hotel_id: user.hotelid}, user.token)
+            console.log(goods.info.images)
             if (goods.info.data[0]) {
                 setRoomId(goods.info.data[0].room_id)
                 setName(goods.info.data[0].goods_name)
@@ -50,7 +51,7 @@ const GoodsDetail = observer(() => {
                 setRate((goods.info.data[0].price - goods.info.data[0].sale_price) / goods.info.data[0].price * 100)
                 setMinNight(goods.info.data[0].min_nights)
                 setMaxNight(goods.info.data[0].max_nights)
-                setOption(goods.info.data[0].options.split(","))
+                setOption(goods.info.data[0].options?.split(","))
                 setBreakfast(goods.info.data[0].breakfast)
                 // setParking(goods.info.data[0].parking)
                 setImgList(goods.info.images)
@@ -144,7 +145,6 @@ const GoodsDetail = observer(() => {
             }
 
             // success
-            const optionList = option.join();
 
             const data = {
                 hotel_id: user.hotelid,
@@ -157,15 +157,14 @@ const GoodsDetail = observer(() => {
                 sale_price: salePrice,
                 min_nights: minNight,
                 max_nights: maxNight,
-                options: optionList,
                 breakfast: breakfast,
                 parking: parking,
             }
+            if (option) {
+                data.options = option.join();
+            }
             
-            console.log(data)
-
             await goods.updateInfo(data, user.token, (success, result) => {
-                console.log(result)
                 if (success) {
                     message.success('수정 완료')
                     window.location.href=`/goods/${router.query.pid}`

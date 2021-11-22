@@ -25,7 +25,6 @@ const PartnerDetail = observer(() => {
         const callDetail = async() => {
             await user.callInfo(user.token);
             await hotel.callInfo({id: user.hotelid}, user.token);
-            console.log(user.info.data, hotel.info.data[0])
 
             setPartner(user.info.data.nickname)
             setPw(user.info.data.pw)
@@ -58,7 +57,7 @@ const PartnerDetail = observer(() => {
         if (val == 'name') setName(e.target.value);
     }
     
-    const onModi = () => {
+    const onModi = async () => {
         const pwRegExp = /^[a-z0-9]{8,20}$/;
         if (!router.query.type) router.push('/user/partner/detail?type=modi');
         else {
@@ -67,6 +66,9 @@ const PartnerDetail = observer(() => {
             }
             if (!phone) {
                 return message.warning('담당자 연락처를 입력해 주세요')
+            }
+            if (phone.length < 8 || phone.length > 12) {
+                return message.warning('담당자 연락처를 정확히 입력해 주세요')
             }
             if (!pw) {
                 return message.warning('비밀번호를 입력해 주세요')
@@ -84,8 +86,21 @@ const PartnerDetail = observer(() => {
             // success
             const data = {
                 name: name,
+                phone: phone,
+                pw: pw,
+                pw2: pw2,
+                user_id: user.info.data.id,
+                email: user.info.data.email,
+                nickname: user.info.data.nickname,
+                user_type: 1
             }
 
+            await user.updateInfo(data, user.token, (success, result) => {
+                if (success) {
+                    message.success('수정 완료');
+                    window.location.href='/user/partner/detail'
+                }
+            })
         }
     }
 
