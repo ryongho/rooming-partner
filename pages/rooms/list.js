@@ -8,7 +8,6 @@ import xlsx from 'xlsx'
 import router from 'next/router';
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../store/StoreProvider'
-import { toJS } from 'mobx';
 
 
 const RoomsList = observer(() => {

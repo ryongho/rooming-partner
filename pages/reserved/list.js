@@ -163,8 +163,8 @@ const ReservedList = observer(() => {
                         <FilterLabel>예약상태</FilterLabel>
                         <Radio.Group defaultValue={"total"}>
                             <Radio.Button value="total" buttonStyle="solid">전체</Radio.Button>
-                            <Radio.Button value="">예약확정</Radio.Button>
-                            <Radio.Button value="">예약취소</Radio.Button>
+                            <Radio.Button value="S">예약확정</Radio.Button>
+                            <Radio.Button value="X">예약취소</Radio.Button>
                         </Radio.Group>
                     </Filter>
                 </FilterWrap>

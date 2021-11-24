@@ -118,6 +118,7 @@ const GoodsWrite = observer(() => {
                         style={{width: '190px'}}
                         placeholder={"침대 개수를 입력하세요"}
                         value={bedNum} 
+                        type="number"
                         onChange={e => {
                             const numRegExp = /^[0-9]*$/;
                             if (!numRegExp.test(e.target.value)) return;setBedNum(e.target.value)
@@ -125,6 +126,7 @@ const GoodsWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="기준 인원수">
                         <Input
+                        type="number"
                         value={people} 
                         onChange={e => {
                         const numRegExp = /^[0-9]*$/;
