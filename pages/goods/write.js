@@ -49,7 +49,7 @@ const GoodsWrite = observer(() => {
             return message.warning('상품명을 입력해 주세요')
         }
         if (!start) {
-            return message.warning('상품 판매 개시일을 입력해 주세요')
+            return message.warning('상품 판매 게시일을 입력해 주세요')
         }
         if (!end) {
             return message.warning('상품 판매 종료일을 입력해 주세요')
@@ -86,9 +86,10 @@ const GoodsWrite = observer(() => {
         }
 
         await goods.addInfo(data, user.token, (success, result) => {
-            if (success) {
+            console.log('success result : ',success, result);
+            if (success && result.insert_id) {
                 message.success('게시 완료')
-                window.location.href = "/goods/list"
+                window.location.href = `/goods/quantity/${result.insert_id}`
             }
         })
     }
@@ -127,7 +128,7 @@ const GoodsWrite = observer(() => {
                         value={name} 
                         onChange={e => setName(e.target.value)} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="상품 판매 개시일">
+                    <Descriptions.Item label="상품 판매 게시일">
                         <DatePicker
                         onChange={e => setStart(moment(e).format('YYYY-MM-DD'))} />
                     </Descriptions.Item>

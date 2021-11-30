@@ -117,6 +117,7 @@ const MyApp = ({ Component, pageProps }) => {
         if (router.pathname == '/goods/write') setTitle('상품 등록')
         if (router.pathname == '/goods/list') setTitle('상품 목록')
         if (router.pathname == '/goods/[pid]') setTitle('상품 상세')
+        if (router.pathname == '/goods/quantity/[pid]') setTitle('상품 재고수량')
 
         if (router.pathname.indexOf('/reserved/') !== -1) setGroup('예약 관리')
         if (router.pathname == '/reserved/list') setTitle('예약 목록')

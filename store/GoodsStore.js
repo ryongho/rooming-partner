@@ -121,7 +121,7 @@ export default class GoodsStore {
                 this.info = result.data
             }
         } catch (err) {
-            console.log(err)
+            console.log('callInfo err ? ',err)
         }
     }
 

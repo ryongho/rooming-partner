@@ -137,7 +137,7 @@ const GoodsDetail = observer(() => {
                 return message.warning('객실을 선택해 주세요')
             }
             if (!start) {
-                return message.warning('상품 판매 개시일을 입력해 주세요')
+                return message.warning('상품 판매 게시일을 입력해 주세요')
             }
             if (!end) {
                 return message.warning('상품 판매 종료일을 입력해 주세요')
@@ -210,7 +210,7 @@ const GoodsDetail = observer(() => {
                         bordered={modiStatus} />
                         : name}
                     </Descriptions.Item>
-                    <Descriptions.Item label="상품 판매 개시일">
+                    <Descriptions.Item label="상품 판매 게시일">
                         {modiStatus ?
                         <DatePicker
                         defaultValue={moment(start)}
