@@ -18,6 +18,7 @@ const GoodsDetail = observer(() => {
     const options = ['룸서비스', '사진 무한 촬영', '조식 패키지', '파티 용품 제공']
     const [roomId, setRoomId] = useState()
     const [name, setName] = useState()
+    const [sale, setSale] = useState()
     const [start, setStart] = useState()
     const [end, setEnd] = useState()
     const [price, setPrice] = useState()
@@ -40,10 +41,11 @@ const GoodsDetail = observer(() => {
 
             await goods.callInfo({id: router.query.pid}, user.token)
             await room.callRoomList({hotel_id: user.hotelid}, user.token)
-            console.log(goods.info.images)
+            
             if (goods.info.data[0]) {
                 setRoomId(goods.info.data[0].room_id)
                 setName(goods.info.data[0].goods_name)
+                setSale(goods.info.data[0].sale)
                 setStart(goods.info.data[0].start_date)
                 setEnd(goods.info.data[0].end_date)
                 setPrice(goods.info.data[0].price)
@@ -81,7 +83,7 @@ const GoodsDetail = observer(() => {
             if (!numRegExp.test(e.target.value)) return;
         }
         if (val == 'name') setName(e.target.value);
-        if (val == 'active') setActive(e);
+        if (val == 'sale') setSale(e.target.value);
         if (val == 'price') setPrice(e.target.value);
         if (val == 'salePrice') setSalePrice(e.target.value);
         // if (val == 'rate') {
@@ -159,6 +161,7 @@ const GoodsDetail = observer(() => {
                 max_nights: maxNight,
                 breakfast: breakfast,
                 parking: parking,
+                sale: sale
             }
             if (option) {
                 data.options = option.join();
@@ -221,15 +224,16 @@ const GoodsDetail = observer(() => {
                         onChange={e => setEnd(moment(e).format('YYYY-MM-DD'))} />
                         : end?.substring(0, 10)}
                     </Descriptions.Item>
-                    {/* <Descriptions.Item label="상품 상태값">
+                    <Descriptions.Item label="상품 상태값">
                         <GoodsWrap>
-                            <Radio.Group defaultValue={data.active ? "active" : "notActive"} onChange={(e) => onDataChange(e, 'active')}>
-                                <Radio.Button value="active" buttonStyle="solid">활성화</Radio.Button>
-                                <Radio.Button value="notActive">비활성화</Radio.Button>
-                            </Radio.Group>
+                            {modiStatus ?
+                            <Radio.Group defaultValue={sale == 'Y' ? 'Y' : 'N'} onChange={(e) => onDataChange(e, 'sale')} buttonStyle="solid">
+                                <Radio.Button value="Y">활성화</Radio.Button>
+                                <Radio.Button value="N">비활성화</Radio.Button>
+                            </Radio.Group> : sale == 'Y' ? '활성화' : '비활성화' }
                         </GoodsWrap>
                         <GoodsInfo>※ 비활성화된 상품은 앱에서 비공개 처리 됩니다.</GoodsInfo>
-                    </Descriptions.Item> */}
+                    </Descriptions.Item>
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
                         {modiStatus ?

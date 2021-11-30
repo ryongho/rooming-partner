@@ -15,6 +15,7 @@ const GoodsWrite = observer(() => {
     const options = ['룸서비스', '사진 무한 촬영', '조식 패키지', '파티 용품 제공']
     const [roomId, setRoomId] = useState()
     const [name, setName] = useState()
+    const [sale, setSale] = useState('Y')
     const [start, setStart] = useState()
     const [end, setEnd] = useState()
     const [type, setType] = useState(0)
@@ -73,7 +74,8 @@ const GoodsWrite = observer(() => {
             rate: rate,
             min_nights: minNight,
             max_nights: maxNight,
-            breakfast: breakfast
+            breakfast: breakfast,
+            sale: sale
         }
 
         if (imgList.length > 0) {
@@ -133,6 +135,13 @@ const GoodsWrite = observer(() => {
                         <DatePicker
                         onChange={e => setEnd(moment(e).format('YYYY-MM-DD'))} 
                         disabledDate={(e) => e < start} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="상품 상태값">
+                        <Radio.Group defaultValue={'Y'} onChange={(e) => setSale(e.target.value)} buttonStyle="solid">
+                            <Radio.Button value="Y">활성화</Radio.Button>
+                            <Radio.Button value="N">비활성화</Radio.Button>
+                        </Radio.Group>
+                        <GoodsInfo>※ 비활성화된 상품은 앱에서 비공개 처리 됩니다.</GoodsInfo>
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 선택">
                         <RoomsWrap>
@@ -279,6 +288,12 @@ const ButtonWrap = styled.div`
     button:first-child {
         margin-right: 10px;
     }
+`
+
+const GoodsInfo = styled.div`
+    margin-top: 22px;
+    font-size: 12px;    
+    color: #666;
 `
 
 const UploadLength = styled.div`

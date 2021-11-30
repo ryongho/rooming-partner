@@ -40,20 +40,20 @@ const GoodsList = observer(() => {
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => a.sale_price - b.sale_price,
     },
-    //  {
-    //     title: '상태값',
-    //     dataIndex: 'active',
-    //     key: 'active',
-    //     render: (active) => {
-    //         return (
-    //             <>
-    //                 {active ? 
-    //                 <Tag color="blue">활성화</Tag>
-    //                 : <Tag color="default">비활성화</Tag>}
-    //             </>
-    //         )
-    //     }
-    // },
+     {
+        title: '상태값',
+        dataIndex: 'sale',
+        key: 'sale',
+        render: (sale) => {
+            return (
+                <>
+                    {sale == 'Y' ? 
+                    <Tag color="blue">활성화</Tag>
+                    : <Tag color="default">비활성화</Tag>}
+                </>
+            )
+        }
+    },
      {
         title: '삭제',
         dataIndex: 'delete',
