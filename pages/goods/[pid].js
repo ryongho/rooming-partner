@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Descriptions, Input, Button, message, Select, DatePicker, Checkbox, Radio, Modal } from 'antd'
+import { Descriptions, Input, Button, message, Select, DatePicker, Checkbox, Radio, Modal, Calendar } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import ModiImgs from '../../components/atom/ModiImgs'
@@ -74,6 +74,10 @@ const GoodsDetail = observer(() => {
     useEffect(() => {
         setRate((price - salePrice) / price * 100);
     }, [salePrice, price])
+
+    const dateCellRender = () => {
+        return null
+    }
 
     const onDataChange = (e, val) => {
         const numRegExp = /^[0-9]*$/;
@@ -278,6 +282,13 @@ const GoodsDetail = observer(() => {
                         bordered={modiStatus} />
                         : rate?.toFixed(0)} %
                     </Descriptions.Item>
+                    <Descriptions.Item label="상품 재고수량">
+                        <CountWrap>
+                            하단의 표시된 수량은 판매가능한 상품수입니다.
+                            <Button type="primary" size="small" onClick={() => router.push(`/goods/quantity/${router.query.pid}`)} style={{fontSize: '12px'}}>수량 수정</Button>
+                        </CountWrap>
+                        <Calendar dateCellRender={(value)=>dateCellRender(value)} />
+                    </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <ModiImgs 
                         imgList={imgList}
@@ -454,16 +465,10 @@ const ButtonWrap = styled.div`
     }
 `
 
-const AddBtn = styled(Button)`
-    border: none;
-`
 
-const DeleteBtn = styled(Button)`
-    border: none;
-`
-
-const Empty = styled.div`
-    padding-top: 30px;
+const CountWrap = styled.div`
+    display: flex;
+    justify-content: space-between;
 `
 
 export default GoodsDetail

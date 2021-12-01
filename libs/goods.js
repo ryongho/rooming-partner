@@ -115,3 +115,24 @@ export function getGoodsListByHotel(params, token) {
         }
     })
 }
+
+export function putQuantityUpdate(params, token) {
+    console.log('params, token : ',params, token);
+    return axios({
+        method: 'put',
+        url: 'quantity/update',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}
+
+export function putQuantityListUpdate(list, token) {
+    return axios.all(list.map((params)=>putQuantityUpdate(params, token))
+  ).then((data)=>{
+    console.log('data', data);
+    return data
+  })
+}

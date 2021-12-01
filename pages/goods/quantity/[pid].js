@@ -6,6 +6,7 @@ import { observer } from 'mobx-react-lite'
 import { useStore } from '../../../store/StoreProvider'
 import moment from 'moment'
 import { toJS } from "mobx"
+import _ from "lodash"
 
 const GoodsQuantity = observer(() => {
 
@@ -50,18 +51,17 @@ const GoodsQuantity = observer(() => {
                 setStart(moment(goods?.info?.data[0].start_date))
                 setEnd(moment(goods?.info?.data[0].end_date))
                 let _start = start
-                let diff = end.diff(start, 'days')
+                let diff = end?.diff(start, 'days')
                 let dates = {}
                 for (let i = 0; i < diff+1; i++) {
-                    let _date = ''
-                    if(i === 0){
-                        _date = _start.format('YYYY-MM-DD')
-                    }else{
+                    let _date = i === 0 ? _start.format('YYYY-MM-DD') : _start.add(1, 'd').format('YYYY-MM-DD')
 
-                        _date = _start.add(1, 'd').format('YYYY-MM-DD')
+                    if(selectedDates[_date]){
+                        dates[_date] = selectedDates[_date]
+                    }else{
+                        dates[_date] = 0
                     }
 
-                    dates[_date] = 0
                 }
                 setSelectedDates(dates)
             }
@@ -70,6 +70,7 @@ const GoodsQuantity = observer(() => {
         
     }, [goods?.info?.data])
 
+
     const onWrite = async() => {
         if (!start) {
             return message.warning('상품 판매 게시일을 입력해 주세요')
@@ -77,19 +78,31 @@ const GoodsQuantity = observer(() => {
         if (!end) {
             return message.warning('상품 판매 종료일을 입력해 주세요')
         }
+        
+        let quantityList = []
 
-        // await goods.addInfo(data, user.token, (success, result) => {
-        //     if (success) {
-        //         message.success('게시 완료')
-        //         window.location.href = "/goods/list"
-        //     }
-        // })
+        _.forEach( selectedDates, (value, key) => {
+            const row = {
+                goods_id: router.query.pid,
+                qty: value,
+                date: key
+            }
+            quantityList.push(row)
+        });
+        console.log('quantityList',quantityList);
+        await goods.updateQuantity(quantityList, user.token, (success, result) => {
+            // if (success) {
+            //     message.success('게시 완료')
+            //     window.location.href = "/goods/list"
+            // }
+        })
     }
 
-    const dateCellRender = (value) => {
+    const dateCellRender = (value, _selectedDates) => {
         const dateStr = value.format('YYYY-MM-DD')
         const _dates = Object.keys(selectedDates)
         const selected = _dates.includes(dateStr)
+
         return(
             selected ?
                 (isEditMode ?
@@ -110,23 +123,38 @@ const GoodsQuantity = observer(() => {
         )
     }
 
-    const onSetAll = () => {
+    const onSetAll = (start, end) => {
         let _start = start
         let diff = end.diff(start, 'days')
         let dates = {}
         for (let i = 0; i < diff+1; i++) {
-            let _date = ''
-            if(i === 0){
-                _date = _start.format('YYYY-MM-DD')
-            }else{
-
-                _date = _start.add(1, 'd').format('YYYY-MM-DD')
-            }
+            let _date = i === 0 ? _start.format('YYYY-MM-DD') : _start.add(1, 'd').format('YYYY-MM-DD')
 
             dates[_date] = count
         }
         setSelectedDates(dates)
-        console.log('set ',dates);
+    }
+
+    const changeDate = (e, type = '') => {
+        if(!e) return
+        const dateStr = e.format('YYYY-MM-DD')
+        
+        let _start = type === 'start' ? moment(dateStr) : moment(start.format('YYYY-MM-DD'));
+        let _end = type === 'start' ? moment(end.format('YYYY-MM-DD')) : moment(dateStr);
+
+        let diff = _end.diff(_start, 'days')
+        let dates = {}
+        for (let i = 0; i < diff+1; i++) {
+            let _date = i === 0 ? _start.format('YYYY-MM-DD') :  _start.add(1, 'd').format('YYYY-MM-DD')
+
+            dates[_date] = selectedDates[_date] ? selectedDates[_date] : 0
+        }
+        setSelectedDates(dates)
+        if(type === 'start'){
+            setStart(moment(dateStr))
+        }else{
+            setEnd(moment(dateStr))
+        }
     }
     
 
@@ -143,11 +171,11 @@ const GoodsQuantity = observer(() => {
                     <Descriptions.Item label="판매 게시일 ~ 판매 종료일">
                         <StartDate 
                             value={start}
-                            onChange={e => setStart(moment(e).format('YYYY-MM-DD'))} />
+                            onChange={(e)=>changeDate(e, 'start')} />
                         ~
                         <EndDate
                             value={end}
-                            onChange={e => setEnd(moment(e).format('YYYY-MM-DD'))} 
+                            onChange={e => changeDate(e)} 
                             disabledDate={(e) => e < start} />
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 수량">
@@ -163,7 +191,7 @@ const GoodsQuantity = observer(() => {
                                     /> 개
                             </Count>
 
-                            <Button type="primary" disabled={isEditMode} onClick={onSetAll} >일괄적용</Button>
+                            <Button type="primary" disabled={isEditMode} onClick={()=>onSetAll(start, end)} >일괄적용</Button>
                             <ModiButton type="primary" onChange={e=>{setIsEditMode(e)}} />부분 수량 수정
                         </CountWrap>
                     </Descriptions.Item>
@@ -172,12 +200,9 @@ const GoodsQuantity = observer(() => {
 
                 
 
-                <Calendar dateCellRender={dateCellRender} disabledDate={(date)=>{
-                    if(date < new Date()){
-                        return false;
-                    }
-                    return true;
-                }} />
+                <Calendar 
+                    dateCellRender={(value)=>dateCellRender(value, selectedDates)}
+                />
 
                 
 
