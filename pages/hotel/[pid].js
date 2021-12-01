@@ -373,7 +373,7 @@ const HotelDetail = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                     {modiStatus ?
-                        <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} /> : facility.join(', ')}
+                        <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} /> : facility ? facility.join(', ') : null}
                     </Descriptions.Item>
                     <Descriptions.Item label="주차 정보">
                     {modiStatus ?
