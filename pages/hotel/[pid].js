@@ -21,6 +21,9 @@ const HotelDetail = () => {
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
+    const [bank, setBank] = useState()
+    const [account, setAccount] = useState()
+    const [accountName, setAccountName] = useState()
     const [imgList, setImgList] = useState()
     const [fileList, setFileList] = useState()
     // const [breakfast, setBreakfast] = useState()
@@ -58,6 +61,9 @@ const HotelDetail = () => {
                 setAddress2(hotel.info.data[0].address_detail)
                 setZonecode(hotel.info.data[0].address.slice(0, 5))
                 setTel(hotel.info.data[0].tel)
+                setBank(hotel.info.data[0].bank_name)
+                setAccount(hotel.info.data[0].account_number)
+                setAccountName(hotel.info.data[0].account_name)
                 setImgList(hotel.info.images)
 
                 let list = Array.from(Array(10).keys());
@@ -101,6 +107,9 @@ const HotelDetail = () => {
         if (val == 'content') setContent(e.target.value);
         if (val == 'owner') setOwner(e.target.value);
         if (val == 'cancel') setCancel(e.target.value);
+        if (val == 'bank') setBank(e.target.value);
+        if (val == 'account') setAccount(e.target.value);
+        if (val == 'accountName') setAccountName(e.target.value);
         if (val == 'reg') {
             const regExp = /^[0-9-]*$/;
             if (!regExp.test(e.target.value)) return;
@@ -159,6 +168,15 @@ const HotelDetail = () => {
             if (reg?.length > 12) {
                 message.warning('사업자 번호를 정확히 입력해 주세요')
             }
+            if (!bank) {
+                return message.warning('입금 은행명을 입력해 주세요')
+            }
+            if (!account) {
+                return message.warning('입금 계좌번호를 입력해 주세요')
+            }
+            if (!accountName) {
+                return message.warning('예금주를 입력해 주세요')
+            }
             if (imgList.length < 1) {
                 message.warning('숙소 사진을 입력해 주세요')
             }
@@ -186,7 +204,10 @@ const HotelDetail = () => {
                 longtitude: longtitude,
                 type: category,
                 refund_rule: cancel,
-                parking: parking
+                parking: parking,
+                bank_name: bank,
+                account_number: account,
+                account_name: accountName
             }
 
             if (facility) {
@@ -314,6 +335,33 @@ const HotelDetail = () => {
                         onChange={(e) => onDataChange(e, 'level')}
                         bordered={modiStatus} />
                         : level}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="입금 계좌 은행명">
+                        {modiStatus ?
+                        <InputValue
+                        placeholder={"은행명을 입력해 주세요"}
+                        value={bank} 
+                        onChange={(e) => onDataChange(e, 'bank')}
+                        bordered={modiStatus} />
+                        : bank}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="입금 계좌번호">
+                        {modiStatus ?
+                        <InputValue
+                        placeholder={"계좌번호를 입력해 주세요"}
+                        value={account} 
+                        onChange={(e) => onDataChange(e, 'account')}
+                        bordered={modiStatus} />
+                        : account}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="예금주">
+                        {modiStatus ?
+                        <InputValue
+                        placeholder={"예금주를 입력해 주세요"}
+                        value={accountName} 
+                        onChange={(e) => onDataChange(e, 'accountName')}
+                        bordered={modiStatus} />
+                        : accountName}
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 이미지">
                         <ModiImgs 

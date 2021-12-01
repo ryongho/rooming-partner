@@ -21,6 +21,9 @@ const HotelWrite = observer(() => {
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
+    const [bank, setBank] = useState()
+    const [account, setAccount] = useState()
+    const [accountName, setAccountName] = useState()
     // const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
@@ -52,6 +55,15 @@ const HotelWrite = observer(() => {
         if (tel.length > 12) {
             return message.warning('숙소 연락처를 정확히 입력해 주세요')
         }
+        if (!bank) {
+            return message.warning('입금 은행명을 입력해 주세요')
+        }
+        if (!account) {
+            return message.warning('입금 계좌번호를 입력해 주세요')
+        }
+        if (!accountName) {
+            return message.warning('예금주를 입력해 주세요')
+        }
         if (imgList.length < 1) {
             return message.warning('숙소 이미지를 입력해 주세요')
         }
@@ -79,6 +91,9 @@ const HotelWrite = observer(() => {
             type: category,
             refund_rule: cancel,
             parking: parking,
+            bank_name: bank,
+            account_number: account,
+            account_name: accountName
         }
         if (imgList.length > 0) {
             data.images = imgList.join();
@@ -201,6 +216,24 @@ const HotelWrite = observer(() => {
                             const numRegExp = /^[0-9]*$/;
                             if (!numRegExp.test(e.target.value)) return;
                             setLevel(e.target.value)}} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="입금 계좌 은행명">
+                        <InputValue
+                        placeholder={"은행명을 입력해 주세요"}
+                        value={bank} 
+                        onChange={(e) => setBank(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="입금 계좌번호">
+                        <InputValue
+                        placeholder={"계좌번호를 입력해 주세요"}
+                        value={account} 
+                        onChange={(e) => setAccount(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="예금주">
+                        <InputValue
+                        placeholder={"예금주를 입력해 주세요"}
+                        value={accountName} 
+                        onChange={(e) => setAccountName(e.target.value)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 이미지">
                         <UploadImgs 
