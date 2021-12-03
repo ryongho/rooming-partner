@@ -10,7 +10,8 @@ import {
     putGoodsImageUpdate,
     getGoodsListByHotel,
     delGoods,
-    putQuantityListUpdate
+    putQuantityListUpdate,
+    getGoodsQuantityList
 } from '../libs/goods'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -31,7 +32,8 @@ export default class GoodsStore {
             callListByHotel: action,
             list: observable,
             deleteGoods: action,
-            updateQuantity: action
+            updateQuantity: action,
+            callQuantityList: action
         })
     }
 
@@ -151,14 +153,30 @@ export default class GoodsStore {
         }
     }
 
-    updateQuantity = async (list, token) => {
+    updateQuantity = async (list, token, callback) => {
         try {
             const result = await putQuantityListUpdate(list, token)
             if (result.length) {
-                callback(true, result)
+                if(callback){
+                    callback(true)
+                }
             }
         } catch (error) {
+            console.log(error);
             
+        }
+    }
+    
+    callQuantityList = async (params, callback) => {
+        try {
+            const result = await getGoodsQuantityList(params)
+            // console.log('result', result);
+            
+            if (result.status === 200) {
+                callback(result.data)
+            }
+        } catch (error) {
+            console.log('got ',error)
         }
     }
 }

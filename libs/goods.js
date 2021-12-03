@@ -116,8 +116,17 @@ export function getGoodsListByHotel(params, token) {
     })
 }
 
+
+export function getGoodsQuantityList(params) {
+    return axios({
+        method: 'get',
+        url: 'goods/get_qty_list',
+        baseURL: baseUrl[env].baseUrl,
+        params: params
+    })
+}
+
 export function putQuantityUpdate(params, token) {
-    console.log('params, token : ',params, token);
     return axios({
         method: 'put',
         url: 'quantity/update',

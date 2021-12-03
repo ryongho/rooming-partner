@@ -54,9 +54,12 @@ const ReservedList = observer(() => {
 
     const { user, reservation } = useStore();
 
+
     useEffect(() => {
         const callList = async () => {
-            await reservation.callList(user.token)
+            if(user.token){
+                await reservation.callList(user.token)
+            }
             // console.log(reservation.list.data)
         }
 

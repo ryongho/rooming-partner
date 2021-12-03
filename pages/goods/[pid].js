@@ -33,6 +33,7 @@ const GoodsDetail = observer(() => {
     const [imgList, setImgList] = useState()
     const [loading, setLoading] = useState(false)
     const [showDelete, setShowDelete] = useState(false)
+    const [selectedDates, setSelectedDates] = useState([])
 
     useEffect(() => {
         const callDetail = async() => {
@@ -42,7 +43,7 @@ const GoodsDetail = observer(() => {
             await goods.callInfo({id: router.query.pid}, user.token)
             await room.callRoomList({hotel_id: user.hotelid}, user.token)
             
-            if (goods.info.data[0]) {
+            if (goods?.info?.data[0]) {
                 setRoomId(goods.info.data[0].room_id)
                 setName(goods.info.data[0].goods_name)
                 setSale(goods.info.data[0].sale)
@@ -66,6 +67,21 @@ const GoodsDetail = observer(() => {
                     })
                 }
                 setFileList(list)
+
+                let dates = {}
+                
+                const params = {
+                    goods_id: parseInt(router.query.pid),
+                    start_date: goods?.info?.data[0].start_date,
+                    end_date: goods?.info?.data[0].end_date,
+                }
+                await goods.callQuantityList(params, (result)=>{
+                    result.qty_info.map((goods)=>{
+                        dates[goods.date] = goods.qty
+                    })
+                })
+                
+                setSelectedDates(dates)
             }
         }
         callDetail();
@@ -75,8 +91,12 @@ const GoodsDetail = observer(() => {
         setRate((price - salePrice) / price * 100);
     }, [salePrice, price])
 
-    const dateCellRender = () => {
-        return null
+    const dateCellRender = (value) => {
+        const dateStr = value.format('YYYY-MM-DD')
+        const _dates = Object.keys(selectedDates)
+        const selected = _dates.includes(dateStr)
+
+        return( selected ? `수량 ${selectedDates[dateStr]}개` : '' )
     }
 
     const onDataChange = (e, val) => {
@@ -172,6 +192,7 @@ const GoodsDetail = observer(() => {
             }
             
             await goods.updateInfo(data, user.token, (success, result) => {
+
                 if (success) {
                     message.success('수정 완료')
                     window.location.href=`/goods/${router.query.pid}`
@@ -287,7 +308,7 @@ const GoodsDetail = observer(() => {
                             하단의 표시된 수량은 판매가능한 상품수입니다.
                             <Button type="primary" size="small" onClick={() => router.push(`/goods/quantity/${router.query.pid}`)} style={{fontSize: '12px'}}>수량 수정</Button>
                         </CountWrap>
-                        <Calendar dateCellRender={(value)=>dateCellRender(value)} />
+                        <Calendar defaultValue={moment(start)} dateCellRender={(value)=>dateCellRender(value, selectedDates)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <ModiImgs 

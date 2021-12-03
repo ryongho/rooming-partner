@@ -48,21 +48,21 @@ const GoodsQuantity = observer(() => {
     useEffect(() => {
         const callGoodsInfo = async() => {
             if(goods?.info?.data[0].start_date){
+                let dates = {}
+                
+                const params = {
+                    goods_id: parseInt(router.query.pid),
+                    start_date: goods?.info?.data[0].start_date,
+                    end_date: goods?.info?.data[0].end_date,
+                }
+                await goods.callQuantityList(params, (result)=>{
+                    result.qty_info.map((goods)=>{
+                        dates[goods.date] = goods.qty
+                    })
+                })
+                
                 setStart(moment(goods?.info?.data[0].start_date))
                 setEnd(moment(goods?.info?.data[0].end_date))
-                let _start = start
-                let diff = end?.diff(start, 'days')
-                let dates = {}
-                for (let i = 0; i < diff+1; i++) {
-                    let _date = i === 0 ? _start.format('YYYY-MM-DD') : _start.add(1, 'd').format('YYYY-MM-DD')
-
-                    if(selectedDates[_date]){
-                        dates[_date] = selectedDates[_date]
-                    }else{
-                        dates[_date] = 0
-                    }
-
-                }
                 setSelectedDates(dates)
             }
         }
@@ -78,10 +78,11 @@ const GoodsQuantity = observer(() => {
         if (!end) {
             return message.warning('상품 판매 종료일을 입력해 주세요')
         }
+
         
         let quantityList = []
 
-        _.forEach( selectedDates, (value, key) => {
+        _.forEach(selectedDates, (value, key) => {
             const row = {
                 goods_id: router.query.pid,
                 qty: value,
@@ -89,13 +90,37 @@ const GoodsQuantity = observer(() => {
             }
             quantityList.push(row)
         });
-        console.log('quantityList',quantityList);
-        await goods.updateQuantity(quantityList, user.token, (success, result) => {
-            // if (success) {
-            //     message.success('게시 완료')
-            //     window.location.href = "/goods/list"
-            // }
+
+        await goods.updateQuantity(quantityList, user.token, async (success) => {
+            if (success) {
+                const goodsDetail = goods?.info?.data[0]
+        
+                const data = {
+                    hotel_id: user.hotelid,
+                    room_id: goodsDetail.room_id,
+                    goods_id: router.query.pid,
+                    goods_name: goodsDetail.goods_name,
+                    start_date: start.format('YYYY-MM-DD'),
+                    end_date: end.format('YYYY-MM-DD'),
+                    price: goodsDetail.price,
+                    sale_price: goodsDetail.sale_price,
+                    min_nights: goodsDetail.min_nights,
+                    max_nights: goodsDetail.max_nights,
+                    breakfast: goodsDetail.breakfast,
+                    parking: goodsDetail.parking,
+                    sale: goodsDetail.sale,
+                    options: goodsDetail.options
+                }    
+                
+                await goods.updateInfo(data, user.token, (success, result) => {
+                    if (success) {
+                        message.success('수정 완료')
+                        window.location.href="/goods/list"
+                    }
+                })
+            }
         })
+
     }
 
     const dateCellRender = (value, _selectedDates) => {
@@ -124,7 +149,7 @@ const GoodsQuantity = observer(() => {
     }
 
     const onSetAll = (start, end) => {
-        let _start = start
+        let _start = moment(start.format('YYYY-MM-DD'))
         let diff = end.diff(start, 'days')
         let dates = {}
         for (let i = 0; i < diff+1; i++) {
@@ -198,13 +223,9 @@ const GoodsQuantity = observer(() => {
                 </Descriptions>
                 <Empty />
 
-                
-
                 <Calendar 
                     dateCellRender={(value)=>dateCellRender(value, selectedDates)}
                 />
-
-                
 
                 <ButtonWrap>
                     <Button type="primary" onClick={onWrite}>수정</Button>
@@ -238,7 +259,7 @@ const InputValue = styled(Input)`
 const ButtonWrap = styled.div`
     display: flex;
     justify-content: center;
-    padding: 25px 0 10px;
+    padding: 10px 0;
 
     button:first-child {
         margin-right: 10px;
