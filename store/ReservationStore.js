@@ -23,19 +23,21 @@ export default class ReservationStore {
         let end_date = new Date(now.setFullYear(now.getFullYear() + 1));
 
         const params = {
-            row: 10,
-            start_no: 0,
-            start_date: start_date,
-            end_date: end_date
+            row: '10',
+            start_no: '0',
+            start_date: '2021-01-01',
+            end_date: '2021-12-31'
         }
 
         try {
             const result = await getReservationList(params, token)
+            
             if (result.status === 200) {
                 this.list = result.data
             }
         } catch (err) {
-            console.log(err)
+            
+            console.log(err.response)
         }
     }
 
