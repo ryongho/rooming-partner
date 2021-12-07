@@ -13,7 +13,7 @@ const ReservedDetail = observer(() => {
 
     useEffect(() => {
         const callDetail = async() => {
-            await reservation.callDetail({reservation_no: router.query.pid}, user.token, (success, result) => {
+            await reservation.callDetail({id: router.query.pid}, user.token, (success, result) => {
                 if (success) {
                     console.log(result.data)
                     setData(result.data[0])
@@ -33,7 +33,7 @@ const ReservedDetail = observer(() => {
                             <Desc>{data.reservation_no}</Desc>
                         </Descriptions.Item>
                         <Descriptions.Item label="예약자">
-                            <Desc>{data.name} / {data.phone}</Desc>
+                            <Desc>{data.name} / {data.phone ? `${data.phone.slice(0,3)}-${data.phone.slice(3,7)}-${data.phone.slice(7)}` : null}</Desc>
                         </Descriptions.Item>
                         {/* <Descriptions.Item label="투숙객">
                             <Desc>{data.reservedName} / {data.reservedPhone}</Desc>
@@ -51,9 +51,9 @@ const ReservedDetail = observer(() => {
                         <Descriptions.Item label="객실명">
                             <Desc>{data.room_name}</Desc>
                         </Descriptions.Item>
-                        <Descriptions.Item label="숙박 인원수">
+                        {/* <Descriptions.Item label="숙박 인원수">
                             <Desc>{data.peoples}</Desc>
-                        </Descriptions.Item>
+                        </Descriptions.Item> */}
                         <Descriptions.Item label="체크인 / 체크아웃">
                             <Desc>{data.start_date} {data.checkin} ~ {data.end_date} {data.checkout}</Desc>
                         </Descriptions.Item>
@@ -62,6 +62,7 @@ const ReservedDetail = observer(() => {
                         </Descriptions.Item>
                         <Descriptions.Item label="예약 상태">
                             <Desc>
+                                {data.status == 'P' && '입금확인요청'}
                                 {data.status == 'W' && '예약대기'}
                                 {data.status == 'S' && '예약확정'}
                                 {data.status == 'C' && '취소완료'}
@@ -69,7 +70,7 @@ const ReservedDetail = observer(() => {
                             </Desc>
                         </Descriptions.Item>
                         <Descriptions.Item label="결제정보">
-                            <Desc>결제 수단 없음 / {data.sale_price == '' ? data.price : data.sale_price}원</Desc>
+                            <Desc>무통장입금 / {data.sale_price == '' ? data.price : data.sale_price}원</Desc>
                         </Descriptions.Item>
                     </>
                     }
@@ -83,6 +84,7 @@ const ReservedDetail = observer(() => {
 const Wrapper = styled.div`
     width: 100%;
     max-width: 1100px;
+    padding-bottom: 100px;
 `
 
 const Detail = styled.div`

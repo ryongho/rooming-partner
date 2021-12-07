@@ -2,7 +2,10 @@ import { action, observable, makeObservable } from 'mobx'
 import { enableStaticRendering } from 'mobx-react-lite'
 import { 
     getReservationList,
-    getReservationDetail
+    getReservationListByHotel,
+    getReservationDetail,
+    putReservationConfirm,
+    putReservationCancel
 } from '../libs/reservation'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -13,6 +16,8 @@ export default class ReservationStore {
             callList: action,
             list: observable,
             callDetail: action,
+            confirmReservation: action,
+            cancelReservation: action
         })
     }
 
@@ -20,22 +25,21 @@ export default class ReservationStore {
     callList = async(token) => {
         let now = new Date();
         let start_date = new Date(now.setFullYear(now.getFullYear() - 1));
-        let end_date = new Date(now.setFullYear(now.getFullYear() + 1));
+        let end_date = new Date(now.setFullYear(now.getFullYear() + 2));
 
         const params = {
-            row: 10,
-            start_no: 0,
             start_date: start_date,
             end_date: end_date
         }
 
+
         try {
-            const result = await getReservationList(params, token)
+            const result = await getReservationListByHotel(params, token)
             if (result.status === 200) {
                 this.list = result.data
             }
         } catch (err) {
-            console.log(err)
+            console.log('what ',err)
         }
     }
 
@@ -50,5 +54,31 @@ export default class ReservationStore {
             console.log(err)
         }
     }
+    
+    confirmReservation = async (params, token, callback) => {
+        try {
+            const result = await putReservationConfirm(params, token)
+            console.log('result', result);
 
+            if (result.status === 200) {
+                callback(true, result.data)
+            }
+        } catch (err) {
+            callback(false, null)
+            console.log(err)
+        }
+    }
+
+    cancelReservation = async (params, token, callback) => {
+        try {
+            const result = await putReservationCancel(params, token)
+            console.log('result', result);
+            if (result.status === 200) {
+                callback(true, result.data)
+            }
+        } catch (err) {
+            callback(false, null)
+            console.log(err)
+        }
+    }
 }

@@ -1,58 +1,15 @@
 import styled from 'styled-components'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input } from 'antd'
+import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input, Popconfirm, message } from 'antd'
 import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
 import { useStore } from '../../store/StoreProvider'
 
 const ReservedList = observer(() => {
-    const data = [{
-        key: '1',
-        goods: '숙소1',
-        num: 12312312,
-        category: '호텔',
-        name: '김루밍',
-        checkin: '2021-08-31',
-        checkout: '2021-09-01',
-        price: '113000',
-        duration: 3,
-        reserved: '예약확정'
-    }, {
-        key: '2',
-        goods: '숙소123123',
-        num: 412315,
-        category: '호텔',
-        name: '이루밍',
-        checkin: '2021-08-31',
-        checkout: '2021-09-01',
-        price: '113000',
-        duration: 3,
-        reserved: '예약확정'
-    }, {
-        key: '3',
-        goods: '숙소1231239102',
-        num: 83627,
-        category: '리조트',
-        name: '박루밍',
-        checkin: '2021-08-31',
-        checkout: '2021-09-01',
-        price: '113000',
-        duration: 3,
-        reserved: '예약취소'
-    }, {
-        key: '4',
-        goods: '숙소1020202020',
-        num: 99999,
-        category: '호텔',
-        name: '홍길동',
-        checkin: '2021-08-31',
-        checkout: '2021-09-01',
-        price: '113000',
-        duration: 3,
-        reserved: '예약확정'
-    }];
-
     const { user, reservation } = useStore();
+    const router = useRouter();
+
 
 
     useEffect(() => {
@@ -60,7 +17,6 @@ const ReservedList = observer(() => {
             if(user.token){
                 await reservation.callList(user.token)
             }
-            // console.log(reservation.list.data)
         }
 
         callList()
@@ -74,9 +30,9 @@ const ReservedList = observer(() => {
         title: '예약번호',
         dataIndex: 'reservation_no',
         key: 'reservation_no',
-        render: reservation_no => {
+        render: (reservation_no, record) => {
             return (
-                <Link href={`/reserved/${reservation_no}`}><a>{reservation_no}</a></Link>
+                <Link href={`/reserved/${record.reservation_id}`}><a>{reservation_no}</a></Link>
             )
         },
     }, {
@@ -91,11 +47,7 @@ const ReservedList = observer(() => {
         title: '예약자명',
         dataIndex: 'name',
         key: 'name',
-        render: (name, record) => {
-            return (
-                <Link href={`/reserved/${record.reservation_no}`}><a>{name}</a></Link>
-            )
-        },
+        render: name => {return name}
     }, {
         title: '체크인',
         dataIndex: 'start_date',
@@ -116,6 +68,7 @@ const ReservedList = observer(() => {
         key: 'status',
         render: status => {
             if (status == 'W') return <Tag color={'success'}>예약대기</Tag>
+            if (status == 'P') return <Tag color={'success'}>입금확인요청</Tag>
             if (status == 'S') return <Tag color={'processing'}>예약확정</Tag>
             if (status == 'C') return <Tag color={'default'}>취소완료</Tag>
             if (status == 'X') return <Tag color={'error'}>취소신청</Tag>
@@ -128,7 +81,58 @@ const ReservedList = observer(() => {
             if (record.sale_price == '') return record.price
             else return record.sale_price
         }
-    }];
+    },{
+        title: '예약확정',
+        dataIndex: 'status',
+        render: (status, record) => {
+            return (<Popconfirm
+                title='예약 확정하시겠습니까?'
+                okText='예약확정'
+                disabled={record.status !== "P"}
+                onConfirm={async () => {
+                    const params = {
+                        reservation_id: record.reservation_id
+                    }
+                    await reservation.confirmReservation(params, user.token, async (status) => {
+                        if(status){
+                            // success
+                            message.success('예약확정 완료')
+                            await reservation.callList(user.token)
+                            router.push('/reserved/list').then(()=> window.scrollTo(0,0));
+                        }
+                    })
+                }}
+                cancelText='취소'>
+                <Button>예약확정</Button>
+            </Popconfirm>)
+        }
+    },{
+        title: '예약취소',
+        dataIndex: 'status',
+        render: (status, record) => {
+            return (<Popconfirm
+                title='예약 취소하시겠습니까?'
+                okText='예약취소'
+                okType='danger'
+                onConfirm={async () => {
+                    const params = {
+                        id: record.reservation_id
+                    }
+                    await reservation.cancelReservation(params, user.token, async (status) => {
+                        if(status){
+                            // success
+                            message.success('예약 취소 완료')
+                            await reservation.callList(user.token)
+                            router.push('/reserved/list').then(()=> window.scrollTo(0,0));
+                        }
+                    })
+                }}
+                cancelText='취소'>
+                <Button>예약취소</Button>
+            </Popconfirm>)
+        }
+    }
+    ];
 
     const { RangePicker } = DatePicker;
     const { Search } = Input;
@@ -151,8 +155,10 @@ const ReservedList = observer(() => {
                         <FilterLabel>카테고리</FilterLabel>
                         <SelectBar defaultValue={"total"} onChange={onCategory}>
                             <Select.Option value={"total"}>전체</Select.Option>
-                            <Select.Option value={"hotel"}>호텔</Select.Option>
-                            <Select.Option value={"resort"}>리조트</Select.Option>
+                            <Select.Option value={"호텔"}>호텔</Select.Option>
+                            <Select.Option value={"모텔"}>모텔</Select.Option>
+                            <Select.Option value={"펜션"}>펜션</Select.Option>
+                            <Select.Option value={"콘도"}>콘도</Select.Option>
                         </SelectBar>
                     </Filter>
                     }
@@ -174,15 +180,15 @@ const ReservedList = observer(() => {
 
                 <SearchWrap>
                     <FilterLabel>검색</FilterLabel>
-                    <SearchBar placeholder="예약자명 또는 상품명을 입력해주세요" onSearch={onSearch} />
+                    <SearchBar placeholder="예약자명 또는 예약번호를 입력해주세요" onSearch={onSearch} />
                 </SearchWrap>
             </TopBox>
 
             <TableTop>
-                <TotalNum>총 {data.length}건</TotalNum>
-                <Space>
+                <TotalNum>총 {reservation?.list?.data?.length}건</TotalNum>
+                {/* <Space>
                     <Button type="primary" onClick={onExcelDown}>엑셀 다운로드</Button>
-                </Space>
+                </Space> */}
             </TableTop>
             <Table columns={columns} dataSource={reservation.list.data} pagination={{ position: ['bottomCenter'] }}/>
         </Wrapper>
