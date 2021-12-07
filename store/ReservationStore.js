@@ -1,11 +1,10 @@
 import { action, observable, makeObservable } from 'mobx'
 import { enableStaticRendering } from 'mobx-react-lite'
 import { 
-    getReservationList,
     getReservationListByHotel,
     getReservationDetail,
     putReservationConfirm,
-    putReservationCancel
+    putReservationCancelByPartner
 } from '../libs/reservation'
 
 enableStaticRendering(typeof window === 'undefined')
@@ -71,7 +70,7 @@ export default class ReservationStore {
 
     cancelReservation = async (params, token, callback) => {
         try {
-            const result = await putReservationCancel(params, token)
+            const result = await putReservationCancelByPartner(params, token)
             console.log('result', result);
             if (result.status === 200) {
                 callback(true, result.data)

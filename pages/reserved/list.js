@@ -148,7 +148,7 @@ const ReservedList = observer(() => {
 
     return (
         <Wrapper>
-            <TopBox>
+            {/* <TopBox>
                 <FilterWrap>
                     {isAdmin &&
                     <Filter>
@@ -182,7 +182,7 @@ const ReservedList = observer(() => {
                     <FilterLabel>검색</FilterLabel>
                     <SearchBar placeholder="예약자명 또는 예약번호를 입력해주세요" onSearch={onSearch} />
                 </SearchWrap>
-            </TopBox>
+            </TopBox> */}
 
             <TableTop>
                 <TotalNum>총 {reservation?.list?.data?.length}건</TotalNum>

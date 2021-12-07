@@ -39,10 +39,10 @@ export function getReservationDetail(params, token) {
     })
 }
 
-export function putReservationCancel(params, token) {
+export function putReservationCancelByPartner(params, token) {
     return axios({
         method: 'put',
-        url: '/reservation/cancel',
+        url: '/reservation/cancel_by_partner',
         baseURL: baseUrl[env].baseUrl,
         params: params,
         headers: {
