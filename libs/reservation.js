@@ -18,11 +18,13 @@ export function getReservationList(params, token) {
 export function getReservationListByHotel(params, token) {
     return axios({
         method: 'get',
-        url: '/reservation/list',
+        url: '/reservation/list_by_hotel',
         baseURL: baseUrl[env].baseUrl,
         params: params,
         headers: {
-            'Authorization': 'Bearer '+token
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+token,
+            'withCredentials': 'true'
         }
     })
 }
