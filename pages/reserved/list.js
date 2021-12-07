@@ -16,6 +16,7 @@ const ReservedList = observer(() => {
         const callList = async () => {
             if(user.token){
                 await reservation.callList(user.token)
+                setData(reservation?.list?.data)
             }
         }
 
@@ -98,6 +99,7 @@ const ReservedList = observer(() => {
                             // success
                             message.success('예약확정 완료')
                             await reservation.callList(user.token)
+                            setData(reservation?.list?.data)
                             router.push('/reserved/list').then(()=> window.scrollTo(0,0));
                         }
                     })
@@ -123,6 +125,7 @@ const ReservedList = observer(() => {
                             // success
                             message.success('예약 취소 완료')
                             await reservation.callList(user.token)
+                            setData(reservation?.list?.data)
                             router.push('/reserved/list').then(()=> window.scrollTo(0,0));
                         }
                     })
@@ -137,10 +140,20 @@ const ReservedList = observer(() => {
     const { RangePicker } = DatePicker;
     const { Search } = Input;
     const [isAdmin, setIsAdmin] = useState(true);
+    const [data, setData] = useState(null)
 
-    const onSearch = () => {
 
+    const onSearch = async (word) => {
+        if (word) {
+            setData(data.filter(e => e.name.indexOf(word) !== -1))
+        } else {
+            message.warning('예약자명을 입력해 주세요.')
+            
+            await reservation.callList(user.token)
+            setData(reservation.list.data)
+        }
     }
+
 
     const onExcelDown = () => {
 
@@ -148,8 +161,8 @@ const ReservedList = observer(() => {
 
     return (
         <Wrapper>
-            {/* <TopBox>
-                <FilterWrap>
+            <TopBox>
+                {/* <FilterWrap>
                     {isAdmin &&
                     <Filter>
                         <FilterLabel>카테고리</FilterLabel>
@@ -176,13 +189,13 @@ const ReservedList = observer(() => {
                             <Radio.Button value="X">예약취소</Radio.Button>
                         </Radio.Group>
                     </Filter>
-                </FilterWrap>
+                </FilterWrap> */}
 
                 <SearchWrap>
                     <FilterLabel>검색</FilterLabel>
                     <SearchBar placeholder="예약자명 또는 예약번호를 입력해주세요" onSearch={onSearch} />
                 </SearchWrap>
-            </TopBox> */}
+            </TopBox>
 
             <TableTop>
                 <TotalNum>총 {reservation?.list?.data?.length}건</TotalNum>
@@ -190,7 +203,7 @@ const ReservedList = observer(() => {
                     <Button type="primary" onClick={onExcelDown}>엑셀 다운로드</Button>
                 </Space> */}
             </TableTop>
-            <Table columns={columns} dataSource={reservation.list.data} pagination={{ position: ['bottomCenter'] }}/>
+            <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
         </Wrapper>
     )
 })
