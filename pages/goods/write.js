@@ -29,6 +29,7 @@ const GoodsWrite = observer(() => {
     // const [parking, setParking] = useState()
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
+    const [content, setContent] = useState('')
 
 
     useEffect(() => {
@@ -75,7 +76,8 @@ const GoodsWrite = observer(() => {
             min_nights: minNight,
             max_nights: maxNight,
             breakfast: breakfast,
-            sale: sale
+            sale: sale,
+            content: content
         }
 
         if (imgList.length > 0) {
@@ -220,6 +222,12 @@ const GoodsWrite = observer(() => {
                             value: 'N'
                         }]} />
                     </Descriptions.Item>
+                    <Descriptions.Item label="상품 정보">
+                        <Input.TextArea
+                        value={content} 
+                        rows={4}
+                        onChange={(e) => setContent(e.target.value)} />
+                    </Descriptions.Item>
                     {/* <Descriptions.Item label="주차 정보">
                         <Radio.Group 
                         value={parking}
@@ -234,7 +242,7 @@ const GoodsWrite = observer(() => {
                             value: 'N'
                         }]} />
                     </Descriptions.Item> */}
-                    <Descriptions.Item label="옵션">
+                    <Descriptions.Item label="상품 옵션">
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} />
                     </Descriptions.Item>
                 </Descriptions>
@@ -292,7 +300,7 @@ const ButtonWrap = styled.div`
 `
 
 const GoodsInfo = styled.div`
-    margin-top: 22px;
+    margin-top: 15px;
     font-size: 12px;    
     color: #666;
 `
@@ -305,24 +313,5 @@ const UploadLength = styled.div`
 const Empty = styled.div`
     padding-top: 30px;
 `
-
-// export async function getServerSideProps(context) {
-//     let content = null
-//     try {
-//         const result = await getBridgeContent({ bridgeIdx: context.params.pid })
-//         if (result.status === 200) {
-//             content = result.data.content
-//         }
-//     } catch (err) {
-        
-//     } finally {
-//         return {
-//             props: {
-//                 content: content,
-//                 pid: context.params.pid
-//             }
-//         }
-//     }
-// }
 
 export default GoodsWrite

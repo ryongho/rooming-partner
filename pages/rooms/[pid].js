@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Descriptions, Input, Button, message, Space, Select, Modal } from 'antd'
+import { Descriptions, Input, Button, message, Checkbox, Space, Select, Modal } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { useStore } from '../../store/StoreProvider'
@@ -12,12 +12,14 @@ const RoomsDetail = observer(() => {
 
     const { hotel, user, room, goods } = useStore();
 
-    const options = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
+    const options = ['무료 wifi', '3인용 소파', 'TV', '헤어 드라이어', '에어컨', '소형 냉장고', 'CCTV', '욕조', '입욕제', '비데', '룸서비스']
+    const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
     const [isAdmin, setIsAdmin] = useState(true);
     const [modiStatus, setModiStatus] = useState(false)
 
     const [name, setName] = useState()
     const [people, setPeople] = useState()
+    const [maxPeople, setMaxPeople] = useState()
     const [checkIn, setCheckIn] = useState()
     const [checkOut, setCheckOut] = useState()
     const [bed, setBed] = useState()
@@ -26,6 +28,8 @@ const RoomsDetail = observer(() => {
     const [fileList, setFileList] = useState()
     const [showDelete, setShowDelete] = useState(false)
     const [roomList, setRoomList] = useState([])
+    const [option, setOption] = useState()
+    const [square, setSquare] = useState()
 
 
     useEffect(() => {
@@ -39,15 +43,19 @@ const RoomsDetail = observer(() => {
             await goods.callListByHotel({hotel_id: user.hotelid}, user.token)
             await hotel.callListPartner(user.token)
             await user.callInfo(user.token)
-
+            
+            // console.log(room.info.data[0])
             if (room.info.data[0]) {
                 setName(room.info.data[0].name)
                 setPeople(room.info.data[0].peoples)
+                setMaxPeople(room.info.data[0].max_peoples)
+                setSquare(room.info.data[0].square)
                 setCheckIn(room.info.data[0].checkin.substring(0, 5))
                 setCheckOut(room.info.data[0].checkout.substring(0, 5))
                 setBed(room.info.data[0].bed)
                 setBedNum(room.info.data[0].amount)
                 setImgList(room.info.images)
+                setOption(room.info.data[0].options?.split(","))
 
                 let list = Array.from(Array(10).keys());
                 for (let i = 0; i <= list.length; i++) {
@@ -73,11 +81,13 @@ const RoomsDetail = observer(() => {
         const numRegExp = /^[0-9]*$/;
         if (!router.query.type) return;
 
-        if (val == 'people' || val == 'bedNum') {
+        if (val == 'people' || val == 'bedNum' || val == 'maxPeople') {
             if (!numRegExp.test(e.target.value)) return;
         }
         if (val == 'name') setName(e.target.value);
         if (val == 'people') setPeople(e.target.value);
+        if (val == 'maxPeople') setMaxPeople(e.target.value);
+        if (val == 'square') setSquare(e.target.value);
         if (val == 'bed') setBed(e.target.value);
         if (val == 'bedNum') setBedNum(e.target.value);
         if (val == 'checkIn') setCheckIn(e);
@@ -92,6 +102,9 @@ const RoomsDetail = observer(() => {
             }
             if (!people) {
                 message.warning('기준 인원수를 입력해 주세요')
+            }
+            if (!maxPeople) {
+                message.warning('최대 인원수를 입력해 주세요')
             }
             if (!bed || !bedNum) {
                 message.warning('침대 사이즈를 입력해 주세요')
@@ -110,12 +123,18 @@ const RoomsDetail = observer(() => {
                 id: router.query.pid,
                 name: name,
                 peoples: people,
+                max_peoples: maxPeople,
                 checkin: checkIn,
                 checkout: checkOut,
                 bed: bed,
-                amount: bedNum
+                amount: bedNum,
+                square: square
             }
 
+            if (option) {
+                data.options = option.join();
+            }
+            
             // console.log(data, user.token)
             await room.updateInfo(data, user.token, (success, result) => {
                 if (success) {
@@ -184,6 +203,7 @@ const RoomsDetail = observer(() => {
                 labelStyle={{width: '200px', minWidth: '180px'}}
                 extra={
                     <>
+                        {!router.query.type && <Button type="primary" onClick={onModi} style={{marginRight: '10px'}}>수정</Button>}
                         <Button type="danger" onClick={() => setShowDelete(true)} style={{marginRight: '8px'}}>삭제</Button>
                         <Button onClick={() => router.push('/rooms/list')}>목록으로 돌아가기</Button>
                     </>
@@ -199,15 +219,37 @@ const RoomsDetail = observer(() => {
                     <Descriptions.Item label="기준 인원수">
                         {modiStatus ?
                         <InputValue
+                        type="number"
                         value={people} 
                         onChange={e => onDataChange(e, 'people')}
-                        bordered={modiStatus} />
-                        : people}
+                        bordered={modiStatus}
+                        style={{width:50}} />
+                        : people} 명
+                    </Descriptions.Item>
+                    <Descriptions.Item label="최대 인원수">
+                        {modiStatus ?
+                        <InputValue
+                        type="number"
+                        value={maxPeople} 
+                        onChange={e => onDataChange(e, 'maxPeople')}
+                        bordered={modiStatus}
+                        style={{width:50}} />
+                        : maxPeople} 명
+                    </Descriptions.Item>
+                    <Descriptions.Item label="객실 평수">
+                        {modiStatus ?
+                        <InputValue
+                        type="number"
+                        value={square} 
+                        onChange={e => onDataChange(e, 'square')}
+                        bordered={modiStatus}
+                        style={{width:100}} />
+                        : square} 평
                     </Descriptions.Item>
                     <Descriptions.Item label="체크인 시간">
                         {modiStatus ?
                             <SelectBar defaultValue={checkIn} onChange={(e) => onDataChange(e, 'checkIn')}>
-                                {options.map((time, idx) => {
+                                {times.map((time, idx) => {
                                 return <Select.Option key={`in_${idx}`} value={time}>{time}</Select.Option>})}
                             </SelectBar>
                             :
@@ -217,7 +259,7 @@ const RoomsDetail = observer(() => {
                     <Descriptions.Item label="체크아웃 시간">
                         {modiStatus ?
                             <SelectBar defaultValue={checkOut} onChange={(e) => onDataChange(e, 'checkOut')}>
-                                {options.map((time, idx) => {
+                                {times.map((time, idx) => {
                                 return <Select.Option key={`out_${idx}`}value={time}>{time}</Select.Option>})}
                             </SelectBar>
                             :
@@ -249,6 +291,10 @@ const RoomsDetail = observer(() => {
                         onUploadChange={onUploadChange}
                         onRemoveImgs={onRemoveImgs}
                         modiStatus={modiStatus} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="숙소 편의시설">
+                    {modiStatus ?
+                        <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} /> : option ? option.join(', ') : null}
                     </Descriptions.Item>
                 </Descriptions>
 

@@ -58,6 +58,9 @@ const GlobalStyle = createGlobalStyle`
     .ant-descriptions-header {
         margin-bottom: 10px;
     }
+    .ant-checkbox + span {
+        padding: 5px 8px;
+    }
 `
 
 const theme = {}

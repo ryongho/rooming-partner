@@ -11,6 +11,7 @@ const GoodsWrite = observer(() => {
     const router = useRouter();
     const { user, room } = useStore()
     
+    const options = ['무료 wifi', '3인용 소파', 'TV', '헤어 드라이어', '에어컨', '소형 냉장고', 'CCTV', '욕조', '입욕제', '비데', '룸서비스']
     const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
 
     const [hotelId, setHotelId] = useState()
@@ -21,8 +22,11 @@ const GoodsWrite = observer(() => {
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     const [people, setPeople] = useState()
+    const [maxPeople, setMaxPeople] = useState()
     const [checkIn, setCheckIn] = useState()
     const [checkOut, setCheckOut] = useState()
+    const [option, setOption] = useState([])
+    const [square, setSquare] = useState()
 
     const onWrite = async() => {
         if (!name) {
@@ -30,6 +34,9 @@ const GoodsWrite = observer(() => {
         }
         if (!people) {
             return message.warning('기준 인원수를 입력해 주세요')
+        }
+        if (!maxPeople) {
+            return message.warning('최대 인원수를 입력해 주세요')
         }
         if (!bed || !bedNum) {
             return message.warning('침대 사이즈를 입력해 주세요')
@@ -52,14 +59,19 @@ const GoodsWrite = observer(() => {
             bed: bed,
             amount: bedNum,
             peoples: people,
+            max_peoples: maxPeople,
             checkin: checkIn,
             checkout: checkOut,
+            square: square
         }
 
         if (imgList.length > 0) {
             data.images = imgList.join();
         }
 
+        if (option) {
+            data.options = option.join();
+        }
 
         await room.addInfo(data, user.token, (success, result) => {
             if (success) {
@@ -134,6 +146,26 @@ const GoodsWrite = observer(() => {
                         setPeople(e.target.value)}}
                         style={{width:50}} /> 명
                     </Descriptions.Item>
+                    <Descriptions.Item label="최대 인원수">
+                        <Input
+                        type="number"
+                        value={maxPeople} 
+                        onChange={e => {
+                        const numRegExp = /^[0-9]*$/;
+                        if (!numRegExp.test(e.target.value)) return;
+                        setMaxPeople(e.target.value)}}
+                        style={{width:50}} /> 명
+                    </Descriptions.Item>
+                    <Descriptions.Item label="객실 평수">
+                        <Input
+                        type="number"
+                        value={square} 
+                        onChange={e => {
+                        const numRegExp = /^[0-9]*$/;
+                        if (!numRegExp.test(e.target.value)) return;
+                        setSquare(e.target.value)}}
+                        style={{width:100}} /> 평
+                    </Descriptions.Item>
                     <Descriptions.Item label="체크인 시간">
                         <SelectBar placeholder={'체크인 가능 시간을 선택하세요'} onChange={(e) => setCheckIn(e)} style={{width:250}}>
                             {times.map((time, idx) => {
@@ -153,6 +185,9 @@ const GoodsWrite = observer(() => {
                             onUploadChange={onUploadChange}
                             onRemoveImgs={onRemoveImgs} />
                     </Descriptions.Item>
+                    <Descriptions.Item label="숙소 편의시설">
+                        <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} />
+                    </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>
                     <Button type="primary" onClick={onWrite}>등록하기</Button>
@@ -166,6 +201,7 @@ const GoodsWrite = observer(() => {
 const Wrapper = styled.div`
     width: 100%;
     max-width: 1100px;
+    padding-bottom: 80px;
 `
 
 const Detail = styled.div`

@@ -44,43 +44,43 @@ const GoodsList = observer(() => {
         title: '상태값',
         dataIndex: 'sale',
         key: 'sale',
-        render: (sale) => {
+        render: (text, record, index) => {
             return (
-                <>
-                    {sale == 'Y' ? 
-                    <Tag color="blue">활성화</Tag>
-                    : <Tag color="default">비활성화</Tag>}
-                </>
+                <Radio.Group defaultValue={text == 'Y' ? 'Y' : 'N'} onChange={e => onChangeSale(e, index)} buttonStyle="solid"> 
+                    <Radio.Button value="Y">활성화</Radio.Button>
+                    <Radio.Button value="N">비활성화</Radio.Button>
+                </Radio.Group>
             )
         }
     },
-     {
-        title: '삭제',
-        dataIndex: 'delete',
-        render: (text, record) => {
-            return (<Popconfirm
-                title='정말 삭제하시겠습니까?'
-                okText='삭제'
-                okType='danger'
-                onConfirm={async () => {
-                    const params = {
-                        goods_id: record.goods_id
-                    }
-                    await goods.deleteGoods(params, user.token, async (status) => {
-                        if(status){
-                            // success
-                            message.success('삭제 완료')
-                            await goods.callListPartner(user.token)
-                            setData(goods.partnerList.data)
-                            router.push('/goods/list').then(()=> window.scrollTo(0,0));
-                        }
-                    })
-                }}
-                cancelText='취소'>
-                <Button type="danger">삭제</Button>
-            </Popconfirm>)
-        }
-    }];
+    //  {
+    //     title: '삭제',
+    //     dataIndex: 'delete',
+    //     render: (text, record) => {
+    //         return (<Popconfirm
+    //             title='정말 삭제하시겠습니까?'
+    //             okText='삭제'
+    //             okType='danger'
+    //             onConfirm={async () => {
+    //                 const params = {
+    //                     goods_id: record.goods_id
+    //                 }
+    //                 await goods.deleteGoods(params, user.token, async (status) => {
+    //                     if(status){
+    //                         // success
+    //                         message.success('삭제 완료')
+    //                         await goods.callListPartner(user.token)
+    //                         setData(goods.partnerList.data)
+    //                         router.push('/goods/list').then(()=> window.scrollTo(0,0));
+    //                     }
+    //                 })
+    //             }}
+    //             cancelText='취소'>
+    //             <Button type="danger">삭제</Button>
+    //         </Popconfirm>)
+    //     }
+    // }
+    ];
 
     const { user, goods } = useStore()
     const [isAdmin, setIsAdmin] = useState(true);
@@ -115,6 +115,10 @@ const GoodsList = observer(() => {
 
     const onExcelDown = () => {
 
+    }
+
+    const onChangeSale = (e, idx) => {
+        console.log(e.target.value, goods.partnerList.data[idx]);
     }
 
     return (

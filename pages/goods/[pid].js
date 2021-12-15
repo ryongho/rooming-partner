@@ -18,6 +18,7 @@ const GoodsDetail = observer(() => {
     const options = ['룸서비스', '사진 무한 촬영', '조식 패키지', '파티 용품 제공']
     const [roomId, setRoomId] = useState()
     const [name, setName] = useState()
+    const [content, setContent] = useState()
     const [sale, setSale] = useState()
     const [start, setStart] = useState()
     const [end, setEnd] = useState()
@@ -46,6 +47,7 @@ const GoodsDetail = observer(() => {
             if (goods?.info?.data[0]) {
                 setRoomId(goods.info.data[0].room_id)
                 setName(goods.info.data[0].goods_name)
+                setContent(goods.info.data[0].content)
                 setSale(goods.info.data[0].sale)
                 setStart(goods.info.data[0].start_date)
                 setEnd(goods.info.data[0].end_date)
@@ -107,6 +109,7 @@ const GoodsDetail = observer(() => {
             if (!numRegExp.test(e.target.value)) return;
         }
         if (val == 'name') setName(e.target.value);
+        if (val == 'content') setContent(e.target.value);
         if (val == 'sale') setSale(e.target.value);
         if (val == 'price') setPrice(e.target.value);
         if (val == 'salePrice') setSalePrice(e.target.value);
@@ -185,8 +188,10 @@ const GoodsDetail = observer(() => {
                 max_nights: maxNight,
                 breakfast: breakfast,
                 parking: parking,
-                sale: sale
+                sale: sale,
+                content: content
             }
+
             if (option) {
                 data.options = option.join();
             }
@@ -223,6 +228,7 @@ const GoodsDetail = observer(() => {
                 labelStyle={{width: '200px', minWidth: '180px'}}
                 extra={
                     <>
+                        {!router.query.type && <Button type="primary" onClick={onModi} style={{marginRight: '10px'}}>수정</Button>}
                         <Button type="danger" onClick={() => setShowDelete(true)} style={{marginRight: '8px'}}>삭제</Button>
                         <Button onClick={() => router.push('/goods/list')}>목록으로 돌아가기</Button>
                     </>
@@ -348,6 +354,12 @@ const GoodsDetail = observer(() => {
                         }]} />
                         : breakfast == 'Y' ? '조식 포함' : breakfast == 'N' ? '조식 불포함' : null}
                     </Descriptions.Item>
+                    <Descriptions.Item label="상품 정보">
+                        <Input.TextArea
+                        value={content} 
+                        rows={4}
+                        onChange={(e) => onDataChange(e, 'content')} />
+                    </Descriptions.Item>
                     {/* <Descriptions.Item label="주차 정보">
                     {modiStatus ?
                         <Radio.Group 
@@ -364,7 +376,7 @@ const GoodsDetail = observer(() => {
                         }]} />
                         : parking == 'Y' ? '주차 가능' : parking == 'N' ? '주차 불가' : null}
                     </Descriptions.Item> */}
-                    <Descriptions.Item label="옵션">
+                    <Descriptions.Item label="상품 옵션">
                     {modiStatus ?
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} /> : goods.info?.data[0]?.options }
                     </Descriptions.Item>
@@ -471,7 +483,7 @@ const GoodsWrap = styled.div`
 `
 
 const GoodsInfo = styled.div`
-    margin-top: 22px;
+    margin-top: 15px;
     font-size: 12px;    
     color: #666;
 `

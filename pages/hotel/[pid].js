@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Descriptions, Input, Button, message, DatePicker, Modal, Select, Checkbox, Radio } from 'antd'
+import { Descriptions, Input, Button, message, DatePicker, Modal, Select, Checkbox, Radio, Tooltip } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
@@ -13,10 +13,13 @@ const HotelDetail = () => {
     const router = useRouter();
 
     const [modiStatus, setModiStatus] = useState(false)
-    const options = ['주차가능', '레스토랑', '수영장', '스파', '피트니스', '무료 wifi', 'cctv', '소형냉장고']
+
+    const hotelCategory = ['호텔', '모텔', '펜션/풀빌라', '리조트', '글램핑/캠핑', '게스트하우스', '한옥', '공유숙박']
+    const options = ['넷플릭스', '유튜브', '디즈니', '왓챠', '쿠팡플레이', '레스토랑', '피트니스', '야외수영장', '실내수영장', '사우나', '스파',  '공유키친', '세미나룸', '세탁실', '주차공간', '무료wifi', 'PC', '노트북', '안마의자', '비데', '욕조', '월풀', '반신욕기계']
     const [category, setCategory] = useState()
     const [name, setName] = useState()
     const [facility, setFacility] = useState([])
+    const [facilityEtc, setFacilityEtc] = useState('');
     const [address, setAddress] = useState()
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
@@ -52,11 +55,12 @@ const HotelDetail = () => {
             await goods.callListPartner(user.token)
             await user.callInfo(user.token);
 
-            console.log('str:', String(hotel.info.data[0].open_date), 'date:',new Date(hotel.info.data[0].open_date))
+            // console.log(hotel.info.data[0])
             if (hotel.info.data[0]) {
                 setCategory(hotel.info.data[0].type)
                 setName(hotel.info.data[0].name)
-                setFacility(hotel.info.data[0].options?.split(","))
+                setFacility(hotel.info.data[0].options?.split(",").filter(el => options.includes(el)))
+                setFacilityEtc(hotel.info.data[0].options?.split(",").filter(el => !options.includes(el) && el !== ''))
                 setAddress(hotel.info.data[0].address.slice(6, hotel.info.data[0].address.length))
                 setAddress2(hotel.info.data[0].address_detail)
                 setZonecode(hotel.info.data[0].address.slice(0, 5))
@@ -101,6 +105,7 @@ const HotelDetail = () => {
         if (val == 'category') setCategory(e);
         if (val == 'name') setName(e.target.value);
         if (val == 'facility') setFacility(e);
+        if (val == 'facilityEtc') setFacilityEtc(e.target.value);
         if (val == 'zonecode') setZonecode(e.target.value);
         if (val == 'address') setAddress(e.target.value);
         if (val == 'address2') setAddress2(e.target.value);
@@ -144,7 +149,7 @@ const HotelDetail = () => {
         }
         if (file) reader.readAsDataURL(file);
     }
-
+    
     const onRemoveImgs = async(key) => {
         setImgList(imgList.filter((e, idx) => idx !== key))
         let copy = fileList.slice()
@@ -211,11 +216,14 @@ const HotelDetail = () => {
             }
 
             if (facility) {
-                data.options = facility.join();
+                let facile = facility.join()
+                if (facilityEtc) {
+                    facile = facile + ',' + facilityEtc
+                }
+                data.options = facile
             }
-            
-            // console.log(data)
 
+            // console.log(data)
             await hotel.updateInfo(data, user.token, (success, result) => {
                 if (success) {
                     message.success('수정 완료')
@@ -232,16 +240,21 @@ const HotelDetail = () => {
                 title={<Title>숙소 상세 정보</Title>} 
                 bordered 
                 column={1} 
-                extra={<Button onClick={() => router.push('/hotel/list')}>목록으로 돌아가기</Button>}
+                extra={
+                    <>
+                        {!router.query.type && <Button type="primary" onClick={onModi} style={{marginRight: '10px'}}>수정</Button>}
+                        <Button onClick={() => router.push('/hotel/list')}>목록으로 돌아가기</Button>
+                    </>
+                }
                 labelStyle={{width: '220px', minWidth: '180px'}}>
                     <Descriptions.Item label="숙소 카테고리" >
                         {hotel?.info?.data[0].type &&
                             modiStatus ?
                             <SelectBar defaultValue={hotel?.info?.data[0].type} onChange={(e) => onDataChange(e, 'category')}>
-                                <Select.Option value={"호텔"}>호텔</Select.Option>
-                                <Select.Option value={"모텔"}>모텔</Select.Option>
-                                <Select.Option value={"펜션"}>펜션</Select.Option>
-                                <Select.Option value={"콘도"}>콘도</Select.Option>
+
+                                {hotelCategory.map((el, idx) => {
+                                    return <Select.Option value={el} key={`category_${idx}`}>{el}</Select.Option>
+                                })}
                             </SelectBar>
                             : hotel?.info?.data[0].type
                         }
@@ -330,7 +343,8 @@ const HotelDetail = () => {
                     <Descriptions.Item label="숙소 등급">
                         {modiStatus ?
                         <InputValue
-                        placeholder={"숫자로 입력해 주세요"}
+                        type={'number'}
+                        placeholder={"1~5까지 숫자로 입력해 주세요"}
                         value={level} 
                         onChange={(e) => onDataChange(e, 'level')}
                         bordered={modiStatus} />
@@ -373,7 +387,16 @@ const HotelDetail = () => {
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                     {modiStatus ?
-                        <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} /> : facility ? facility.join(', ') : null}
+                        <>
+                        <Checkbox.Group options={options} value={facility} onChange={e => onDataChange(e, 'facility')} /> 
+                        <Tooltip title="콤마(,)로 구분해 입력 바랍니다.">
+                            <span>기타 </span>
+                            <InputValue 
+                            value={facilityEtc} 
+                            onChange={e => onDataChange(e, 'facilityEtc')} />
+                        </Tooltip>
+                        </>
+                        : (facility && !facilityEtc.length > 0) ? facility.join(', ') : (!facility.length > 0 && facilityEtc) ? facilityEtc.join(', ') : (facility && facilityEtc) ? facility.join(', ') + ', ' + facilityEtc.join(', ') : null}
                     </Descriptions.Item>
                     <Descriptions.Item label="주차 정보">
                     {modiStatus ?
@@ -383,8 +406,11 @@ const HotelDetail = () => {
                         buttonStyle="solid"
                         optionType="button"
                         options={[{
-                            label: '주차 가능',
-                            value: 'Y'
+                            label: '유료 주차',
+                            value: 'Y1'
+                        }, {
+                            label: '무료 주차',
+                            value: 'Y2'
                         }, {
                             label: '주차 불가',
                             value: 'N'
@@ -420,6 +446,7 @@ const HotelDetail = () => {
                         <Input.TextArea
                         value={content} 
                         rows={4}
+                        maxLength={100}
                         onChange={(e) => onDataChange(e, 'content')} />
                     </Descriptions.Item>
                     <Descriptions.Item label="교통 정보">

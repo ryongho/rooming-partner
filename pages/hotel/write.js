@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Descriptions, Select, Input, Button, Checkbox, message, Modal, DatePicker, Radio, Space } from 'antd'
+import { Descriptions, Select, Input, Button, Checkbox, message, Modal, DatePicker, Radio, Tooltip, Space } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import DaumPostcode from 'react-daum-postcode';
@@ -13,10 +13,12 @@ const HotelWrite = observer(() => {
     const router = useRouter();
     const { user, hotel } = useStore()
 
-    const options = ['주차가능', '레스토랑', '수영장', '스파', '피트니스', '무료 wifi', 'cctv', '소형냉장고']
+    const hotelCategory = ['호텔', '모텔', '펜션/풀빌라', '리조트', '글램핑/캠핑', '게스트하우스', '한옥', '공유숙박']
+    const options = ['넷플릭스', '유튜브', '디즈니', '왓챠', '쿠팡플레이', '레스토랑', '피트니스', '야외수영장', '실내수영장', '사우나', '스파',  '공유키친', '세미나룸', '세탁실', '주차공간', '무료wifi', 'PC', '노트북', '안마의자', '비데', '욕조', '월풀', '반신욕기계']
     const [category, setCategory] = useState('호텔')
     const [name, setName] = useState()
     const [facility, setFacility] = useState([])
+    const [facilityEtc, setFacilityEtc] = useState('');
     const [address, setAddress] = useState()
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
@@ -99,7 +101,11 @@ const HotelWrite = observer(() => {
             data.images = imgList.join();
         }
         if (facility) {
-            data.options = facility.join();
+            let facile = facility.join()
+            if (facilityEtc) {
+                facile = facile + ',' + facilityEtc
+            }
+            data.options = facile
         }
         console.log(data)
 
@@ -139,10 +145,9 @@ const HotelWrite = observer(() => {
                 <Descriptions title={<Title>숙소 정보 입력</Title>} bordered column={1} extra={<Button onClick={() => router.push('/hotel/list')}>목록으로 돌아가기</Button>}>
                     <Descriptions.Item label="숙소 카테고리">
                         <SelectBar placeholder={"선택하세요"} onChange={(e) => setCategory(e)}>
-                            <Select.Option value={"호텔"}>호텔</Select.Option>
-                            <Select.Option value={"모텔"}>모텔</Select.Option>
-                            <Select.Option value={"펜션"}>펜션</Select.Option>
-                            <Select.Option value={"콘도"}>콘도</Select.Option>
+                            {hotelCategory.map((el, idx) => {
+                                return <Select.Option value={el} key={`category_${idx}`}>{el}</Select.Option>
+                            })}
                         </SelectBar>
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소명">
@@ -210,7 +215,8 @@ const HotelWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="숙소 등급">
                         <InputValue
-                        placeholder={"숫자로 입력해 주세요"}
+                        type={'number'}
+                        placeholder={"1~5까지 숫자로 입력해 주세요"}
                         value={level} 
                         onChange={(e) => {
                             const numRegExp = /^[0-9]*$/;
@@ -244,6 +250,12 @@ const HotelWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="편의시설">
                         <Checkbox.Group options={options} value={facility} onChange={e => setFacility(e)} />
+                        <Tooltip title="콤마(,)로 구분해 입력 바랍니다.">
+                            <span>기타 </span>
+                            <InputValue 
+                            value={facilityEtc} 
+                            onChange={e => setFacilityEtc(e.target.value)} />
+                        </Tooltip>
                     </Descriptions.Item>
                     <Descriptions.Item label="대표자">
                         <InputValue
@@ -262,6 +274,7 @@ const HotelWrite = observer(() => {
                         <Input.TextArea
                         value={content} 
                         rows={4}
+                        maxLength={100}
                         onChange={(e) => setContent(e.target.value)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="교통 정보">
@@ -283,8 +296,11 @@ const HotelWrite = observer(() => {
                         buttonStyle="solid"
                         optionType="button"
                         options={[{
-                            label: '주차 가능',
-                            value: 'Y'
+                            label: '유료 주차',
+                            value: 'Y1'
+                        }, {
+                            label: '무료 주차',
+                            value: 'Y2'
                         }, {
                             label: '주차 불가',
                             value: 'N'
