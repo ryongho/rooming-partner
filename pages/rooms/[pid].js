@@ -292,7 +292,7 @@ const RoomsDetail = observer(() => {
                         onRemoveImgs={onRemoveImgs}
                         modiStatus={modiStatus} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="숙소 편의시설">
+                    <Descriptions.Item label="객실 내 시설">
                     {modiStatus ?
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} /> : option ? option.join(', ') : null}
                     </Descriptions.Item>

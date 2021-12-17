@@ -185,7 +185,7 @@ const GoodsWrite = observer(() => {
                             onUploadChange={onUploadChange}
                             onRemoveImgs={onRemoveImgs} />
                     </Descriptions.Item>
-                    <Descriptions.Item label="숙소 편의시설">
+                    <Descriptions.Item label="객실 내 시설">
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} />
                     </Descriptions.Item>
                 </Descriptions>
