@@ -32,7 +32,6 @@ const HotelDetail = () => {
     // const [breakfast, setBreakfast] = useState()
     const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
-
     const [content, setContent] = useState('')
     const [owner, setOwner] = useState('')
     const [reg, setReg] = useState('')
@@ -42,6 +41,9 @@ const HotelDetail = () => {
     const [fax, setFax] = useState('')
     const [longtitude, setLongtitude] = useState()
     const [latitude, setLatitude] = useState()
+    const [csInfo, setCsInfo] = useState()
+    const [receiptInfo, setReceiptInfo] = useState()
+    const [commonInfo, setCommonInfo] = useState()
 
     const [showAddress, setShowAddress] = useState(false)
 
@@ -55,7 +57,7 @@ const HotelDetail = () => {
             await goods.callListPartner(user.token)
             await user.callInfo(user.token);
 
-            // console.log(hotel.info.data[0])
+            console.log(hotel.info.data[0])
             if (hotel.info.data[0]) {
                 setCategory(hotel.info.data[0].type)
                 setName(hotel.info.data[0].name)
@@ -90,6 +92,9 @@ const HotelDetail = () => {
                 setLongtitude(hotel.info.data[0].longtitude)
                 setLatitude(hotel.info.data[0].latitude)
                 setParking(hotel.info.data[0].parking)
+                setCsInfo(hotel.info.data[0].cs_info)
+                setReceiptInfo(hotel.info.data[0].receipt_info)
+                setCommonInfo(hotel.info.data[0].common_info)
             }
         }
         callDetail();
@@ -125,6 +130,9 @@ const HotelDetail = () => {
         if (val == 'fax') setFax(e.target.value);
         if (val == 'longtitude') setLongtitude(e.target.value);
         if (val == 'latitude') setLatitude(e.target.value);
+        if (val == 'csInfo') setCsInfo(e.target.value);
+        if (val == 'receiptInfo') setReceiptInfo(e.target.value);
+        if (val == 'commonInfo') setCommonInfo(e.target.value);
     }
 
     const onUploadChange = async (e, item) => {
@@ -171,7 +179,7 @@ const HotelDetail = () => {
                 return message.warning('숙소 연락처를 입력해 주세요')
             }
             if (reg?.length > 12) {
-                message.warning('사업자 번호를 정확히 입력해 주세요')
+                return message.warning('사업자 번호를 정확히 입력해 주세요')
             }
             if (!bank) {
                 return message.warning('입금 은행명을 입력해 주세요')
@@ -183,7 +191,7 @@ const HotelDetail = () => {
                 return message.warning('예금주를 입력해 주세요')
             }
             if (imgList.length < 1) {
-                message.warning('숙소 사진을 입력해 주세요')
+                return message.warning('숙소 사진을 입력해 주세요')
             }
             if (!cancel) {
                 return message.warning('취소 및 환불 규정을 입력해 주세요')
@@ -212,7 +220,10 @@ const HotelDetail = () => {
                 parking: parking,
                 bank_name: bank,
                 account_number: account,
-                account_name: accountName
+                account_name: accountName,
+                cs_info: csInfo,
+                receipt_info: receiptInfo,
+                common_info: commonInfo
             }
 
             if (facility) {
@@ -396,7 +407,7 @@ const HotelDetail = () => {
                             onChange={e => onDataChange(e, 'facilityEtc')} />
                         </Tooltip>
                         </>
-                        : (facility && !facilityEtc.length > 0) ? facility.join(', ') : (!facility.length > 0 && facilityEtc) ? facilityEtc.join(', ') : (facility && facilityEtc) ? facility.join(', ') + ', ' + facilityEtc.join(', ') : null}
+                        : (facility && !facilityEtc?.length > 0) ? facility.join(', ') : (!facility?.length > 0 && facilityEtc) ? facilityEtc.join(', ') : (facility && facilityEtc) ? facility.join(', ') + ', ' + facilityEtc.join(', ') : null}
                     </Descriptions.Item>
                     <Descriptions.Item label="주차 정보">
                     {modiStatus ?
@@ -407,15 +418,15 @@ const HotelDetail = () => {
                         optionType="button"
                         options={[{
                             label: '유료 주차',
-                            value: 'Y1'
+                            value: 'P'
                         }, {
                             label: '무료 주차',
-                            value: 'Y2'
+                            value: 'Y'
                         }, {
                             label: '주차 불가',
                             value: 'N'
                         }]} />
-                        : parking == 'Y' ? '주차 가능' : parking == 'N' ? '주차 불가' : null}
+                        : parking == 'Y' ? '주차 가능' : parking == 'N' ? '주차 불가' : parking == 'P' ? '유료 주차' : null}
                     </Descriptions.Item>
                     <Descriptions.Item label="대표자">
                         {modiStatus ?
@@ -460,6 +471,24 @@ const HotelDetail = () => {
                         value={cancel} 
                         rows={4}
                         onChange={(e) => onDataChange(e, 'cancel')} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="고객센터 안내">
+                        <Input.TextArea
+                        value={csInfo} 
+                        rows={4}
+                        onChange={(e) => onDataChange(e, 'csInfo')} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="영수증 발급 안내">
+                        <Input.TextArea
+                        value={receiptInfo} 
+                        rows={4}
+                        onChange={(e) => onDataChange(e, 'receiptInfo')} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="공통 적용사항 안내">
+                        <Input.TextArea
+                        value={commonInfo} 
+                        rows={4}
+                        onChange={(e) => onDataChange(e, 'commonInfo')} />
                     </Descriptions.Item>
 
                     <Descriptions.Item label="파트너 정보">

@@ -145,3 +145,15 @@ export function putQuantityListUpdate(list, token) {
     return data
   })
 }
+
+export function putGoodsSaleByKey(params, token) {
+    return axios({
+        method: 'put',
+        url: '/goods/update_by_key',
+        baseURL: baseUrl[env].baseUrl,
+        params: params,
+        headers: {
+            'Authorization': 'Bearer '+token
+        }
+    })
+}

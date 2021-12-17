@@ -30,7 +30,6 @@ const HotelWrite = observer(() => {
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     const [cancel, setCancel] = useState()
-
     const [content, setContent] = useState('')
     const [owner, setOwner] = useState('')
     const [reg, setReg] = useState('')
@@ -41,6 +40,9 @@ const HotelWrite = observer(() => {
     const [parking, setParking] = useState()
     const [longtitude, setLongtitude] = useState()
     const [latitude, setLatitude] = useState()
+    const [csInfo, setCsInfo] = useState()
+    const [receiptInfo, setReceiptInfo] = useState()
+    const [commonInfo, setCommonInfo] = useState()
 
     const [showAddress, setShowAddress] = useState(false)
 
@@ -95,7 +97,10 @@ const HotelWrite = observer(() => {
             parking: parking,
             bank_name: bank,
             account_number: account,
-            account_name: accountName
+            account_name: accountName,
+            cs_info: csInfo,
+            receipt_info: receiptInfo,
+            common_info: commonInfo
         }
         if (imgList.length > 0) {
             data.images = imgList.join();
@@ -107,10 +112,9 @@ const HotelWrite = observer(() => {
             }
             data.options = facile
         }
-        console.log(data)
+        // console.log(data)
 
         await hotel.addInfo(data, user.token, (success, result) => {
-            console.log()
             if (success) {
                 message.success('게시 완료').then(() => window.location.href='/hotel/list')
             }
@@ -297,10 +301,10 @@ const HotelWrite = observer(() => {
                         optionType="button"
                         options={[{
                             label: '유료 주차',
-                            value: 'Y1'
+                            value: 'P'
                         }, {
                             label: '무료 주차',
-                            value: 'Y2'
+                            value: 'Y'
                         }, {
                             label: '주차 불가',
                             value: 'N'
@@ -311,6 +315,24 @@ const HotelWrite = observer(() => {
                         value={cancel} 
                         rows={4}
                         onChange={(e) => setCancel(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="고객센터 안내">
+                        <Input.TextArea
+                        value={csInfo} 
+                        rows={4}
+                        onChange={(e) => setCsInfo(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="영수증 발급 안내">
+                        <Input.TextArea
+                        value={receiptInfo} 
+                        rows={4}
+                        onChange={(e) => setReceiptInfo(e.target.value)} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="공통 적용사항 안내">
+                        <Input.TextArea
+                        value={commonInfo} 
+                        rows={4}
+                        onChange={(e) => setCommonInfo(e.target.value)} />
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>

@@ -44,6 +44,7 @@ const GoodsDetail = observer(() => {
             await goods.callInfo({id: router.query.pid}, user.token)
             await room.callRoomList({hotel_id: user.hotelid}, user.token)
             
+            console.log(goods?.info?.data[0])
             if (goods?.info?.data[0]) {
                 setRoomId(goods.info.data[0].room_id)
                 setName(goods.info.data[0].goods_name)
@@ -312,7 +313,7 @@ const GoodsDetail = observer(() => {
                     <Descriptions.Item label="상품 재고수량">
                         <CountWrap>
                             하단의 표시된 수량은 판매가능한 상품수입니다.
-                            <Button type="primary" size="small" onClick={() => router.push(`/goods/quantity/${router.query.pid}`)} style={{fontSize: '12px'}}>수량 수정</Button>
+                            <Button type="primary" size="small" onClick={() => router.push(`/goods/quantity/${router.query.pid}?modi=true`)} style={{fontSize: '12px'}}>수량 수정</Button>
                         </CountWrap>
                         <Calendar defaultValue={moment(start)} dateCellRender={(value)=>dateCellRender(value, selectedDates)} />
                     </Descriptions.Item>

@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Descriptions, Select, Input, Button, message, DatePicker, Checkbox, Radio, Calendar, Switch, InputNumber } from 'antd'
+import { Descriptions, Select, Input, Button, message, DatePicker, Checkbox, Radio, Calendar, Switch, InputNumber, Spin } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
@@ -109,13 +109,15 @@ const GoodsQuantity = observer(() => {
                     breakfast: goodsDetail.breakfast,
                     parking: goodsDetail.parking,
                     sale: goodsDetail.sale,
-                    options: goodsDetail.options
+                    options: goodsDetail.options,
+                    content: goodsDetail.content
                 }    
                 
                 await goods.updateInfo(data, user.token, (success, result) => {
                     if (success) {
                         message.success('수정 완료')
-                        window.location.href="/goods/list"
+                        if (location.search) window.location.href=`/goods/${router.query.pid}`
+                        else window.location.href='/goods/list';
                     }
                 })
             }
@@ -184,55 +186,57 @@ const GoodsQuantity = observer(() => {
     
 
     return (
-        <Wrapper>
-            <Detail>
-                <Descriptions title={<Title>상품 수량 관리</Title>} bordered column={1} extra={<Button onClick={() => router.push('/goods/list')}>목록으로 돌아가기</Button>}>
-                    <Descriptions.Item label="상품명">
-                        <InputValue
-                            disabled
-                            value={goods?.info?.data[0]?.goods_name}
-                            onChange={e => setName(e.target.value)} />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="판매 게시일 ~ 판매 종료일">
-                        <StartDate 
-                            value={start}
-                            onChange={(e)=>changeDate(e, 'start')} />
-                        ~
-                        <EndDate
-                            value={end}
-                            onChange={e => changeDate(e)} 
-                            disabledDate={(e) => e < start} />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="상품 수량">
-                        <CountWrap>
-                            <Count>
-                                <CountInput
-                                    max={100}
-                                    min={0}
-                                    value={count}
-                                    autoFocus
-                                    disabled={isEditMode}
-                                    onChange={e => setCount(e)} 
-                                    /> 개
-                            </Count>
+        <Spin spinning={goods.info?.data[0].length > 0} tip="Loading...">
+            <Wrapper>
+                <Detail>
+                    <Descriptions title={<Title>상품 수량 관리</Title>} bordered column={1} extra={<Button onClick={() => router.push('/goods/list')}>목록으로 돌아가기</Button>}>
+                        <Descriptions.Item label="상품명">
+                            <InputValue
+                                disabled
+                                value={goods?.info?.data[0]?.goods_name}
+                                onChange={e => setName(e.target.value)} />
+                        </Descriptions.Item>
+                        <Descriptions.Item label="판매 게시일 ~ 판매 종료일">
+                            <StartDate 
+                                value={start}
+                                onChange={(e)=>changeDate(e, 'start')} />
+                            ~
+                            <EndDate
+                                value={end}
+                                onChange={e => changeDate(e)} 
+                                disabledDate={(e) => e < start} />
+                        </Descriptions.Item>
+                        <Descriptions.Item label="상품 수량">
+                            <CountWrap>
+                                <Count>
+                                    <CountInput
+                                        max={100}
+                                        min={0}
+                                        value={count}
+                                        autoFocus
+                                        disabled={isEditMode}
+                                        onChange={e => setCount(e)} 
+                                        /> 개
+                                </Count>
 
-                            <Button type="primary" disabled={isEditMode} onClick={()=>onSetAll(start, end)} >일괄적용</Button>
-                            <ModiButton type="primary" onChange={e=>{setIsEditMode(e)}} />부분 수량 수정
-                        </CountWrap>
-                    </Descriptions.Item>
-                </Descriptions>
-                <Empty />
+                                <Button type="primary" disabled={isEditMode} onClick={()=>onSetAll(start, end)} >일괄적용</Button>
+                                <ModiButton type="primary" onChange={e=>{setIsEditMode(e)}} />부분 수량 수정
+                            </CountWrap>
+                        </Descriptions.Item>
+                    </Descriptions>
+                    <Empty />
 
-                <Calendar 
-                    dateCellRender={(value)=>dateCellRender(value, selectedDates)}
-                />
+                    <Calendar 
+                        dateCellRender={(value)=>dateCellRender(value, selectedDates)}
+                    />
 
-                <ButtonWrap>
-                    <Button type="primary" onClick={onWrite}>수정</Button>
-                    <Button onClick={() => router.push('/goods/list')}>목록</Button>
-                </ButtonWrap>
-            </Detail>
-        </Wrapper>
+                    <ButtonWrap>
+                        <Button type="primary" onClick={onWrite}>수정</Button>
+                        <Button onClick={() => router.push('/goods/list')}>목록</Button>
+                    </ButtonWrap>
+                </Detail>
+            </Wrapper>
+        </Spin>
     )
 })
 

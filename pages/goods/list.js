@@ -117,8 +117,20 @@ const GoodsList = observer(() => {
 
     }
 
-    const onChangeSale = (e, idx) => {
-        console.log(e.target.value, goods.partnerList.data[idx]);
+    const onChangeSale = async (e, idx) => {
+        // console.log(e.target.value, goods.partnerList.data[idx].goods_id);
+
+        const data = {
+            goods_id: goods.partnerList.data[idx].goods_id,
+            key: 'sale',
+            value: e.target.value
+        }
+        
+        await goods.updateSaleByKey(data, user.token, (success) => {
+            if (success) {
+                router.push('/goods/list');
+            }
+        })
     }
 
     return (

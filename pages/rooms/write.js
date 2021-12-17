@@ -26,7 +26,7 @@ const GoodsWrite = observer(() => {
     const [checkIn, setCheckIn] = useState()
     const [checkOut, setCheckOut] = useState()
     const [option, setOption] = useState([])
-    const [square, setSquare] = useState()
+    const [size, setSize] = useState()
 
     const onWrite = async() => {
         if (!name) {
@@ -62,7 +62,7 @@ const GoodsWrite = observer(() => {
             max_peoples: maxPeople,
             checkin: checkIn,
             checkout: checkOut,
-            square: square
+            size: size
         }
 
         if (imgList.length > 0) {
@@ -159,11 +159,11 @@ const GoodsWrite = observer(() => {
                     <Descriptions.Item label="객실 평수">
                         <Input
                         type="number"
-                        value={square} 
+                        value={size} 
                         onChange={e => {
                         const numRegExp = /^[0-9]*$/;
                         if (!numRegExp.test(e.target.value)) return;
-                        setSquare(e.target.value)}}
+                        setSize(e.target.value)}}
                         style={{width:100}} /> 평
                     </Descriptions.Item>
                     <Descriptions.Item label="체크인 시간">

@@ -29,7 +29,7 @@ const RoomsDetail = observer(() => {
     const [showDelete, setShowDelete] = useState(false)
     const [roomList, setRoomList] = useState([])
     const [option, setOption] = useState()
-    const [square, setSquare] = useState()
+    const [size, setSize] = useState()
 
 
     useEffect(() => {
@@ -44,18 +44,18 @@ const RoomsDetail = observer(() => {
             await hotel.callListPartner(user.token)
             await user.callInfo(user.token)
             
-            // console.log(room.info.data[0])
+            console.log(room.info.data[0])
             if (room.info.data[0]) {
                 setName(room.info.data[0].name)
                 setPeople(room.info.data[0].peoples)
                 setMaxPeople(room.info.data[0].max_peoples)
-                setSquare(room.info.data[0].square)
+                setSize(room.info.data[0].size)
                 setCheckIn(room.info.data[0].checkin.substring(0, 5))
                 setCheckOut(room.info.data[0].checkout.substring(0, 5))
                 setBed(room.info.data[0].bed)
                 setBedNum(room.info.data[0].amount)
                 setImgList(room.info.images)
-                setOption(room.info.data[0].options?.split(","))
+                setOption(room.info.data[0].room_options?.split(","))
 
                 let list = Array.from(Array(10).keys());
                 for (let i = 0; i <= list.length; i++) {
@@ -87,7 +87,7 @@ const RoomsDetail = observer(() => {
         if (val == 'name') setName(e.target.value);
         if (val == 'people') setPeople(e.target.value);
         if (val == 'maxPeople') setMaxPeople(e.target.value);
-        if (val == 'square') setSquare(e.target.value);
+        if (val == 'size') setSize(e.target.value);
         if (val == 'bed') setBed(e.target.value);
         if (val == 'bedNum') setBedNum(e.target.value);
         if (val == 'checkIn') setCheckIn(e);
@@ -98,22 +98,22 @@ const RoomsDetail = observer(() => {
         if (!router.query.type) router.push(`/rooms/${router.query.pid}?type=modi`);
         else {
             if (!name) {
-                message.warning('객실명을 입력해 주세요')
+                return message.warning('객실명을 입력해 주세요')
             }
             if (!people) {
-                message.warning('기준 인원수를 입력해 주세요')
+                return message.warning('기준 인원수를 입력해 주세요')
             }
             if (!maxPeople) {
-                message.warning('최대 인원수를 입력해 주세요')
+                return message.warning('최대 인원수를 입력해 주세요')
             }
             if (!bed || !bedNum) {
-                message.warning('침대 사이즈를 입력해 주세요')
+                return message.warning('침대 사이즈를 입력해 주세요')
             }
             if (!checkIn) {
-                message.warning('체크인 시간을 입력해 주세요')
+                return message.warning('체크인 시간을 입력해 주세요')
             }
             if (!checkOut) {
-                message.warning('체크아웃 시간을 입력해 주세요')
+                return message.warning('체크아웃 시간을 입력해 주세요')
             }
 
             // success
@@ -128,7 +128,7 @@ const RoomsDetail = observer(() => {
                 checkout: checkOut,
                 bed: bed,
                 amount: bedNum,
-                square: square
+                size: size
             }
 
             if (option) {
@@ -240,11 +240,11 @@ const RoomsDetail = observer(() => {
                         {modiStatus ?
                         <InputValue
                         type="number"
-                        value={square} 
-                        onChange={e => onDataChange(e, 'square')}
+                        value={size} 
+                        onChange={e => onDataChange(e, 'size')}
                         bordered={modiStatus}
                         style={{width:100}} />
-                        : square} 평
+                        : size} 평
                     </Descriptions.Item>
                     <Descriptions.Item label="체크인 시간">
                         {modiStatus ?

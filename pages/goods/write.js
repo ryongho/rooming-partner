@@ -76,8 +76,8 @@ const GoodsWrite = observer(() => {
             min_nights: minNight,
             max_nights: maxNight,
             breakfast: breakfast,
+            content: content,
             sale: sale,
-            content: content
         }
 
         if (imgList.length > 0) {
@@ -87,8 +87,10 @@ const GoodsWrite = observer(() => {
             data.options = option.join();
         }
 
+        // console.log(data, user.token)
+
         await goods.addInfo(data, user.token, (success, result) => {
-            console.log('success result : ',success, result);
+            // console.log('success result : ',success, result);
             if (success && result.insert_id) {
                 message.success('게시 완료')
                 window.location.href = `/goods/quantity/${result.insert_id}`
