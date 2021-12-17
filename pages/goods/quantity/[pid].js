@@ -22,28 +22,21 @@ const GoodsQuantity = observer(() => {
     const [allCount, setAllCount] = useState()
     const [loading, setLoading] = useState(false)
     const [isEditMode, setIsEditMode] = useState()
+    const [spin, setSpin] = useState(true)
+    
 
-    
-    
     useEffect(() => {
         const callGoodsInfo = async() => {
             if(router.query.pid && user.token){
                 await goods.callInfo({id: router.query.pid}, user.token)
+                setTimeout(() => {
+                    setSpin(false)
+                }, 500)
             }
         }
         callGoodsInfo()
         
     }, [router])
-
-    useEffect(() => {
-        const callGoodsInfo = async() => {
-            if(router.query.pid && user.token){
-                await goods.callInfo({id: router.query.pid}, user.token)
-            }
-        }
-        callGoodsInfo()
-        
-    }, [])
 
     useEffect(() => {
         const callGoodsInfo = async() => {
@@ -79,7 +72,7 @@ const GoodsQuantity = observer(() => {
             return message.warning('상품 판매 종료일을 입력해 주세요')
         }
 
-        
+        setSpin(true)
         let quantityList = []
 
         _.forEach(selectedDates, (value, key) => {
@@ -115,6 +108,7 @@ const GoodsQuantity = observer(() => {
                 
                 await goods.updateInfo(data, user.token, (success, result) => {
                     if (success) {
+                        setSpin(false)
                         message.success('수정 완료')
                         if (location.search) window.location.href=`/goods/${router.query.pid}`
                         else window.location.href='/goods/list';
@@ -186,7 +180,7 @@ const GoodsQuantity = observer(() => {
     
 
     return (
-        <Spin spinning={goods.info?.data[0].length > 0} tip="Loading...">
+        <Spin spinning={spin} tip="Loading...">
             <Wrapper>
                 <Detail>
                     <Descriptions title={<Title>상품 수량 관리</Title>} bordered column={1} extra={<Button onClick={() => router.push('/goods/list')}>목록으로 돌아가기</Button>}>

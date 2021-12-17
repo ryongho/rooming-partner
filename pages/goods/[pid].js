@@ -44,7 +44,7 @@ const GoodsDetail = observer(() => {
             await goods.callInfo({id: router.query.pid}, user.token)
             await room.callRoomList({hotel_id: user.hotelid}, user.token)
             
-            console.log(goods?.info?.data[0])
+            // console.log(goods?.info?.data[0])
             if (goods?.info?.data[0]) {
                 setRoomId(goods.info.data[0].room_id)
                 setName(goods.info.data[0].goods_name)
