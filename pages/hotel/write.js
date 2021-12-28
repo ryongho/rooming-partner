@@ -107,7 +107,7 @@ const HotelWrite = observer(() => {
         }
         if (facility) {
             let facile = facility.join()
-            if (facilityEtc) {
+            if (facilityEtc.length > 1) {
                 facile = facile + ',' + facilityEtc
             }
             data.options = facile
@@ -127,6 +127,12 @@ const HotelWrite = observer(() => {
         setLoading(true)
         let file = e.target.files[0];
         let reader = new FileReader();
+
+        if (file.size / 1024 / 1024 > 1) {
+            message.error('이미지 사이즈는 1MB보다 작아야 합니다')
+            setLoading(false)
+            return
+        }
 
         reader.onloadend = async(e) => {
             await hotel.imagesUpload(file, user.token, (success, data) => {
@@ -269,6 +275,7 @@ const HotelWrite = observer(() => {
                     <Descriptions.Item label="사업자 번호">
                         <InputValue
                         value={reg} 
+                        maxLength={14}
                         onChange={e => setReg(e.target.value)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="개업일">

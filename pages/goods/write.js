@@ -12,6 +12,7 @@ const GoodsWrite = observer(() => {
     const router = useRouter();
     const { goods, user, room } = useStore()
     
+    const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
     const options = ['룸서비스', '사진 무한 촬영', '조식 패키지', '파티 용품 제공']
     const [roomId, setRoomId] = useState()
     const [name, setName] = useState()
@@ -24,6 +25,8 @@ const GoodsWrite = observer(() => {
     const [rate, setRate] = useState()
     const [minNight, setMinNight] = useState()
     const [maxNight, setMaxNight] = useState()
+    const [checkIn, setCheckIn] = useState()
+    const [checkOut, setCheckOut] = useState()
     const [option, setOption] = useState([])
     const [breakfast, setBreakfast] = useState()
     // const [parking, setParking] = useState()
@@ -58,6 +61,12 @@ const GoodsWrite = observer(() => {
         if (!price) {
             return message.warning('상품 원가를 입력해 주세요')
         }
+        if (!checkIn) {
+            return message.warning('체크인 시간을 입력해 주세요')
+        }
+        if (!checkOut) {
+            return message.warning('체크아웃 시간을 입력해 주세요')
+        }
         if (imgList.length < 1) {
             return message.warning('상품 이미지를 입력해 주세요')
         }
@@ -75,6 +84,8 @@ const GoodsWrite = observer(() => {
             rate: rate,
             min_nights: minNight,
             max_nights: maxNight,
+            checkin: checkIn,
+            checkout: checkOut,
             breakfast: breakfast,
             content: content,
             sale: sale,
@@ -102,6 +113,12 @@ const GoodsWrite = observer(() => {
 
         setLoading(true)
         let file = e.target.files[0];
+
+        if (file.size / 1024 / 1024 > 1) {
+            message.error('이미지 사이즈는 1MB보다 작아야 합니다')
+            setLoading(false)
+            return
+        }
         let reader = new FileReader();
 
         reader.onloadend = async(e) => {
@@ -209,6 +226,18 @@ const GoodsWrite = observer(() => {
                         if (!numRegExp.test(e.target.value)) return;
                         setMaxNight(e.target.value)}}
                         style={{width:50}} /> 일
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크인 시간">
+                        <SelectBar placeholder={'체크인 가능 시간을 선택하세요'} onChange={(e) => setCheckIn(e)} style={{width:250}}>
+                            {times.map((time, idx) => {
+                            return <Select.Option key={`in_${idx}`} value={time}>{time}</Select.Option>})}
+                        </SelectBar>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크아웃 시간">
+                        <SelectBar placeholder={'체크아웃 가능 시간을 선택하세요'} onChange={(e) => setCheckOut(e)} style={{width:250}}>
+                            {times.map((time, idx) => {
+                            return <Select.Option key={`out_${idx}`} value={time}>{time}</Select.Option>})}
+                        </SelectBar>
                     </Descriptions.Item>
                     <Descriptions.Item label="조식 정보">
                         <Radio.Group 

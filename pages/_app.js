@@ -171,7 +171,7 @@ const MyApp = ({ Component, pageProps }) => {
                                     <SubMenu key="/reserved" icon={<ScheduleOutlined />} title="예약 관리">
                                         <Menu.Item key="/reserved/list" group="예약 관리" title="예약 목록"><Link href="/reserved/list">예약 목록</Link></Menu.Item>
                                     </SubMenu>
-                                    <SubMenu key="/review" icon={<FormOutlined />} title="리뷰 관리">
+                                    {/* <SubMenu key="/review" icon={<FormOutlined />} title="리뷰 관리">
                                         <Menu.Item key="/review/list" group="리뷰 관리" title="리뷰 목록"><Link href="/review/list">리뷰 목록</Link></Menu.Item>
                                     </SubMenu>
                                     {isAdmin &&
@@ -183,7 +183,7 @@ const MyApp = ({ Component, pageProps }) => {
                                     }
                                     <SubMenu key="/stats" icon={<BarChartOutlined />} title="통계 관리">
                                         <Menu.Item key="/stats/list" group="통계 관리" title="통계 목록"><Link href="/stats/list">통계 목록</Link></Menu.Item>
-                                    </SubMenu>
+                                    </SubMenu> */}
                                 </Menu>
                             </Sider>
                             <Layout style={{height: '100vh', overflowY: 'auto'}}>

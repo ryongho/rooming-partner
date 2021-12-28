@@ -105,6 +105,7 @@ const HotelList = observer(() => {
 
             <TableTop>
                 {/* <TotalNum>총 {hotel.partnerList.data && hotel.partnerList.data.length}건</TotalNum> */}
+                <Space> </Space>
                 <Space>
                     {!user.hotelid &&
                     <Button type="primary" onClick={onWriteHotel}><PlusSquareOutlined /> 숙소 등록</Button>}

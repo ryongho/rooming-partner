@@ -16,6 +16,7 @@ const GoodsDetail = observer(() => {
     const [modiStatus, setModiStatus] = useState(false)
     
     const options = ['룸서비스', '사진 무한 촬영', '조식 패키지', '파티 용품 제공']
+    const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
     const [roomId, setRoomId] = useState()
     const [name, setName] = useState()
     const [content, setContent] = useState()
@@ -27,6 +28,8 @@ const GoodsDetail = observer(() => {
     const [rate, setRate] = useState()
     const [minNight, setMinNight] = useState()
     const [maxNight, setMaxNight] = useState()
+    const [checkIn, setCheckIn] = useState()
+    const [checkOut, setCheckOut] = useState()
     const [option, setOption] = useState()
     const [breakfast, setBreakfast] = useState()
     const [parking, setParking] = useState()
@@ -57,6 +60,8 @@ const GoodsDetail = observer(() => {
                 setRate((goods.info.data[0].price - goods.info.data[0].sale_price) / goods.info.data[0].price * 100)
                 setMinNight(goods.info.data[0].min_nights)
                 setMaxNight(goods.info.data[0].max_nights)
+                setCheckIn(goods.info.data[0].checkin.substring(0, 5))
+                setCheckOut(goods.info.data[0].checkout.substring(0, 5))
                 setOption(goods.info.data[0].options?.split(","))
                 setBreakfast(goods.info.data[0].breakfast)
                 // setParking(goods.info.data[0].parking)
@@ -121,11 +126,19 @@ const GoodsDetail = observer(() => {
         if (val == 'minNight') setMinNight(e.target.value);
         if (val == 'maxNight') setMaxNight(e.target.value);
         if (val == 'parking') setParking(e);
+        if (val == 'checkIn') setCheckIn(e);
+        if (val == 'checkOut') setCheckOut(e);
     }
 
     const onUploadChange = async(e, item) => {
         let file = e.target.files[0];
         let reader = new FileReader();
+        
+        if (file.size / 1024 / 1024 > 1) {
+            message.error('이미지 사이즈는 1MB보다 작아야 합니다')
+            setLoading(false)
+            return
+        }
         
         reader.onloadend = async (e) => {
 
@@ -173,6 +186,12 @@ const GoodsDetail = observer(() => {
             if (!price) {
                 return message.warning('상품 원가를 입력해 주세요')
             }
+            if (!checkIn) {
+                return message.warning('체크인 시간을 입력해 주세요')
+            }
+            if (!checkOut) {
+                return message.warning('체크아웃 시간을 입력해 주세요')
+            }
 
             // success
 
@@ -187,6 +206,8 @@ const GoodsDetail = observer(() => {
                 sale_price: salePrice,
                 min_nights: minNight,
                 max_nights: maxNight,
+                checkin: checkIn,
+                checkout: checkOut,
                 breakfast: breakfast,
                 parking: parking,
                 sale: sale,
@@ -315,7 +336,7 @@ const GoodsDetail = observer(() => {
                             하단의 표시된 수량은 판매가능한 상품수입니다.
                             <Button type="primary" size="small" onClick={() => router.push(`/goods/quantity/${router.query.pid}?modi=true`)} style={{fontSize: '12px'}}>수량 수정</Button>
                         </CountWrap>
-                        <Calendar defaultValue={moment(start)} dateCellRender={(value)=>dateCellRender(value, selectedDates)} />
+                        <Calendar value={moment(start)} defaultValue={moment(start)} dateCellRender={(value)=>dateCellRender(value, selectedDates)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <ModiImgs 
@@ -338,6 +359,26 @@ const GoodsDetail = observer(() => {
                         value={maxNight} 
                         onChange={e => onDataChange(e, 'maxNight')}
                         style={{width:50}} /> : maxNight } 일
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크인 시간">
+                        {modiStatus ?
+                            <SelectBar defaultValue={checkIn} onChange={(e) => onDataChange(e, 'checkIn')}>
+                                {times.map((time, idx) => {
+                                return <Select.Option key={`in_${idx}`} value={time}>{time}</Select.Option>})}
+                            </SelectBar>
+                            :
+                            <div>{checkIn}시 이후</div>
+                        }
+                    </Descriptions.Item>
+                    <Descriptions.Item label="체크아웃 시간">
+                        {modiStatus ?
+                            <SelectBar defaultValue={checkOut} onChange={(e) => onDataChange(e, 'checkOut')}>
+                                {times.map((time, idx) => {
+                                return <Select.Option key={`out_${idx}`}value={time}>{time}</Select.Option>})}
+                            </SelectBar>
+                            :
+                            <div>{checkOut}시 이전</div>
+                        }
                     </Descriptions.Item>
                     <Descriptions.Item label="조식 정보">
                     {modiStatus ?

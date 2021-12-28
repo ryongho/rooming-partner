@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Descriptions, Select, Input, Button, message, Checkbox } from 'antd'
+import { Descriptions, Select, Input, Button, message, Checkbox, Tooltip } from 'antd'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import UploadImgs from '../../components/atom/UploadImgs'
@@ -12,7 +12,6 @@ const GoodsWrite = observer(() => {
     const { user, room } = useStore()
     
     const options = ['무료 wifi', '3인용 소파', 'TV', '헤어 드라이어', '에어컨', '소형 냉장고', 'CCTV', '욕조', '입욕제', '비데', '룸서비스']
-    const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
 
     const [hotelId, setHotelId] = useState()
     const [name, setName] = useState()
@@ -23,9 +22,10 @@ const GoodsWrite = observer(() => {
     const [loading, setLoading] = useState(false)
     const [people, setPeople] = useState()
     const [maxPeople, setMaxPeople] = useState()
-    const [checkIn, setCheckIn] = useState()
-    const [checkOut, setCheckOut] = useState()
+    // const [checkIn, setCheckIn] = useState()
+    // const [checkOut, setCheckOut] = useState()
     const [option, setOption] = useState([])
+    const [facilityEtc, setFacilityEtc] = useState('');
     const [size, setSize] = useState()
 
     const onWrite = async() => {
@@ -41,12 +41,12 @@ const GoodsWrite = observer(() => {
         if (!bed || !bedNum) {
             return message.warning('침대 사이즈를 입력해 주세요')
         }
-        if (!checkIn) {
-            return message.warning('체크인 시간을 입력해 주세요')
-        }
-        if (!checkOut) {
-            return message.warning('체크아웃 시간을 입력해 주세요')
-        }
+        // if (!checkIn) {
+        //     return message.warning('체크인 시간을 입력해 주세요')
+        // }
+        // if (!checkOut) {
+        //     return message.warning('체크아웃 시간을 입력해 주세요')
+        // }
         if (imgList.length < 1) {
             return message.warning('객실 이미지를 입력해 주세요')
         }
@@ -60,8 +60,6 @@ const GoodsWrite = observer(() => {
             amount: bedNum,
             peoples: people,
             max_peoples: maxPeople,
-            checkin: checkIn,
-            checkout: checkOut,
             size: size
         }
 
@@ -70,9 +68,14 @@ const GoodsWrite = observer(() => {
         }
 
         if (option) {
-            data.options = option.join();
+            let facile = option.join()
+            if (facilityEtc.length > 1) {
+                facile = facile + ',' + facilityEtc
+            }
+            data.options = facile
         }
 
+        // console.log(data)
         await room.addInfo(data, user.token, (success, result) => {
             if (success) {
                 message.success('게시 완료')
@@ -95,6 +98,12 @@ const GoodsWrite = observer(() => {
         setLoading(true)
         let file = e.target.files[0];
         let reader = new FileReader();
+        
+        if (file.size / 1024 / 1024 > 1) {
+            message.error('이미지 사이즈는 1MB보다 작아야 합니다')
+            setLoading(false)
+            return
+        }
 
         reader.onloadend = async(e) => {
             await room.imagesUpload(file, user.token, (success, data) => {
@@ -166,7 +175,7 @@ const GoodsWrite = observer(() => {
                         setSize(e.target.value)}}
                         style={{width:100}} /> 평
                     </Descriptions.Item>
-                    <Descriptions.Item label="체크인 시간">
+                    {/* <Descriptions.Item label="체크인 시간">
                         <SelectBar placeholder={'체크인 가능 시간을 선택하세요'} onChange={(e) => setCheckIn(e)} style={{width:250}}>
                             {times.map((time, idx) => {
                             return <Select.Option key={`in_${idx}`} value={time}>{time}</Select.Option>})}
@@ -177,7 +186,7 @@ const GoodsWrite = observer(() => {
                             {times.map((time, idx) => {
                             return <Select.Option key={`out_${idx}`} value={time}>{time}</Select.Option>})}
                         </SelectBar>
-                    </Descriptions.Item>
+                    </Descriptions.Item> */}
                     <Descriptions.Item label="객실 이미지">
                         <UploadImgs 
                             imgList={imgList}
@@ -187,6 +196,12 @@ const GoodsWrite = observer(() => {
                     </Descriptions.Item>
                     <Descriptions.Item label="객실 내 시설">
                         <Checkbox.Group options={options} value={option} onChange={e => setOption(e)} />
+                        <Tooltip title="콤마(,)로 구분해 입력 바랍니다.">
+                            <span>기타 </span>
+                            <InputValue 
+                            value={facilityEtc} 
+                            onChange={e => setFacilityEtc(e.target.value)} />
+                        </Tooltip>
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>

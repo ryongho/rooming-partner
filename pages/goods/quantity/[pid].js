@@ -11,16 +11,12 @@ import _ from "lodash"
 const GoodsQuantity = observer(() => {
 
     const router = useRouter();
-    const { goods, user, room } = useStore()
+    const { goods, user } = useStore()
     
-    const [roomId, setRoomId] = useState()
-    const [name, setName] = useState()
     const [start, setStart] = useState(moment())
     const [end, setEnd] = useState(moment())
-    const [count, setCount] = useState()
+    const [count, setCount] = useState(0)
     const [selectedDates, setSelectedDates] = useState([])
-    const [allCount, setAllCount] = useState()
-    const [loading, setLoading] = useState(false)
     const [isEditMode, setIsEditMode] = useState()
     const [spin, setSpin] = useState(true)
     
@@ -103,7 +99,9 @@ const GoodsQuantity = observer(() => {
                     parking: goodsDetail.parking,
                     sale: goodsDetail.sale,
                     options: goodsDetail.options,
-                    content: goodsDetail.content
+                    content: goodsDetail.content,
+                    checkin: goodsDetail.checkin,
+                    checkout: goodsDetail.checkout,
                 }    
                 
                 await goods.updateInfo(data, user.token, (success, result) => {
@@ -145,13 +143,15 @@ const GoodsQuantity = observer(() => {
     }
 
     const onSetAll = (start, end) => {
+        let countNum;
+        !count ? countNum = 0 : countNum = count;
         let _start = moment(start.format('YYYY-MM-DD'))
         let diff = end.diff(start, 'days')
         let dates = {}
         for (let i = 0; i < diff+1; i++) {
             let _date = i === 0 ? _start.format('YYYY-MM-DD') : _start.add(1, 'd').format('YYYY-MM-DD')
 
-            dates[_date] = count
+            dates[_date] = countNum
         }
         setSelectedDates(dates)
     }
@@ -187,8 +187,7 @@ const GoodsQuantity = observer(() => {
                         <Descriptions.Item label="상품명">
                             <InputValue
                                 disabled
-                                value={goods?.info?.data[0]?.goods_name}
-                                onChange={e => setName(e.target.value)} />
+                                value={goods?.info?.data[0]?.goods_name} />
                         </Descriptions.Item>
                         <Descriptions.Item label="판매 게시일 ~ 판매 종료일">
                             <StartDate 
@@ -221,6 +220,7 @@ const GoodsQuantity = observer(() => {
                     <Empty />
 
                     <Calendar 
+                        value={start}
                         dateCellRender={(value)=>dateCellRender(value, selectedDates)}
                     />
 

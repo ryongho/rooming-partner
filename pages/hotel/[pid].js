@@ -57,7 +57,7 @@ const HotelDetail = () => {
             await goods.callListPartner(user.token)
             await user.callInfo(user.token);
 
-            console.log(hotel.info.data[0])
+            // console.log(hotel.info.data[0])
             if (hotel.info.data[0]) {
                 setCategory(hotel.info.data[0].type)
                 setName(hotel.info.data[0].name)
@@ -138,6 +138,12 @@ const HotelDetail = () => {
     const onUploadChange = async (e, item) => {
         let file = e.target.files[0];
         let reader = new FileReader();
+
+        if (file.size / 1024 / 1024 > 1) {
+            message.error('이미지 사이즈는 1MB보다 작아야 합니다')
+            setLoading(false)
+            return
+        }
         
         reader.onloadend = async (e) => {
 
@@ -234,7 +240,7 @@ const HotelDetail = () => {
                 data.options = facile
             }
 
-            // console.log(data)
+            // console.log(data, user.token)
             await hotel.updateInfo(data, user.token, (success, result) => {
                 if (success) {
                     message.success('수정 완료')
@@ -440,6 +446,7 @@ const HotelDetail = () => {
                         {modiStatus ? 
                         <InputValue
                         value={reg} 
+                        maxLength={14}
                         onChange={e => onDataChange(e, 'reg')}
                         bordered={modiStatus} />
                         : reg }
@@ -450,7 +457,7 @@ const HotelDetail = () => {
                         defaultValue={moment(openDate)}
                         format={'YYYY-MM-DD'} 
                         value={moment(openDate)}
-                        onChange={(e, str) => {console.log(e, str); setOpenDate(str)}} />
+                        onChange={(e, str) => setOpenDate(str)} />
                         : openDate }
                     </Descriptions.Item>
                     <Descriptions.Item label="호텔 소개">
