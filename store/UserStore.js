@@ -116,6 +116,7 @@ export default class UserStore {
             callback(true, result.data)
         }
     } catch (err) {
+        console.log('checkNickDuplicate err', err);
         callback(false, null)
     }
   }

@@ -10,8 +10,10 @@ const Join = observer(() => {
     const { user } = useStore()
 
     const [nick, setNick] = useState('')
+    const [nickDup, setNickDup] = useState('')
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
+    const [emailDup, setEmailDup] = useState('')
     const [phone, setPhone] = useState('')
     const [pw, setPw] = useState('')
     const [pw2, setPw2] = useState('')
@@ -47,6 +49,18 @@ const Join = observer(() => {
         if (pw !== pw2) {
             return message.warning('비밀번호와 비밀번호 확인을 동일하게 입력해 주세요')
         }
+        if (nickDup === '') {
+            return message.warning('파트너명 중복 검사를 해주세요.')
+        }
+        if (nickDup === false) {
+            return message.warning('이미 사용중인 파트너명 입니다.')
+        }
+        if (emailDup === '') {
+            return message.warning('이메일 중복 검사를 해주세요.')
+        }
+        if (emailDup === false) {
+            return message.warning('이미 사용중인 이메일 입니다.')
+        }
 
         const data = {
             name: name,
@@ -68,7 +82,7 @@ const Join = observer(() => {
                         user.join(data, (success, result) => {
                             if (success) {
                                 if (result.status == 200) {
-                                    console.log(data)
+                                    // console.log(data)
                                     message.success('회원가입이 완료되었습니다')
                                     router.push('/')
                                 } else {
@@ -85,12 +99,16 @@ const Join = observer(() => {
     }
 
     const onCheckNick = async() => {
+        console.log('test')
         await user.checkNickDuplicate({nickname: nick}, (success, result) => {
             if (success) {
-                if (result.usable == 'Y') {
-                    alert('이미 사용중인 파트너명입니다.')
+                console.log(result)
+                alert(`${result.msg}입니다.`)
+                alert(`${result.usable}입니다.`)
+                if (result.usable == 'N') {
+                    setNickDup(false);
                 } else {
-                    alert('사용가능한 파트너명입니다.')
+                    setNickDup(true);
                 }
             }
         })
@@ -99,8 +117,13 @@ const Join = observer(() => {
     const onCheckEmail = async() => {
         await user.checkEmailDuplicate({email}, (success, result) => {
             if (success) {
-                // console.log(result)
+                console.log(result)
                 alert(`${result.msg}입니다.`)
+                if (result.usable == 'N') {
+                    setEmailDup(false);
+                } else {
+                    setEmailDup(true);
+                }
             }
         })
     }
