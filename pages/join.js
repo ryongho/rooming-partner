@@ -99,6 +99,7 @@ const Join = observer(() => {
     }
 
     const onCheckNick = async() => {
+        console.log('test')
         await user.checkNickDuplicate({nickname: nick}, (success, result) => {
             if (success) {
                 console.log(result)
