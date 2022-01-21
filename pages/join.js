@@ -82,7 +82,6 @@ const Join = observer(() => {
                         user.join(data, (success, result) => {
                             if (success) {
                                 if (result.status == 200) {
-                                    // console.log(data)
                                     message.success('회원가입이 완료되었습니다')
                                     router.push('/')
                                 } else {
@@ -99,12 +98,10 @@ const Join = observer(() => {
     }
 
     const onCheckNick = async() => {
-        console.log('test')
+        // console.log('test')
         await user.checkNickDuplicate({nickname: nick}, (success, result) => {
             if (success) {
-                console.log(result)
                 alert(`${result.msg}입니다.`)
-                alert(`${result.usable}입니다.`)
                 if (result.usable == 'N') {
                     setNickDup(false);
                 } else {
