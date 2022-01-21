@@ -101,7 +101,7 @@ const Join = observer(() => {
     const onCheckNick = async() => {
         await user.checkNickDuplicate({nickname: nick}, (success, result) => {
             if (success) {
-                // console.log(result)
+                console.log(result)
                 alert(`${result.msg}입니다.`)
                 if (result.usable == 'N') {
                     setNickDup(false);
@@ -115,7 +115,7 @@ const Join = observer(() => {
     const onCheckEmail = async() => {
         await user.checkEmailDuplicate({email}, (success, result) => {
             if (success) {
-                // console.log(result)
+                console.log(result)
                 alert(`${result.msg}입니다.`)
                 if (result.usable == 'N') {
                     setEmailDup(false);
