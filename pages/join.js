@@ -104,6 +104,7 @@ const Join = observer(() => {
             if (success) {
                 console.log(result)
                 alert(`${result.msg}입니다.`)
+                alert(`${result.usable}입니다.`)
                 if (result.usable == 'N') {
                     setNickDup(false);
                 } else {
