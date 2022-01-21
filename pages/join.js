@@ -101,12 +101,12 @@ const Join = observer(() => {
     const onCheckNick = async() => {
         await user.checkNickDuplicate({nickname: nick}, (success, result) => {
             if (success) {
+                // console.log(result)
+                alert(`${result.msg}입니다.`)
                 if (result.usable == 'N') {
                     setNickDup(false);
-                    alert('이미 사용중인 파트너명입니다.')
                 } else {
                     setNickDup(true);
-                    alert('사용가능한 파트너명입니다.')
                 }
             }
         })
