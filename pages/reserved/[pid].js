@@ -12,6 +12,7 @@ const ReservedDetail = observer(() => {
     const [data, setData] = useState();
 
     useEffect(() => {
+        // 상세 정보 불러오기
         const callDetail = async() => {
             await reservation.callDetail({id: router.query.pid}, user.token, (success, result) => {
                 if (success) {

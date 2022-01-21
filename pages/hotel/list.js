@@ -4,7 +4,6 @@ import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input, message } 
 import { PlusSquareOutlined } from '@ant-design/icons';
 import Link from 'next/link'
 import moment from 'moment'
-import xlsx from 'xlsx'
 import router from 'next/router';
 import { useStore } from '../../store/StoreProvider'
 import { observer } from 'mobx-react-lite'
@@ -66,10 +65,6 @@ const HotelList = observer(() => {
 
     }
 
-    const onExcelDown = () => {
-
-    }
-
     const onWriteHotel = () => {
         if (user.hotelid) {
             return message.error("숙소는 업체당 1개씩만 등록 가능합니다.")
@@ -109,7 +104,6 @@ const HotelList = observer(() => {
                 <Space>
                     {!user.hotelid &&
                     <Button type="primary" onClick={onWriteHotel}><PlusSquareOutlined /> 숙소 등록</Button>}
-                    {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
                 </Space>
             </TableTop>
             <Table columns={columns} dataSource={hotel.partnerList.data} pagination={false}/>

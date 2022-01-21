@@ -10,9 +10,8 @@ const ReservedList = observer(() => {
     const { user, reservation } = useStore();
     const router = useRouter();
 
-
-
     useEffect(() => {
+        // 리스트 불러오기
         const callList = async () => {
             if(user.token){
                 await reservation.callList(user.token)
@@ -22,10 +21,6 @@ const ReservedList = observer(() => {
 
         callList()
     }, [])
-
-    const onCategory = (e) => {
-        console.log(e)
-    }
 
     const columns = [{
         title: '예약번호',
@@ -143,6 +138,7 @@ const ReservedList = observer(() => {
     const [data, setData] = useState(null)
 
 
+    // 데이터 검색
     const onSearch = async (word) => {
         if (word) {
             setData(data.filter(e => e.name.indexOf(word) !== -1))
@@ -154,10 +150,10 @@ const ReservedList = observer(() => {
         }
     }
 
-
-    const onExcelDown = () => {
-
+    const onCategory = (e) => {
+        console.log(e)
     }
+
 
     return (
         <Wrapper>
@@ -199,9 +195,6 @@ const ReservedList = observer(() => {
 
             <TableTop>
                 <TotalNum>총 {reservation?.list?.data?.length}건</TotalNum>
-                {/* <Space>
-                    <Button type="primary" onClick={onExcelDown}>엑셀 다운로드</Button>
-                </Space> */}
             </TableTop>
             <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
         </Wrapper>

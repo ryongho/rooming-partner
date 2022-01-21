@@ -97,6 +97,8 @@ const MyApp = ({ Component, pageProps }) => {
         }
     }, [])
 
+
+    // 페이지 상단 타이틀명 설정
     useEffect(() => {
         if (router.pathname.indexOf('/user/') !== -1) {
             setTitle('파트너 상세')
@@ -130,7 +132,6 @@ const MyApp = ({ Component, pageProps }) => {
         if (router.pathname == '/stats/list') setTitle('통계 목록')
     }, [router])
 
-    
 
     return (
         <>
@@ -154,7 +155,6 @@ const MyApp = ({ Component, pageProps }) => {
                                     <HeaderLogo src={'/image/logo.png'} />
                                 </LogoArea>
                                 <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={isAdmin ? ['/user/partner/list'] : [router.pathname]} mode="inline">
-                                {/* <Menu defaultOpenKeys={['/user', '/goods', '/hotel', '/rooms']} theme={'light'} onSelect={onMenuSelect} defaultSelectedKeys={router.pathname} mode="inline"> */}
                                     <SubMenu key="/user" icon={<UserOutlined />} title="회원 관리">
                                         <Menu.Item key="/user/partner/list" group="회원 관리" title="파트너 목록"><Link href="/user/partner/list">파트너 목록</Link></Menu.Item>
                                         {isAdmin && <Menu.Item key="/user/customer/list" group="회원 관리" title="고객 목록">고객 목록</Menu.Item>}
@@ -186,6 +186,7 @@ const MyApp = ({ Component, pageProps }) => {
                                     </SubMenu> */}
                                 </Menu>
                             </Sider>
+
                             <Layout style={{height: '100vh', overflowY: 'auto'}}>
                                 <StoreProvider {...pageProps}>
                                     <Header title={group} />

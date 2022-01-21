@@ -87,11 +87,11 @@ const Join = observer(() => {
     const onCheckNick = async() => {
         await user.checkNickDuplicate({nickname: nick}, (success, result) => {
             if (success) {
-                // console.log(result)
-                alert('사용가능한 파트너명입니다.')
-
-                if (result.usable == 'N') {
+                if (result.usable == 'Y') {
+                    alert('이미 사용중인 파트너명입니다.')
                     setNick('')
+                } else {
+                    alert('사용가능한 파트너명입니다.')
                 }
             }
         })
@@ -100,10 +100,10 @@ const Join = observer(() => {
     const onCheckEmail = async() => {
         await user.checkEmailDuplicate({email}, (success, result) => {
             if (success) {
-                // console.log(result)
+                console.log(result)
                 alert(`${result.msg}입니다.`)
 
-                if (result.usable == 'N') {
+                if (result.usable == 'Y') {
                     setEmail('')
                 }
             }

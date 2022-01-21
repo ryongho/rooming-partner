@@ -16,17 +16,16 @@ const HotelWrite = observer(() => {
     const hotelCategory = ['호텔', '모텔', '펜션/풀빌라', '리조트', '글램핑/캠핑', '게스트하우스', '한옥', '공유숙박']
     const options = ['넷플릭스', '유튜브', '디즈니', '왓챠', '쿠팡플레이', '레스토랑', '피트니스', '야외수영장', '실내수영장', '사우나', '스파',  '공유키친', '세미나룸', '세탁실', '주차공간', '무료wifi', 'PC', '노트북', '안마의자', '비데', '욕조', '월풀', '반신욕기계']
     const [category, setCategory] = useState('호텔')
-    const [name, setName] = useState()
+    const [name, setName] = useState('')
     const [facility, setFacility] = useState([])
     const [facilityEtc, setFacilityEtc] = useState('');
-    const [address, setAddress] = useState()
+    const [address, setAddress] = useState('')
     const [address2, setAddress2] = useState('')
     const [zonecode, setZonecode] = useState()
     const [tel, setTel] = useState()
     const [bank, setBank] = useState()
     const [account, setAccount] = useState()
     const [accountName, setAccountName] = useState()
-    // const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     const [cancel, setCancel] = useState()
@@ -37,16 +36,17 @@ const HotelWrite = observer(() => {
     const [traffic, setTraffic] = useState('')
     const [level, setLevel] = useState('')
     const [fax, setFax] = useState('')
-    const [parking, setParking] = useState()
-    const [longtitude, setLongtitude] = useState()
-    const [latitude, setLatitude] = useState()
-    const [csInfo, setCsInfo] = useState()
+    const [parking, setParking] = useState('')
+    const [longtitude, setLongtitude] = useState('')
+    const [latitude, setLatitude] = useState('')
+    const [csInfo, setCsInfo] = useState('')
     const [receiptInfo, setReceiptInfo] = useState()
     const [commonInfo, setCommonInfo] = useState()
-
     const [showAddress, setShowAddress] = useState(false)
 
-    const onWrite = async () => {        
+
+    // 등록하기 버튼 클릭 이벤트
+    const onWrite = async () => { 
         if (!name) {
             return message.warning('숙소명을 입력해 주세요')
         }
@@ -75,7 +75,7 @@ const HotelWrite = observer(() => {
             return message.warning('취소 및 환불 규정을 입력해 주세요')
         }
 
-
+        // success
         let total_address = zonecode + ' ' + address
 
         const data = {
@@ -119,10 +119,9 @@ const HotelWrite = observer(() => {
                 message.success('게시 완료').then(() => window.location.href='/hotel/list')
             }
         })
-        
     }
 
-
+    // 이미지 업로드 이벤트
     const onUploadChange = async (e) => {
         setLoading(true)
         let file = e.target.files[0];
@@ -145,6 +144,7 @@ const HotelWrite = observer(() => {
         if (file) reader.readAsDataURL(file);
     }
     
+    // 업로드 이미지 삭제
     const onRemoveImgs = async(key) => {
         await setImgList(imgList.filter((e, idx) => idx !== key))
     }
@@ -294,12 +294,6 @@ const HotelWrite = observer(() => {
                         rows={4}
                         onChange={(e) => setTraffic(e.target.value)} />
                     </Descriptions.Item>
-                    {/* <Descriptions.Item label="조식 정보">
-                        <Input.TextArea
-                        value={breakfast} 
-                        rows={4}
-                        onChange={(e) => setBreakfast(e.target.value)} />
-                    </Descriptions.Item> */}
                     <Descriptions.Item label="주차 정보">
                         <Radio.Group 
                         value={parking}

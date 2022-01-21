@@ -9,11 +9,9 @@ import moment from 'moment'
 
 const HotelDetail = () => {
     const { user, hotel, goods } = useStore();
-
     const router = useRouter();
 
     const [modiStatus, setModiStatus] = useState(false)
-
     const hotelCategory = ['호텔', '모텔', '펜션/풀빌라', '리조트', '글램핑/캠핑', '게스트하우스', '한옥', '공유숙박']
     const options = ['넷플릭스', '유튜브', '디즈니', '왓챠', '쿠팡플레이', '레스토랑', '피트니스', '야외수영장', '실내수영장', '사우나', '스파',  '공유키친', '세미나룸', '세탁실', '주차공간', '무료wifi', 'PC', '노트북', '안마의자', '비데', '욕조', '월풀', '반신욕기계']
     const [category, setCategory] = useState()
@@ -29,7 +27,6 @@ const HotelDetail = () => {
     const [accountName, setAccountName] = useState()
     const [imgList, setImgList] = useState()
     const [fileList, setFileList] = useState()
-    // const [breakfast, setBreakfast] = useState()
     const [parking, setParking] = useState()
     const [cancel, setCancel] = useState()
     const [content, setContent] = useState('')
@@ -44,10 +41,10 @@ const HotelDetail = () => {
     const [csInfo, setCsInfo] = useState()
     const [receiptInfo, setReceiptInfo] = useState()
     const [commonInfo, setCommonInfo] = useState()
-
     const [showAddress, setShowAddress] = useState(false)
 
     useEffect(() => {
+        // 호텔 상세 정보 불러오기
         const callDetail = async() => {
 
             if (router.query.type) setModiStatus(true)
@@ -57,7 +54,6 @@ const HotelDetail = () => {
             await goods.callListPartner(user.token)
             await user.callInfo(user.token);
 
-            // console.log(hotel.info.data[0])
             if (hotel.info.data[0]) {
                 setCategory(hotel.info.data[0].type)
                 setName(hotel.info.data[0].name)
@@ -100,6 +96,7 @@ const HotelDetail = () => {
         callDetail();
     }, [router])
 
+    // 정보 변경시 change event
     const onDataChange = (e, val) => {
         const numRegExp = /^[0-9]*$/
         if (!router.query.type) return;
@@ -135,6 +132,7 @@ const HotelDetail = () => {
         if (val == 'commonInfo') setCommonInfo(e.target.value);
     }
 
+    // 업로드 이미지 수정시 change event
     const onUploadChange = async (e, item) => {
         let file = e.target.files[0];
         let reader = new FileReader();
@@ -164,6 +162,7 @@ const HotelDetail = () => {
         if (file) reader.readAsDataURL(file);
     }
     
+    // 업로드 이미지 삭제 이벤트
     const onRemoveImgs = async(key) => {
         setImgList(imgList.filter((e, idx) => idx !== key))
         let copy = fileList.slice()
@@ -171,7 +170,8 @@ const HotelDetail = () => {
         setFileList(copy)
         await hotel.imagesDel(router.query.pid, key, user.token)
     }
-    
+
+    // 수정완료 클릭시
     const onModi = async () => {
         if (!router.query.type) window.location.href =`/hotel/${user.hotelid}?type=modi`;
         else {
@@ -240,7 +240,6 @@ const HotelDetail = () => {
                 data.options = facile
             }
 
-            // console.log(data, user.token)
             await hotel.updateInfo(data, user.token, (success, result) => {
                 if (success) {
                     message.success('수정 완료')
@@ -511,7 +510,6 @@ const HotelDetail = () => {
                                 )
                             }) : <>등록된 상품이 없습니다.</>
                         }
-                        {/* <GoodsInfo>※ 비활성화된 상품은 앱에서 비공개 처리 됩니다.</GoodsInfo> */}
                     </Descriptions.Item>
                 </Descriptions>
                 <ButtonWrap>

@@ -90,9 +90,6 @@ const ReviewList = () => {
 
     }
 
-    const onExcelDown = () => {
-
-    }
 
     return (
         <Wrapper>

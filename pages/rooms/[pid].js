@@ -20,8 +20,6 @@ const RoomsDetail = observer(() => {
     const [name, setName] = useState()
     const [people, setPeople] = useState()
     const [maxPeople, setMaxPeople] = useState()
-    // const [checkIn, setCheckIn] = useState()
-    // const [checkOut, setCheckOut] = useState()
     const [bed, setBed] = useState()
     const [bedNum, setBedNum] = useState()
     const [imgList, setImgList] = useState()
@@ -34,7 +32,7 @@ const RoomsDetail = observer(() => {
 
 
     useEffect(() => {
-
+        // 상세 정보 불러오기
         const callDetail = async() => {
 
             if (router.query.type) setModiStatus(true)
@@ -45,14 +43,11 @@ const RoomsDetail = observer(() => {
             await hotel.callListPartner(user.token)
             await user.callInfo(user.token)
             
-            // console.log(room.info.data[0])
             if (room.info.data[0]) {
                 setName(room.info.data[0].name)
                 setPeople(room.info.data[0].peoples)
                 setMaxPeople(room.info.data[0].max_peoples)
                 setSize(room.info.data[0].size)
-                // setCheckIn(room.info.data[0].checkin.substring(0, 5))
-                // setCheckOut(room.info.data[0].checkout.substring(0, 5))
                 setBed(room.info.data[0].bed)
                 setBedNum(room.info.data[0].amount)
                 setImgList(room.info.images)
@@ -92,8 +87,6 @@ const RoomsDetail = observer(() => {
         if (val == 'size') setSize(e.target.value);
         if (val == 'bed') setBed(e.target.value);
         if (val == 'bedNum') setBedNum(e.target.value);
-        // if (val == 'checkIn') setCheckIn(e);
-        // if (val == 'checkOut') setCheckOut(e);
     }
     
     const onModi = async () => {
