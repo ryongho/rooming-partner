@@ -4,7 +4,6 @@ import { Space, Select, Table, Tag, message, Radio, Button, Input, DatePicker, P
 import { PlusSquareOutlined } from '@ant-design/icons';
 import Link from 'next/link'
 import moment from 'moment'
-import xlsx from 'xlsx'
 import router from 'next/router';
 import { observer } from 'mobx-react-lite'
 import { useStore } from '../../store/StoreProvider'
@@ -18,24 +17,19 @@ const RoomsList = observer(() => {
     const [data, setData] = useState(null)
 
     useEffect(() => {
+        // 관리자 모드 설정
         setIsAdmin(user.auth == 1 ? false : true)
 
+        // 객실 리스트 정보 불러오기
         const callList = async () => {
             await room.callListPartner(user.token)
             setData(room.partnerList.data[0])
-            // console.log(user.token, room.partnerList.data)
         }
 
         callList()
     }, [])
 
-    const columns = [
-    // {
-    //     title: '카테고리',
-    //     dataIndex: 'type',
-    //     key: 'type',
-    // }, 
-    {
+    const columns = [{
         title: '객실명',
         dataIndex: ['name', 'id'],
         key: 'name',
@@ -64,30 +58,7 @@ const RoomsList = observer(() => {
         key: 'peoples',
         sortDirections: ['descend', 'ascend'],
         sorter: (a, b) => a.peoples - b.peoples,
-    }, 
-    // {
-    //     title: '객실 생성일',
-    //     dataIndex: 'created_at',
-    //     key: 'created_at',
-    //     sortDirections: ['descend', 'ascend'],
-    //     sorter: (a, b) => a < b ? 1 : a == b ? 0 : -1,
-    //     render: (created_at) => {
-    //         return (
-    //             moment(created_at).format('YYYY-MM-DD')
-    //         )
-    //     }
-    // }, 
-    // {
-    //     title: '상품 상태값',
-    //     dataIndex: 'active',
-    //     key: 'active',
-    //     render: (active) => {
-    //         return (
-    //             active ? <Tag color="blue">활성화</Tag> : <Tag color="default">비활성화</Tag>
-    //         )
-    //     }
-    // }, 
-    {
+    }, {
         title: '삭제',
         dataIndex: 'delete',
         render: (_, record) => {
@@ -117,10 +88,7 @@ const RoomsList = observer(() => {
         }
     }];
 
-    const onCategory = (e) => {
-        console.log(e)
-    }
-
+    // 검색 클릭 event
     const onSearch = async (word) => {
         if (word) {
             setData(data.filter(e => e.name.indexOf(word) !== -1))
@@ -132,12 +100,8 @@ const RoomsList = observer(() => {
         }
     }
 
-    const onExcelDown = () => {
-
-    }
-
+    // 객실 등록일 검색 event
     const onListDate = (e) => {
-        // console.log(moment(e._d).format('YYYY-MM-DD'))
         if (e) {
             let selectDate = moment(e._d).format('YYYY-MM-DD');
             setData(data.filter(e => moment(e.created_at).format('YYYY-MM-DD') == selectDate))
@@ -148,28 +112,9 @@ const RoomsList = observer(() => {
         <Wrapper>
             <TopBox>
                 <FilterWrap>
-                    {isAdmin &&
-                    <Filter>
-                        <FilterLabel>카테고리</FilterLabel>
-                        <SelectBar defaultValue={"total"} onChange={onCategory}>
-                            <Select.Option value={"total"}>전체</Select.Option>
-                            <Select.Option value={"hotel"}>호텔</Select.Option>
-                            <Select.Option value={"resort"}>리조트</Select.Option>
-                        </SelectBar>
-                    </Filter>}
-                    
                     {/* <Filter>
                         <FilterLabel>객실 등록일</FilterLabel>
                         <DatePicker onChange={onListDate} />
-                    </Filter> */}
-                    
-                    {/* <Filter>
-                        <FilterLabel>상품 상태값</FilterLabel>
-                        <Radio.Group defaultValue={"total"}>
-                            <Radio.Button value="total" buttonStyle="solid">전체</Radio.Button>
-                            <Radio.Button value="">활성화</Radio.Button>
-                            <Radio.Button value="">비활성화</Radio.Button>
-                        </Radio.Group>
                     </Filter> */}
                     
                 </FilterWrap>
@@ -183,9 +128,9 @@ const RoomsList = observer(() => {
                 <TotalNum>총 {room.partnerList.data && room.partnerList.data[0]?.length}건</TotalNum>
                 <Space>
                     <Button type="primary" onClick={() => router.push('/rooms/write')}><PlusSquareOutlined /> 객실 등록</Button>
-                    {/* <Button onClick={onExcelDown}>엑셀 다운로드</Button> */}
                 </Space>
             </TableTop>
+
             {room.partnerList.data &&
                 <Table columns={columns} dataSource={data} pagination={{ position: ['bottomCenter'] }}/>
             }
@@ -231,10 +176,6 @@ const SearchWrap = styled(Filter)`
 
 const SearchBar = styled(Input.Search)`
     width: 80%;
-`
-
-const SelectBar = styled(Select)`
-    width: 150px;
 `
 
 const TableTop = styled.div`

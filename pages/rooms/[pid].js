@@ -13,7 +13,6 @@ const RoomsDetail = observer(() => {
     const { hotel, user, room, goods } = useStore();
 
     const options = ['무료 wifi', '3인용 소파', 'TV', '헤어 드라이어', '에어컨', '소형 냉장고', 'CCTV', '욕조', '입욕제', '비데', '룸서비스']
-    // const times = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
     const [isAdmin, setIsAdmin] = useState(true);
     const [modiStatus, setModiStatus] = useState(false)
 
@@ -74,6 +73,7 @@ const RoomsDetail = observer(() => {
         
     }, [router])
 
+    // 정보 변경시 change event
     const onDataChange = (e, val) => {
         const numRegExp = /^[0-9]*$/;
         if (!router.query.type) return;
@@ -89,6 +89,7 @@ const RoomsDetail = observer(() => {
         if (val == 'bedNum') setBedNum(e.target.value);
     }
     
+    // 수정완료 클릭시
     const onModi = async () => {
         if (!router.query.type) router.push(`/rooms/${router.query.pid}?type=modi`);
         else {
@@ -104,12 +105,6 @@ const RoomsDetail = observer(() => {
             if (!bed || !bedNum) {
                 return message.warning('침대 사이즈를 입력해 주세요')
             }
-            // if (!checkIn) {
-            //     return message.warning('체크인 시간을 입력해 주세요')
-            // }
-            // if (!checkOut) {
-            //     return message.warning('체크아웃 시간을 입력해 주세요')
-            // }
 
             // success
 
@@ -119,8 +114,6 @@ const RoomsDetail = observer(() => {
                 name: name,
                 peoples: people,
                 max_peoples: maxPeople,
-                // checkin: checkIn,
-                // checkout: checkOut,
                 bed: bed,
                 amount: bedNum,
                 size: size
@@ -144,6 +137,7 @@ const RoomsDetail = observer(() => {
         }
     }
 
+    // 객실 삭제 event
     const onDeleteLists = async (_id) => {
         const params = {
             room_id: _id
@@ -157,7 +151,7 @@ const RoomsDetail = observer(() => {
         })
     }
 
-
+    // 업로드 이미지 수정시 change event
     const onUploadChange = async (e, item) => {
         let file = e.target.files[0];
         let reader = new FileReader();
@@ -175,7 +169,6 @@ const RoomsDetail = observer(() => {
                     let img_file = data.images.toString();
                     room.imagesUpdate(router.query.pid, item, img_file, user.token, (success, data) => {
                         if (success) {
-                            // console.log('!!!!!!!!!!!!!imgs:', item, room.info.images)
                             setImgList(imgList.concat(img_file))
                             let copy = fileList.slice()
                             let removed = copy.splice(item - 1, 1, img_file)
@@ -189,13 +182,13 @@ const RoomsDetail = observer(() => {
 
     }
 
+    // 업로드 이미지 삭제 이벤트
     const onRemoveImgs = async(key) => {
         setImgList(imgList.filter((e, idx) => idx !== key))
         let copy = fileList.slice()
         let removed = copy.splice(key - 1, 1, key - 1)
         setFileList(copy)
         await room.imagesDel(router.query.pid, key, user.token)
-        // console.log(key, fileList, room.info.images)
     }
 
     return (
@@ -251,26 +244,6 @@ const RoomsDetail = observer(() => {
                         style={{width:100}} />
                         : size} 평
                     </Descriptions.Item>
-                    {/* <Descriptions.Item label="체크인 시간">
-                        {modiStatus ?
-                            <SelectBar defaultValue={checkIn} onChange={(e) => onDataChange(e, 'checkIn')}>
-                                {times.map((time, idx) => {
-                                return <Select.Option key={`in_${idx}`} value={time}>{time}</Select.Option>})}
-                            </SelectBar>
-                            :
-                            <div>{checkIn}시 이후</div>
-                        }
-                    </Descriptions.Item>
-                    <Descriptions.Item label="체크아웃 시간">
-                        {modiStatus ?
-                            <SelectBar defaultValue={checkOut} onChange={(e) => onDataChange(e, 'checkOut')}>
-                                {times.map((time, idx) => {
-                                return <Select.Option key={`out_${idx}`}value={time}>{time}</Select.Option>})}
-                            </SelectBar>
-                            :
-                            <div>{checkOut}시 이전</div>
-                        }
-                    </Descriptions.Item> */}
                     <Descriptions.Item label="침대 사이즈">
                     {modiStatus ?
                         <>
@@ -392,10 +365,6 @@ const InputValue = styled(Input)`
     width: 400px;
 `
 
-const SelectBar = styled(Select)`
-    width: 150px;
-`
-
 const HotelBtn = styled.div`
     display: inline-block;
     color: #666;
@@ -424,22 +393,6 @@ const ButtonWrap = styled.div`
 
 const Empty = styled.div`
     padding-top: 30px;
-`
-
-const SelectWrap = styled.div`
-    margin-bottom: 10px;
-    
-    .ant-select {
-        margin-right: 5px;
-    }
-`
-
-const AddBtn = styled(Button)`
-    border: none;
-`
-
-const DeleteBtn = styled(Button)`
-    border: none;
 `
 
 
