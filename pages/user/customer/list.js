@@ -1,10 +1,10 @@
 import styled from 'styled-components'
-import { useState, useEffect } from 'react'
-import { Space, Select, Table, Tag, DatePicker, Radio, Button, Input } from 'antd'
+import { useState } from 'react'
+import { Space, Select, Table, DatePicker, Button, Input } from 'antd'
 import Link from 'next/link'
 import moment from 'moment'
-import xlsx from 'xlsx'
 
+// 고객(앱 유저) 리스트
 const CustomerList = () => {
     const data = [{
         key: '1',
@@ -86,7 +86,6 @@ const CustomerList = () => {
     }
 
     const onExcelDown = () => {
-
     }
 
     const onSortChange = (sorter) => {

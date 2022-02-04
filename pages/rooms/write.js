@@ -17,17 +17,15 @@ const GoodsWrite = observer(() => {
     const [name, setName] = useState()
     const [bed, setBed] = useState()
     const [bedNum, setBedNum] = useState()
-    const [fileList, setFileList] = useState([])
     const [imgList, setImgList] = useState([])
     const [loading, setLoading] = useState(false)
     const [people, setPeople] = useState()
     const [maxPeople, setMaxPeople] = useState()
-    // const [checkIn, setCheckIn] = useState()
-    // const [checkOut, setCheckOut] = useState()
     const [option, setOption] = useState([])
     const [facilityEtc, setFacilityEtc] = useState('');
     const [size, setSize] = useState()
 
+    // 등록하기 버튼 클릭 이벤트
     const onWrite = async() => {
         if (!name) {
             return message.warning('객실명을 입력해 주세요')
@@ -41,12 +39,6 @@ const GoodsWrite = observer(() => {
         if (!bed || !bedNum) {
             return message.warning('침대 사이즈를 입력해 주세요')
         }
-        // if (!checkIn) {
-        //     return message.warning('체크인 시간을 입력해 주세요')
-        // }
-        // if (!checkOut) {
-        //     return message.warning('체크아웃 시간을 입력해 주세요')
-        // }
         if (imgList.length < 1) {
             return message.warning('객실 이미지를 입력해 주세요')
         }
@@ -75,7 +67,6 @@ const GoodsWrite = observer(() => {
             data.options = facile
         }
 
-        // console.log(data)
         await room.addInfo(data, user.token, (success, result) => {
             if (success) {
                 message.success('게시 완료')
@@ -85,6 +76,7 @@ const GoodsWrite = observer(() => {
     }
 
     useEffect(() => {
+        // 유저 정보, 호텔 아이디 불러오기
         const callInfo = async() => {
             await user.callInfo(user.token)
             await setHotelId(user.hotelid)
@@ -92,9 +84,8 @@ const GoodsWrite = observer(() => {
         callInfo()
     }, [])
     
-
+    // 이미지 업로드 이벤트
     const onUploadChange = async (e) => {
-
         setLoading(true)
         let file = e.target.files[0];
         let reader = new FileReader();
@@ -116,6 +107,7 @@ const GoodsWrite = observer(() => {
         if (file) reader.readAsDataURL(file);
     }
 
+    // 업로드 이미지 삭제
     const onRemoveImgs = async(key) => {
         await setImgList(imgList.filter((e, idx) => idx !== key))
     }
@@ -175,18 +167,6 @@ const GoodsWrite = observer(() => {
                         setSize(e.target.value)}}
                         style={{width:100}} /> 평
                     </Descriptions.Item>
-                    {/* <Descriptions.Item label="체크인 시간">
-                        <SelectBar placeholder={'체크인 가능 시간을 선택하세요'} onChange={(e) => setCheckIn(e)} style={{width:250}}>
-                            {times.map((time, idx) => {
-                            return <Select.Option key={`in_${idx}`} value={time}>{time}</Select.Option>})}
-                        </SelectBar>
-                    </Descriptions.Item>
-                    <Descriptions.Item label="체크아웃 시간">
-                        <SelectBar placeholder={'체크아웃 가능 시간을 선택하세요'} onChange={(e) => setCheckOut(e)} style={{width:250}}>
-                            {times.map((time, idx) => {
-                            return <Select.Option key={`out_${idx}`} value={time}>{time}</Select.Option>})}
-                        </SelectBar>
-                    </Descriptions.Item> */}
                     <Descriptions.Item label="객실 이미지">
                         <UploadImgs 
                             imgList={imgList}
@@ -234,10 +214,6 @@ const InputValue = styled(Input)`
     width: 400px;
 `
 
-const SelectBar = styled(Select)`
-    width: 150px;
-`
-
 const ButtonWrap = styled.div`
     display: flex;
     justify-content: center;
@@ -248,9 +224,5 @@ const ButtonWrap = styled.div`
     }
 `
 
-const UploadLength = styled.div`
-    font-size: 12px;
-    color: #999
-`
 
 export default GoodsWrite
