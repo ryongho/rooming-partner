@@ -219,10 +219,7 @@ const GoodsQuantity = observer(() => {
                     </Descriptions>
                     <Empty />
 
-                    <Calendar 
-                        value={start}
-                        dateCellRender={(value)=>dateCellRender(value, selectedDates)}
-                    />
+                    <Calendar dateCellRender={(value)=>dateCellRender(value, selectedDates)} />
 
                     <ButtonWrap>
                         <Button type="primary" onClick={onWrite}>수정</Button>

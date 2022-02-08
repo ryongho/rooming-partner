@@ -336,7 +336,7 @@ const GoodsDetail = observer(() => {
                             하단의 표시된 수량은 판매가능한 상품수입니다.
                             <Button type="primary" size="small" onClick={() => router.push(`/goods/quantity/${router.query.pid}?modi=true`)} style={{fontSize: '12px'}}>수량 수정</Button>
                         </CountWrap>
-                        <Calendar value={moment(start)} defaultValue={moment(start)} dateCellRender={(value)=>dateCellRender(value, selectedDates)} />
+                        <Calendar defaultValue={moment(start)} dateCellRender={(value)=>dateCellRender(value, selectedDates)} />
                     </Descriptions.Item>
                     <Descriptions.Item label="상품 이미지">
                         <ModiImgs 
